@@ -165,6 +165,12 @@
 					bookTab.classList.add('active');
 					mainSection.style.display = 'none';
 					bookSection.style.display = '';
+					const venue = "cRyHuTcU77VZY7Er3jVf5"; // Sengkang Sports Hall
+				 const activity = "YLONatwvqJfikKOmB5N9U"; // Badminton
+				 const date = getDateTwoWeeksFromToday();
+				 const [ts2000, ts2100] = getTimeslotTimestamps(date);
+				 const url = `https://activesg.gov.sg/venues/${venue}/activities/${activity}/timeslots?date=${date}&timeslots=${ts2000}&timeslots=${ts2100}`;
+				 window.location.href = url;
 				}
 			});
 		</script>
