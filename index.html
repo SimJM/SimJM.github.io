@@ -41,7 +41,7 @@
 					<li><a href="#" style="--navAni:4">Portfolio</a></li>
 					<li><a href="#" style="--navAni:5">Contact</a></li>
 					<li>
-						<a href="#" style="--navAni:6" id="bookTab">Book</a>
+						<a href="#book" style="--navAni:6" id="bookTab">Book</a>
 					</li>
 				</ul>
 				<label class="mode">
@@ -157,6 +157,15 @@
 				const [ts2000, ts2100] = getTimeslotTimestamps(date);
 				const url = `https://activesg.gov.sg/venues/${venue}/activities/${activity}/timeslots?date=${date}&timeslots=${ts2000}&timeslots=${ts2100}`;
 				window.location.href = url;
+			});
+
+			window.addEventListener('DOMContentLoaded', function() {
+				if (window.location.hash === '#book') {
+					homeTab.classList.remove('active');
+					bookTab.classList.add('active');
+					mainSection.style.display = 'none';
+					bookSection.style.display = '';
+				}
 			});
 		</script>
 	</body>
