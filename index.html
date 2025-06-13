@@ -28,12 +28,21 @@
 				</label>
 				<ul>
 					<li>
-						<a href="#" class="active" style="--navAni:1">Home</a>
+						<a
+							href="#"
+							class="active"
+							style="--navAni:1"
+							id="homeTab"
+							>Home</a
+						>
 					</li>
 					<li><a href="#" style="--navAni:2">About</a></li>
 					<li><a href="#" style="--navAni:3">Skills</a></li>
 					<li><a href="#" style="--navAni:4">Portfolio</a></li>
 					<li><a href="#" style="--navAni:5">Contact</a></li>
+					<li>
+						<a href="#" style="--navAni:6" id="bookTab">Book</a>
+					</li>
 				</ul>
 				<label class="mode">
 					<input type="checkbox" id="darkModeToggle" />
@@ -42,7 +51,7 @@
 			</div>
 		</header>
 
-		<section class="container">
+		<section class="container" id="mainSection">
 			<div class="main">
 				<div class="images">
 					<img src="person.png" alt="" class="img-w" />
@@ -87,7 +96,68 @@
 				</div>
 			</div>
 		</section>
+		<section
+			class="container"
+			id="bookSection"
+			style="display:none; text-align:center; margin-top:40px;">
+			<button
+				id="bookNowBtn"
+				style="padding: 1em 2em; font-size: 1.2em; background: #f9532d; color: white; border: none; border-radius: 8px; cursor: pointer;">
+				Book Now
+			</button>
+		</section>
 
 		<script src="index.js"></script>
+		<script>
+			// Tab switching logic
+			const homeTab = document.getElementById('homeTab');
+			const bookTab = document.getElementById('bookTab');
+			const mainSection = document.getElementById('mainSection');
+			const bookSection = document.getElementById('bookSection');
+
+			homeTab.addEventListener('click', function(e) {
+				e.preventDefault();
+				homeTab.classList.add('active');
+				bookTab.classList.remove('active');
+				mainSection.style.display = '';
+				bookSection.style.display = 'none';
+			});
+
+			bookTab.addEventListener('click', function(e) {
+				e.preventDefault();
+				homeTab.classList.remove('active');
+				bookTab.classList.add('active');
+				mainSection.style.display = 'none';
+				bookSection.style.display = '';
+				// No date input to set
+			});
+
+			function getDateTwoWeeksFromToday() {
+				const today = new Date();
+				today.setDate(today.getDate() + 14);
+				const yyyy = today.getFullYear();
+				const mm = String(today.getMonth() + 1).padStart(2, '0');
+				const dd = String(today.getDate()).padStart(2, '0');
+				return `${yyyy}-${mm}-${dd}`;
+			}
+
+			function getTimeslotTimestamps(dateStr) {
+				// dateStr in 'YYYY-MM-DD'
+				const [year, month, day] = dateStr.split('-').map(Number);
+				const ts2000 = new Date(year, month - 1, day, 20, 0, 0, 0).getTime();
+				const ts2100 = new Date(year, month - 1, day, 21, 0, 0, 0).getTime();
+				return [ts2000, ts2100];
+			}
+
+			const bookNowBtn = document.getElementById('bookNowBtn');
+			bookNowBtn.addEventListener('click', function() {
+				const venue = "cRyHuTcU77VZY7Er3jVf5"; // Sengkang Sports Hall
+				const activity = "YLONatwvqJfikKOmB5N9U"; // Badminton
+				const date = getDateTwoWeeksFromToday();
+				const [ts2000, ts2100] = getTimeslotTimestamps(date);
+				const url = `https://activesg.gov.sg/venues/${venue}/activities/${activity}/timeslots?date=${date}&timeslots=${ts2000}&timeslots=${ts2100}`;
+				window.location.href = url;
+			});
+		</script>
 	</body>
 </html>
