@@ -15,86 +15,71 @@
     <header class="container">
         <div class="page-header">
             <div class="logo">
-                <a href="#">&#128640; Jia Ming - Coding Dreams into Reality</a
-					>
-				</div>
-				<input type="checkbox" id="click" />
-				<label for="click" class="mainicon">
-					<div class="menu">
-						<i class="bx bx-menu"></i>
-					</div>
-				</label>
-				<ul>
-					<li>
-						<a href="index.html" style="--navAni:1" id="homeTab"
-							>Home</a
-						>
-					</li>
-					<li><a href="#" style="--navAni:2">About</a></li>
-                <li><a href="#" style="--navAni:3">Skills</a></li>
+                <a href="#">&#128640; Jia Ming - Coding Dreams into Reality</a>
+            </div>
+            <input type="checkbox" id="click" />
+            <label for="click" class="mainicon">
+                <div class="menu">
+                    <i class="bx bx-menu"></i>
+                </div>
+            </label>
+            <ul>
                 <li>
-                    <a href="#" class="active" style="--navAni:4">Portfolio</a
-						>
-					</li>
-					<li><a href="#" style="--navAni:5">Contact</a></li>
+                    <a href="index.html" style="--navAni:1" id="homeTab" data-target="home">Home</a>
+                </li>
                 <li>
-                    <a href="bookPage.html" style="--navAni:6" id="bookTab">Book</a
-						>
-					</li>
-				</ul>
-				<label class="mode">
-					<input type="checkbox" id="darkModeToggle" />
-					<i class="bx bxs-moon"></i>
-				</label>
-			</div>
-		</header>
-		<section class="container" id="portfolioMainSection">
-			<div class="portfolio-main">
-				<div class="portfolio-header">
-					<h1>Sim Jia Ming</h1>
-					<p class="subtitle">Software Engineer | Singapore</p>
-					<div class="contact-links">
-						<a href="mailto:jiaming.sim@u.nus.edu"
-							>jiaming.sim@u.nus.edu</a
-						>
-						|
-						<a
-							href="https://www.linkedin.com/in/sim-jia-ming/"
-							target="_blank"
-							>LinkedIn</a
-						>
-						|
-						<a href="https://github.com/SimJM" target="_blank"
-							>GitHub</a
-						>
-					</div>
-				</div>
-				<nav class="portfolio-nav">
-					<button onclick="scrollToSection('experience')">
-						Experience
-					</button>
-					<button onclick="scrollToSection('projects')">
-						Projects
-					</button>
-					<button onclick="scrollToSection('certifications')">
-						Certifications
-					</button>
-					<button onclick="scrollToSection('skills')">Skills</button>
-					<button onclick="scrollToSection('education')">
-						Education
-					</button>
-				</nav>
-				<main>
-					<section id="experience"></section>
-					<section id="projects"></section>
-					<section id="certifications"></section>
-					<section id="skills"></section>
-					<section id="education"></section>
-				</main>
-			</div>
-		</section>
-		<script src="shared.js"></script>
-		<script src="portfolio-content.js"></script>
-		<script src="portfolio.js"></script>
-	</body>
+                    <a href="portfolio.html" style="--navAni:4" data-target="portfolio">Portfolio</a>
+                </li>
+                <li>
+                    <a href="bookPage.html" style="--navAni:6" id="bookTab" data-target="book">Book</a>
+                </li>
+            </ul>
+            <label class="mode">
+                <input type="checkbox" id="darkModeToggle" />
+                <i class="bx bxs-moon"></i>
+            </label>
+        </div>
+    </header>
+    <section class="container" id="portfolioMainSection">
+        <div class="portfolio-main">
+            <div class="portfolio-header">
+                <h1>Sim Jia Ming</h1>
+                <p class="subtitle">Software Engineer | Singapore</p>
+                <div class="contact-links">
+                    <a href="mailto:jiaming.sim@u.nus.edu">jiaming.sim@u.nus.edu</a>
+                    |
+                    <a href="https://www.linkedin.com/in/sim-jia-ming/" target="_blank">LinkedIn</a>
+                    |
+                    <a href="https://github.com/SimJM" target="_blank">GitHub</a>
+                </div>
+            </div>
+            <nav class="portfolio-nav">
+                <button onclick="scrollToSection('experience')">
+                    Experience
+                </button>
+                <button onclick="scrollToSection('projects')">
+                    Projects
+                </button>
+                <button onclick="scrollToSection('certifications')">
+                    Certifications
+                </button>
+                <button onclick="scrollToSection('skills')">Skills</button>
+                <button onclick="scrollToSection('education')">
+                    Education
+                </button>
+            </nav>
+            <main>
+                <section id="experience"></section>
+                <section id="projects"></section>
+                <section id="certifications"></section>
+                <section id="skills"></section>
+                <section id="education"></section>
+            </main>
+        </div>
+    </section>
+    <script src="shared.js"></script>
+    <script src="portfolio-content.js"></script>
+    <script src="portfolio.js"></script>
+</body>
+
 </html>
