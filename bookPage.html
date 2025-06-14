@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link
+			href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+			rel="stylesheet" />
+		<link rel="stylesheet" href="index.css" />
+		<title>Book Venue</title>
+	</head>
+
+	<body>
+		<header class="container">
+			<div class="page-header">
+				<div class="logo">
+					<a href="#">&#x1F3F8; Badminton Booking</a>
+				</div>
+				<input type="checkbox" id="click" />
+				<label for="click" class="mainicon">
+					<div class="menu">
+						<i class="bx bx-menu"></i>
+					</div>
+				</label>
+				<ul style="margin-left:auto;display:flex;align-items:center;">
+					<li>
+						<a href="index.html" style="--navAni:1" id="homeTab"
+							>Home</a
+						>
+					</li>
+				</ul>
+				<label class="mode" style="margin-left:0.5em;">
+					<input type="checkbox" id="darkModeToggle" />
+					<i class="bx bxs-moon"></i>
+				</label>
+			</div>
+		</header>
+		<section
+			class="container"
+			id="bookSection"
+			style="text-align:center; margin-top:40px;">
+			<div style="margin-bottom: 1em;">
+				<label for="venueSelect">Venue:</label>
+				<select
+					id="venueSelect"
+					style="font-size:1em; padding:0.5em 1em; margin-left:0.5em;"></select>
+			</div>
+			<div style="margin-bottom: 1em;">
+				<label for="timeSelect">Time:</label>
+				<select
+					id="timeSelect"
+					style="font-size:1em; padding:0.5em 1em; margin-left:0.5em;"></select>
+			</div>
+			<div
+				id="bookDateDisplay"
+				style="font-size:1.1em; margin-bottom:1em; color:#333;"></div>
+			<button
+				id="bookNowBtn"
+				style="padding: 1em 2em; font-size: 1.2em; background: #f9532d; color: white; border: none; border-radius: 8px; cursor: pointer;">
+				Book Now
+			</button>
+		</section>
+		<script src="shared.js"></script>
+		<script src="venueDetails.js"></script>
+		<script src="bookPage.js"></script>
+	</body>
+</html>
