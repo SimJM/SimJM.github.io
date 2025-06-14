@@ -100,79 +100,32 @@
 			class="container"
 			id="bookSection"
 			style="display:none; text-align:center; margin-top:40px;">
+			<div style="margin-bottom: 1em;">
+				<label for="venueSelect">Venue:</label>
+				<select
+					id="venueSelect"
+					style="font-size:1em; padding:0.5em 1em; margin-left:0.5em;"></select>
+			</div>
+			<div style="margin-bottom: 1em;">
+				<label for="timeSelect">Time:</label>
+				<select
+					id="timeSelect"
+					style="font-size:1em; padding:0.5em 1em; margin-left:0.5em;"></select>
+			</div>
+			<div
+				id="bookDateDisplay"
+				style="font-size:1.1em; margin-bottom:1em; color:#333;"></div>
 			<button
 				id="bookNowBtn"
 				style="padding: 1em 2em; font-size: 1.2em; background: #f9532d; color: white; border: none; border-radius: 8px; cursor: pointer;">
 				Book Now
 			</button>
 		</section>
-
 		<script src="index.js"></script>
-		<script>
-			// Tab switching logic
-			const homeTab = document.getElementById('homeTab');
-			const bookTab = document.getElementById('bookTab');
-			const mainSection = document.getElementById('mainSection');
-			const bookSection = document.getElementById('bookSection');
-
-			homeTab.addEventListener('click', function(e) {
-				e.preventDefault();
-				homeTab.classList.add('active');
-				bookTab.classList.remove('active');
-				mainSection.style.display = '';
-				bookSection.style.display = 'none';
-			});
-
-			bookTab.addEventListener('click', function(e) {
-				e.preventDefault();
-				homeTab.classList.remove('active');
-				bookTab.classList.add('active');
-				mainSection.style.display = 'none';
-				bookSection.style.display = '';
-				// No date input to set
-			});
-
-			function getDateTwoWeeksFromToday() {
-				const today = new Date();
-				today.setDate(today.getDate() + 14);
-				const yyyy = today.getFullYear();
-				const mm = String(today.getMonth() + 1).padStart(2, '0');
-				const dd = String(today.getDate()).padStart(2, '0');
-				return `${yyyy}-${mm}-${dd}`;
-			}
-
-			function getTimeslotTimestamps(dateStr) {
-				// dateStr in 'YYYY-MM-DD'
-				const [year, month, day] = dateStr.split('-').map(Number);
-				const ts2000 = new Date(year, month - 1, day, 20, 0, 0, 0).getTime();
-				const ts2100 = new Date(year, month - 1, day, 21, 0, 0, 0).getTime();
-				return [ts2000, ts2100];
-			}
-
-			const bookNowBtn = document.getElementById('bookNowBtn');
-			bookNowBtn.addEventListener('click', function() {
-				const venue = "cRyHuTcU77VZY7Er3jVf5"; // Sengkang Sports Hall
-				const activity = "YLONatwvqJfikKOmB5N9U"; // Badminton
-				const date = getDateTwoWeeksFromToday();
-				const [ts2000, ts2100] = getTimeslotTimestamps(date);
-				const url = `https://activesg.gov.sg/venues/${venue}/activities/${activity}/timeslots?date=${date}&timeslots=${ts2000}&timeslots=${ts2100}`;
-				window.location.href = url;
-			});
-
-			window.addEventListener('DOMContentLoaded', function() {
-				if (window.location.hash === '#book') {
-					homeTab.classList.remove('active');
-					bookTab.classList.add('active');
-					mainSection.style.display = 'none';
-					bookSection.style.display = '';
-					const venue = "cRyHuTcU77VZY7Er3jVf5"; // Sengkang Sports Hall
-				 const activity = "YLONatwvqJfikKOmB5N9U"; // Badminton
-				 const date = getDateTwoWeeksFromToday();
-				 const [ts2000, ts2100] = getTimeslotTimestamps(date);
-				 const url = `https://activesg.gov.sg/venues/${venue}/activities/${activity}/timeslots?date=${date}&timeslots=${ts2000}&timeslots=${ts2100}`;
-				 window.location.href = url;
-				}
-			});
-		</script>
 	</body>
 </html>
+
+<!-- 
+https://activesg.gov.sg/venues/DS2Y95tMEksERLSJfBSBz/activities/YLONatwvqJfikKOmB5N9U/review/ballot?timeslot=1751097600000&timeslot=1751101200000
+
+https://activesg.gov.sg/venues/DS2Y95tMEksERLSJfBSBz/activities/YLONatwvqJfikKOmB5N9U/timeslots?date=2025-06-28&timeslots=1751097600000&timeslots=1751101200000 -->
