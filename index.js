@@ -3,24 +3,12 @@ window.addEventListener("DOMContentLoaded", () => {
     window.shared.handleDarkMode();
 
     // DOM elements
-    const homeTab = document.getElementById("homeTab");
-    const bookTab = document.getElementById("bookTab");
-    const mainSection = document.getElementById("mainSection");
-    const bookSection = document.getElementById("bookSection");
-    const bookNowBtn = document.getElementById("bookNowBtn");
     const venueSelect = document.getElementById("venueSelect");
-    const bookDateDisplay = document.getElementById("bookDateDisplay");
     const timeSelect = document.getElementById("timeSelect");
+    const bookNowBtn = document.getElementById("bookNowBtn");
 
-    function updateBookDateDisplay() {
-        const date = window.shared.getDateTwoWeeksFromToday();
-        const day = window.shared.getDayOfWeek(date);
-        if (bookDateDisplay)
-            bookDateDisplay.textContent = `Booking Date: ${date} (${day})`;
-    }
-
-    function populateVenueDropdown() {
-        if (!venueSelect) return;
+    // Populate dropdowns if present
+    if (venueSelect) {
         venueSelect.innerHTML = Object.entries(window.shared.venues)
             .map(
                 ([id, name]) =>
@@ -30,9 +18,7 @@ window.addEventListener("DOMContentLoaded", () => {
             )
             .join("");
     }
-
-    function populateTimeDropdown() {
-        if (!timeSelect) return;
+    if (timeSelect) {
         timeSelect.innerHTML = [
                 { value: "9-11", label: "9am - 11am" },
                 { value: "10-12", label: "10am - 12pm" },
@@ -43,44 +29,43 @@ window.addEventListener("DOMContentLoaded", () => {
             .join("");
     }
 
-    function showTab(isBook) {
-        if (!homeTab || !bookTab || !mainSection || !bookSection) return;
-        homeTab.classList.toggle("active", !isBook);
-        bookTab.classList.toggle("active", isBook);
-        mainSection.style.display = isBook ? "none" : "";
-        bookSection.style.display = isBook ? "" : "none";
-        if (isBook) updateBookDateDisplay();
-    }
-
-    if (homeTab) {
-        homeTab.addEventListener("click", (e) => {
-            e.preventDefault();
-            showTab(false);
-        });
-    }
-
-    if (bookTab) {
-        bookTab.addEventListener("click", (e) => {
-            e.preventDefault();
+    // Standardized navigation for all tabs and Book Now button
+    function handleNav(e) {
+        e.preventDefault();
+        const target = e.currentTarget.getAttribute("data-target");
+        if (!target) return;
+        if (target === "home") {
+            window.location.href = "index.html";
+        } else if (target === "book") {
             window.location.href = "bookPage.html";
-        });
-    }
-
-    if (bookNowBtn) {
-        bookNowBtn.addEventListener("click", () => {
-            window.location.href = "bookPage.html";
-        });
-    }
-
-    const portfolioTab = document.querySelector('a[style*="--navAni:4"]');
-    if (portfolioTab) {
-        portfolioTab.addEventListener("click", (e) => {
-            e.preventDefault();
+        } else if (target === "portfolio") {
             window.location.href = "portfolio.html";
-        });
+        } else {
+            // For About, Skills, Contact, etc. (add logic as needed)
+        }
     }
 
-    populateVenueDropdown();
-    populateTimeDropdown();
-    showTab(window.location.hash === "#book");
+    // Assign navigation handler to all nav tabs
+    const navTabs = [
+        "#homeTab",
+        'a[style*="--navAni:2"]',
+        'a[style*="--navAni:3"]',
+        'a[style*="--navAni:4"]',
+        'a[style*="--navAni:5"]',
+        "#bookTab",
+    ];
+    navTabs.forEach((selector) => {
+        const el = document.querySelector(selector);
+        if (el) {
+            el.removeEventListener("click", handleNav);
+            el.addEventListener("click", handleNav);
+        }
+    });
+
+    // Book Now button uses same handler
+    if (bookNowBtn) {
+        bookNowBtn.setAttribute("data-target", "book");
+        bookNowBtn.removeEventListener("click", handleNav);
+        bookNowBtn.addEventListener("click", handleNav);
+    }
 });
