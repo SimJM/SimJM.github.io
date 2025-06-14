@@ -46,7 +46,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     // Assign navigation handler to all nav tabs
-    const navTabs = ["#homeTab", 'a[style*="--navAni:4"]', "#bookTab"];
+    const navTabs = ["#homeTab", 'a[style*="--navAni:4"]'];
     navTabs.forEach((selector) => {
         const el = document.querySelector(selector);
         if (el) {
