@@ -1,18 +1,15 @@
 // portfolio.js
 
-document.addEventListener("DOMContentLoaded", function() {
-            if (window.shared && typeof window.shared.handleDarkMode === "function") {
-                window.shared.handleDarkMode();
-            }
-            if (!window.portfolioContent) return;
-            // Experience
-            const expSection = document.getElementById("experience");
-            if (expSection) {
-                expSection.innerHTML =
-                    `<h2>Work Experience</h2>` +
-                    window.portfolioContent.experience
-                    .map(
-                        (exp) => `
+document.addEventListener("DOMContentLoaded", function () {
+	if (!window.portfolioContent) return;
+	// Experience
+	const expSection = document.getElementById("experience");
+	if (expSection) {
+		expSection.innerHTML =
+			`<h2>Work Experience</h2>` +
+			window.portfolioContent.experience
+				.map(
+					(exp) => `
                 <div class="experience-entry">
                     <div class="experience-title">${exp.title}</div>
                     <div class="experience-company">${exp.company}</div>

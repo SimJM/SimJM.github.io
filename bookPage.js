@@ -1,8 +1,6 @@
 // Book page JS logic
 // Use shared.js for all shared logic
 window.addEventListener("DOMContentLoaded", () => {
-	window.shared.handleDarkMode();
-
 	const venueSelect = document.getElementById("venueSelect");
 	const timeSelect = document.getElementById("timeSelect");
 	const bookDateDisplay = document.getElementById("bookDateDisplay");

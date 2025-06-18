@@ -1,54 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link
+			href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+			rel="stylesheet" />
+		<link rel="stylesheet" href="index.css" />
+		<link rel="stylesheet" href="portfolio.css" />
+		<title>Portfolio | Sim Jia Ming</title>
+	</head>
 
-<head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="index.css" />
-    <link rel="stylesheet" href="portfolio.css" />
-    <title>Portfolio | Sim Jia Ming</title>
-</head>
-
-<body>
-    <header class="container">
-        <div class="page-header">
-            <div class="logo">
-                <a href="#">&#128640; Jia Ming - Coding Dreams into Reality</a
-					>
-				</div>
-				<input type="checkbox" id="click" />
-				<label for="click" class="mainicon">
-					<div class="menu">
-						<i class="bx bx-menu"></i>
-					</div>
-				</label>
-				<ul>
-					<li>
-						<a
-							href="index.html"
-							style="--navAni:1"
-							id="homeTab"
-							data-target="home"
-							>Home</a
-						>
-					</li>
-					<li>
-						<a
-							href="portfolio.html"
-							style="--navAni:4"
-							data-target="portfolio"
-							>Portfolio</a
-						>
-					</li>
-				</ul>
-				<label class="mode">
-					<input type="checkbox" id="darkModeToggle" />
-					<i class="bx bxs-moon"></i>
-				</label>
-			</div>
-		</header>
+	<body>
+		<div id="header-placeholder"></div>
 		<section class="container" id="portfolioMainSection">
 			<div class="portfolio-main">
 				<div class="portfolio-header">
@@ -97,5 +62,10 @@
 		<script src="shared.js"></script>
 		<script src="portfolio-content.js"></script>
 		<script src="portfolio.js"></script>
+		<script src="header.js"></script>
+		<script>
+			// Load header using the header manager
+			window.headerManager.loadHeader();
+		</script>
 	</body>
 </html>

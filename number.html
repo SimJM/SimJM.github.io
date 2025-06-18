@@ -13,51 +13,7 @@
 	</head>
 
 	<body>
-		<header class="container">
-			<div class="page-header">
-				<div class="logo">
-					<a href="#">&#x1F52E; Number</a>
-				</div>
-				<input type="checkbox" id="click" />
-				<label for="click" class="mainicon">
-					<div class="menu">
-						<i class="bx bx-menu"></i>
-					</div>
-				</label>
-				<ul>
-					<li>
-						<a
-							href="index.html"
-							style="--navAni:1"
-							id="homeTab"
-							data-target="home"
-							>Home</a
-						>
-					</li>
-					<li>
-						<a
-							href="portfolio.html"
-							style="--navAni:4"
-							data-target="portfolio"
-							>Portfolio</a
-						>
-					</li>
-					<li>
-						<a
-							href="bookPage.html"
-							style="--navAni:6"
-							id="bookTab"
-							data-target="book"
-							>Book</a
-						>
-					</li>
-				</ul>
-				<label class="mode">
-					<input type="checkbox" id="darkModeToggle" />
-					<i class="bx bxs-moon"></i>
-				</label>
-			</div>
-		</header>
+		<div id="header-placeholder"></div>
 		<section
 			class="container"
 			id="numberSection"
@@ -82,5 +38,10 @@
 		</section>
 		<script src="shared.js"></script>
 		<script src="number.js"></script>
+		<script src="header.js"></script>
+		<script>
+			// Load header using the header manager
+			window.headerManager.loadHeader();
+		</script>
 	</body>
 </html>

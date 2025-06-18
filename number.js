@@ -1,8 +1,3 @@
-// Initialize dark mode when page loads
-if (window.shared && typeof window.shared.handleDarkMode === "function") {
-	window.shared.handleDarkMode();
-}
-
 function removeNumberZeroAndFive(n) {
 	let processed = "";
 	for (let i = 0; i < n.length; i++) {

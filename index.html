@@ -1,52 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link
+			href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+			rel="stylesheet" />
+		<link rel="stylesheet" href="index.css" />
+		<title>Jia Ming Portfolio</title>
+	</head>
 
-<head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="index.css" />
-    <title>Jia Ming Portfolio</title>
-</head>
-
-<body>
-    <header class="container">
-        <div class="page-header">
-            <div class="logo">
-                <a href="#">&#128640; Jia Ming - Coding Dreams into Reality</a
-					>
-				</div>
-				<input type="checkbox" id="click" />
-
-				<label for="click" class="mainicon">
-					<div class="menu">
-						<i class="bx bx-menu"></i>
-					</div>
-				</label>
-				<ul>
-					<li>
-						<a
-							href="#"
-							class="active"
-							style="--navAni:1"
-							id="homeTab"
-							data-target="home"
-							>Home</a
-						>
-					</li>
-					<li>
-						<a href="#" style="--navAni:4" data-target="portfolio"
-							>Portfolio</a
-						>
-					</li>
-				</ul>
-				<label class="mode">
-					<input type="checkbox" id="darkModeToggle" />
-					<i class="bx bxs-moon"></i>
-				</label>
-			</div>
-		</header>
+	<body>
+		<div id="header-placeholder"></div>
 
 		<section class="container" id="mainSection">
 			<div class="main">
@@ -82,19 +48,35 @@
 							title="Portfolio"
 							><i class="bx bx-briefcase"></i
 						></a>
-                <a href="https://www.linkedin.com/in/sim-jia-ming/" target="_blank" style="--socialAni:1"><i class="bx bxl-linkedin"></i
+						<a
+							href="https://www.linkedin.com/in/sim-jia-ming/"
+							target="_blank"
+							style="--socialAni:1"
+							><i class="bx bxl-linkedin"></i
 						></a>
-                <a href="https://github.com/SimJM" style="--socialAni:3" target="_blank"><i class="bx bxl-github"></i
+						<a
+							href="https://github.com/SimJM"
+							style="--socialAni:3"
+							target="_blank"
+							><i class="bx bxl-github"></i
 						></a>
-                <a href="https://www.instagram.com/jiamingsim/" target="_blank" style="--socialAni:2"><i class="bx bxl-instagram"></i
+						<a
+							href="https://www.instagram.com/jiamingsim/"
+							target="_blank"
+							style="--socialAni:2"
+							><i class="bx bxl-instagram"></i
 						></a>
-            </div>
-        </div>
-        </div>
-        </section>
-        <script src="shared.js"></script>
-        <script src="venueDetails.js"></script>
-        <script src="index.js"></script>
-</body>
-
+					</div>
+				</div>
+			</div>
+		</section>
+		<script src="shared.js"></script>
+		<script src="venueDetails.js"></script>
+		<script src="index.js"></script>
+		<script src="header.js"></script>
+		<script>
+			// Load header using the header manager
+			window.headerManager.loadHeader();
+		</script>
+	</body>
 </html>
