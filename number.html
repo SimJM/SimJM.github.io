@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link
+			href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+			rel="stylesheet" />
+		<link rel="stylesheet" href="index.css" />
+		<link rel="stylesheet" href="bookPage.css" />
+		<title>Number Page</title>
+	</head>
+
+	<body>
+		<header class="container">
+			<div class="page-header">
+				<div class="logo">
+					<a href="#">&#x1F52E; Number</a>
+				</div>
+				<input type="checkbox" id="click" />
+				<label for="click" class="mainicon">
+					<div class="menu">
+						<i class="bx bx-menu"></i>
+					</div>
+				</label>
+				<ul>
+					<li>
+						<a
+							href="index.html"
+							style="--navAni:1"
+							id="homeTab"
+							data-target="home"
+							>Home</a
+						>
+					</li>
+					<li>
+						<a
+							href="portfolio.html"
+							style="--navAni:4"
+							data-target="portfolio"
+							>Portfolio</a
+						>
+					</li>
+					<li>
+						<a
+							href="bookPage.html"
+							style="--navAni:6"
+							id="bookTab"
+							data-target="book"
+							>Book</a
+						>
+					</li>
+				</ul>
+				<label class="mode">
+					<input type="checkbox" id="darkModeToggle" />
+					<i class="bx bxs-moon"></i>
+				</label>
+			</div>
+		</header>
+		<section
+			class="container"
+			id="numberSection"
+			style="text-align:center; margin-top:40px;">
+			<div style="margin-bottom: 1em;">
+				<label for="numberInput">Enter Mobile number:</label>
+				<input
+					type="number"
+					id="numberInput"
+					style="font-size:1em; padding:0.5em 1em; margin-left:0.5em;" />
+			</div>
+			<div style="margin-bottom: 1em;">
+				<button
+					id="processNumberBtn"
+					style="padding: 1em 2em; font-size: 1.2em; background: #f9532d; color: white; border: none; border-radius: 8px; cursor: pointer;">
+					Analyse
+				</button>
+			</div>
+			<div
+				id="numberResult"
+				style="font-size:1.1em; margin-bottom:1em; color:#333;"></div>
+		</section>
+		<script src="shared.js"></script>
+		<script src="number.js"></script>
+	</body>
+</html>
