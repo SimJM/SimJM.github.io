@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link
+			href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+			rel="stylesheet" />
+		<link rel="stylesheet" href="index.css" />
+		<link rel="stylesheet" href="bookPage.css" />
+		<style>
+			/* Wordle Game Styles */
+
+			.wordle-container {
+			    max-width: 500px;
+			    margin: 0 auto;
+			    padding: 20px;
+			    text-align: center;
+			}
+
+			.wordle-title {
+			    font-size: 2.5em;
+			    font-weight: bold;
+			    color: #f9532d;
+			    margin-bottom: 10px;
+			    letter-spacing: 2px;
+			}
+
+			.wordle-subtitle {
+			    color: #666;
+			    margin-bottom: 30px;
+			    font-size: 1.1em;
+			}
+
+			.game-board {
+			    display: grid;
+			    grid-template-rows: repeat(6, 1fr);
+			    gap: 5px;
+			    margin-bottom: 30px;
+			    justify-content: center;
+			}
+
+			.word-row {
+			    display: grid;
+			    grid-template-columns: repeat(5, 1fr);
+			    gap: 5px;
+			}
+
+			.letter-box {
+			    width: 62px;
+			    height: 62px;
+			    border: 2px solid #d3d6da;
+			    display: flex;
+			    align-items: center;
+			    justify-content: center;
+			    font-size: 2em;
+			    font-weight: bold;
+			    text-transform: uppercase;
+			    background: white;
+			    transition: all 0.3s ease;
+			}
+
+			.letter-box.filled {
+			    border-color: #878a8c;
+			    animation: flip 0.6s ease forwards;
+			}
+
+			.letter-box.correct {
+			    background: #6aaa64;
+			    color: white;
+			    border-color: #6aaa64;
+			}
+
+			.letter-box.present {
+			    background: #c9b458;
+			    color: white;
+			    border-color: #c9b458;
+			}
+
+			.letter-box.absent {
+			    background: #787c7e;
+			    color: white;
+			    border-color: #787c7e;
+			}
+
+			.keyboard {
+			    display: flex;
+			    flex-direction: column;
+			    gap: 8px;
+			    margin-top: 20px;
+			}
+
+			.keyboard-row {
+			    display: flex;
+			    justify-content: center;
+			    gap: 6px;
+			}
+
+			.key {
+			    min-width: 43px;
+			    height: 58px;
+			    border: none;
+			    border-radius: 4px;
+			    background: #d3d6da;
+			    color: #1a1a1b;
+			    font-size: 14px;
+			    font-weight: bold;
+			    cursor: pointer;
+			    display: flex;
+			    align-items: center;
+			    justify-content: center;
+			    text-transform: uppercase;
+			    transition: background-color 0.1s ease;
+			}
+
+			.key:hover {
+			    background: #bbb;
+			}
+
+			.key.wide {
+			    min-width: 65px;
+			    font-size: 12px;
+			}
+
+			.key.correct {
+			    background: #6aaa64;
+			    color: white;
+			}
+
+			.key.present {
+			    background: #c9b458;
+			    color: white;
+			}
+
+			.key.absent {
+			    background: #787c7e;
+			    color: white;
+			}
+
+			.game-stats {
+			    margin-top: 30px;
+			    padding: 20px;
+			    background: #f8f9fa;
+			    border-radius: 12px;
+			    display: none;
+			}
+
+			.stats-title {
+			    font-size: 1.5em;
+			    font-weight: bold;
+			    color: #333;
+			    margin-bottom: 15px;
+			}
+
+			.stats-grid {
+			    display: grid;
+			    grid-template-columns: repeat(4, 1fr);
+			    gap: 15px;
+			    margin-bottom: 20px;
+			}
+
+			.stat-item {
+			    text-align: center;
+			}
+
+			.stat-number {
+			    font-size: 2em;
+			    font-weight: bold;
+			    color: #f9532d;
+			}
+
+			.stat-label {
+			    font-size: 0.8em;
+			    color: #666;
+			    text-transform: uppercase;
+			}
+
+			.new-game-btn {
+			    background: #f9532d;
+			    color: white;
+			    border: none;
+			    padding: 12px 24px;
+			    border-radius: 8px;
+			    font-size: 1em;
+			    font-weight: bold;
+			    cursor: pointer;
+			    transition: background 0.3s ease;
+			}
+
+			.new-game-btn:hover {
+			    background: #e84419;
+			}
+			/* Congratulations Modal */
+
+			.modal-overlay {
+			    position: fixed;
+			    top: 0;
+			    left: 0;
+			    width: 100%;
+			    height: 100%;
+			    background: rgba(0, 0, 0, 0.7);
+			    display: none;
+			    justify-content: center;
+			    align-items: center;
+			    z-index: 1000;
+			    animation: fadeIn 0.3s ease-in-out;
+			}
+
+			.modal-content {
+			    background: white;
+			    padding: 30px;
+			    border-radius: 15px;
+			    text-align: center;
+			    max-width: 400px;
+			    width: 90%;
+			    max-height: 80vh;
+			    overflow-y: auto;
+			    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+			    animation: slideUp 0.3s ease-in-out;
+			}
+
+			.congrats-title {
+			    font-size: 2.5em;
+			    color: #f9532d;
+			    margin-bottom: 15px;
+			    font-weight: bold;
+			}
+
+			.congrats-subtitle {
+			    font-size: 1.2em;
+			    color: #333;
+			    margin-bottom: 25px;
+			}
+
+			.results-section {
+			    margin: 25px 0;
+			    text-align: left;
+			}
+
+			.results-title {
+			    font-size: 1.3em;
+			    font-weight: bold;
+			    color: #333;
+			    margin-bottom: 15px;
+			    text-align: center;
+			}
+
+			.attempt-info {
+			    background: #f8f9fa;
+			    padding: 15px;
+			    border-radius: 8px;
+			    margin-bottom: 20px;
+			    text-align: center;
+			}
+
+			.attempt-number {
+			    font-size: 2em;
+			    font-weight: bold;
+			    color: #f9532d;
+			    margin-bottom: 5px;
+			}
+
+			.attempt-text {
+			    color: #666;
+			    font-size: 0.9em;
+			}
+
+			.guess-history {
+			    background: #f8f9fa;
+			    padding: 15px;
+			    border-radius: 8px;
+			    margin-bottom: 20px;
+			}
+
+			.guess-history-title {
+			    font-weight: bold;
+			    margin-bottom: 10px;
+			    color: #333;
+			}
+
+			.guess-item {
+			    display: flex;
+			    justify-content: center;
+			    gap: 3px;
+			    margin-bottom: 8px;
+			}
+
+			.guess-letter {
+			    width: 30px;
+			    height: 30px;
+			    display: flex;
+			    align-items: center;
+			    justify-content: center;
+			    font-weight: bold;
+			    font-size: 0.9em;
+			    border-radius: 3px;
+			    color: white;
+			}
+
+			.guess-letter.correct {
+			    background: #6aaa64;
+			}
+
+			.guess-letter.present {
+			    background: #c9b458;
+			}
+
+			.guess-letter.absent {
+			    background: #787c7e;
+			}
+
+			.modal-buttons {
+			    display: flex;
+			    gap: 15px;
+			    justify-content: center;
+			    margin-top: 25px;
+			}
+
+			.modal-btn {
+			    background: #f9532d;
+			    color: white;
+			    border: none;
+			    padding: 12px 24px;
+			    border-radius: 8px;
+			    font-size: 1em;
+			    font-weight: bold;
+			    cursor: pointer;
+			    transition: background 0.3s ease;
+			}
+
+			.modal-btn:hover {
+			    background: #e84419;
+			}
+
+			.modal-btn.secondary {
+			    background: #666;
+			}
+
+			.modal-btn.secondary:hover {
+			    background: #555;
+			}
+
+			@keyframes flip {
+			    0% {
+			        transform: rotateX(0);
+			    }
+			    50% {
+			        transform: rotateX(90deg);
+			    }
+			    100% {
+			        transform: rotateX(0);
+			    }
+			}
+
+			@keyframes fadeIn {
+			    from {
+			        opacity: 0;
+			    }
+			    to {
+			        opacity: 1;
+			    }
+			}
+
+			@keyframes slideUp {
+			    from {
+			        transform: translateY(30px);
+			        opacity: 0;
+			    }
+			    to {
+			        transform: translateY(0);
+			        opacity: 1;
+			    }
+			}
+			/* Dark mode styles */
+
+			body.dark-mode .wordle-container {
+			    color: #e0e0e0;
+			}
+
+			body.dark-mode .wordle-subtitle {
+			    color: #ccc;
+			}
+
+			body.dark-mode .letter-box {
+			    background: #2d2d2d;
+			    border-color: #444;
+			    color: #e0e0e0;
+			}
+
+			body.dark-mode .letter-box.filled {
+			    border-color: #565758;
+			}
+
+			body.dark-mode .key {
+			    background: #565758;
+			    color: #e0e0e0;
+			}
+
+			body.dark-mode .key:hover {
+			    background: #6e7071;
+			}
+
+			body.dark-mode .game-stats {
+			    background: #1a1a1a;
+			    border: 1px solid #333;
+			}
+
+			body.dark-mode .stats-title {
+			    color: #e0e0e0;
+			}
+
+			body.dark-mode .stat-label {
+			    color: #ccc;
+			}
+
+			body.dark-mode .message.success {
+			    background: #2d4a35;
+			    color: #a3d9a5;
+			    border-color: #3e5e42;
+			}
+
+			body.dark-mode .message.error {
+			    background: #4a2d2d;
+			    color: #d9a3a3;
+			    border-color: #5e3e3e;
+			}
+
+			body.dark-mode .message.info {
+			    background: #2d3e4a;
+			    color: #a3c7d9;
+			    border-color: #3e4e5e;
+			}
+
+			body.dark-mode .modal-content {
+			    background: #1a1a1a;
+			    color: #e0e0e0;
+			}
+
+			body.dark-mode .congrats-subtitle {
+			    color: #e0e0e0;
+			}
+
+			body.dark-mode .results-title {
+			    color: #e0e0e0;
+			}
+
+			body.dark-mode .attempt-info {
+			    background: #2d2d2d;
+			}
+
+			body.dark-mode .attempt-text {
+			    color: #ccc;
+			}
+
+			body.dark-mode .guess-history {
+			    background: #2d2d2d;
+			}
+
+			body.dark-mode .guess-history-title {
+			    color: #e0e0e0;
+			}
+
+			.message {
+			    margin: 20px 0;
+			    padding: 15px;
+			    border-radius: 8px;
+			    font-weight: bold;
+			    display: none;
+			}
+
+			.message.success {
+			    background: #d4edda;
+			    color: #155724;
+			    border: 1px solid #c3e6cb;
+			}
+
+			.message.error {
+			    background: #f8d7da;
+			    color: #721c24;
+			    border: 1px solid #f5c6cb;
+			}
+
+			.message.info {
+			    background: #d1ecf1;
+			    color: #0c5460;
+			    border: 1px solid #bee5eb;
+			}
+		</style>
+		<title>Wordle Game</title>
+	</head>
+
+	<body>
+		<div id="header-placeholder"></div>
+
+		<section class="container wordle-container">
+			<h1 class="wordle-title">WORDLE</h1>
+			<p class="wordle-subtitle">Guess the WORDLE in 6 tries.</p>
+
+			<div id="message" class="message"></div>
+			<div class="game-board" id="gameBoard">
+				<!-- Game rows will be generated by JavaScript -->
+			</div>
+
+			<div class="keyboard" id="keyboard">
+				<div class="keyboard-row">
+					<button class="key" data-key="q">Q</button>
+					<button class="key" data-key="w">W</button>
+					<button class="key" data-key="e">E</button>
+					<button class="key" data-key="r">R</button>
+					<button class="key" data-key="t">T</button>
+					<button class="key" data-key="y">Y</button>
+					<button class="key" data-key="u">U</button>
+					<button class="key" data-key="i">I</button>
+					<button class="key" data-key="o">O</button>
+					<button class="key" data-key="p">P</button>
+				</div>
+				<div class="keyboard-row">
+					<button class="key" data-key="a">A</button>
+					<button class="key" data-key="s">S</button>
+					<button class="key" data-key="d">D</button>
+					<button class="key" data-key="f">F</button>
+					<button class="key" data-key="g">G</button>
+					<button class="key" data-key="h">H</button>
+					<button class="key" data-key="j">J</button>
+					<button class="key" data-key="k">K</button>
+					<button class="key" data-key="l">L</button>
+				</div>
+				<div class="keyboard-row">
+					<button class="key wide" data-key="Enter">ENTER</button>
+					<button class="key" data-key="z">Z</button>
+					<button class="key" data-key="x">X</button>
+					<button class="key" data-key="c">C</button>
+					<button class="key" data-key="v">V</button>
+					<button class="key" data-key="b">B</button>
+					<button class="key" data-key="n">N</button>
+					<button class="key" data-key="m">M</button>
+					<button class="key wide" data-key="Backspace">
+						<i class="bx bx-backspace"></i>
+					</button>
+				</div>
+			</div>
+
+			<div class="game-stats" id="gameStats">
+				<h3 class="stats-title">Statistics</h3>
+				<div class="stats-grid">
+					<div class="stat-item">
+						<div class="stat-number" id="gamesPlayed">0</div>
+						<div class="stat-label">Played</div>
+					</div>
+					<div class="stat-item">
+						<div class="stat-number" id="winPercentage">0</div>
+						<div class="stat-label">Win %</div>
+					</div>
+					<div class="stat-item">
+						<div class="stat-number" id="currentStreak">0</div>
+						<div class="stat-label">Current Streak</div>
+					</div>
+					<div class="stat-item">
+						<div class="stat-number" id="maxStreak">0</div>
+						<div class="stat-label">Max Streak</div>
+					</div>
+				</div>
+				<button class="new-game-btn" onclick="startNewGame()">
+					New Game
+				</button>
+			</div>
+		</section>
+
+		<!-- Congratulations Modal -->
+		<div class="modal-overlay" id="congratsModal">
+			<div class="modal-content">
+				<h2 class="congrats-title">Congratulations!</h2>
+				<p class="congrats-subtitle">You've solved the WORDLE!</p>
+
+				<div class="results-section">
+					<h3 class="results-title">Your Results</h3>
+					<div class="attempt-info">
+						<div class="attempt-number" id="attemptNumber">1</div>
+						<div class="attempt-text" id="attemptText">
+							Amazing!
+						</div>
+					</div>
+
+					<div class="guess-history" id="guessHistory">
+						<div class="guess-history-title">Guess History</div>
+						<!-- Guess items will be populated by JavaScript -->
+					</div>
+				</div>
+
+				<div class="modal-buttons">
+					<button class="modal-btn" onclick="startNewGame()">
+						Play Again
+					</button>
+					<button
+						class="modal-btn secondary"
+						onclick="closeCongratsModal()">
+						Close
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<script src="shared.js"></script>
+		<script src="wordle.js"></script>
+		<script src="header.js"></script>
+		<script>
+			// Load header using the header manager
+			window.headerManager.loadHeader();
+		</script>
+	</body>
+</html>

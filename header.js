@@ -4,11 +4,23 @@ window.headerManager = {
 	pageConfig: {
 		"index.html": {
 			logo: "&#128640; Jia Ming - Coding Dreams into Reality",
-			hideNavItems: ["book-nav-item", "number-nav-item", "loan-nav-item"],
+			hideNavItems: [
+				"book-nav-item",
+				"number-nav-item",
+				"loan-nav-item",
+				"wordle-nav-item",
+				"admin-nav-item",
+			],
 		},
 		"portfolio.html": {
 			logo: "&#128640; Portfolio - My Professional Journey",
-			hideNavItems: ["book-nav-item", "number-nav-item", "loan-nav-item"],
+			hideNavItems: [
+				"book-nav-item",
+				"number-nav-item",
+				"loan-nav-item",
+				"wordle-nav-item",
+				"admin-nav-item",
+			],
 		},
 		"bookPage.html": {
 			logo: "&#x1F3F8; Badminton Booking",
@@ -20,6 +32,14 @@ window.headerManager = {
 		},
 		"loan.html": {
 			logo: "&#x1F4B0; Loan Calculator",
+			hideNavItems: [],
+		},
+		"wordle.html": {
+			logo: "&#x1F4DD; Wordle Game",
+			hideNavItems: [],
+		},
+		"wordle-admin.html": {
+			logo: "&#x1F6E0; Wordle Admin",
 			hideNavItems: [],
 		},
 	},
