@@ -31,6 +31,12 @@
 			    color: #666;
 			    margin-bottom: 30px;
 			    font-size: 1.1em;
+			    transition: all 0.3s ease;
+			}
+
+			.wordle-subtitle.custom-challenge {
+			    color: #f9532d;
+			    font-weight: 600;
 			}
 
 			.game-board {
@@ -312,21 +318,26 @@
 
 			.modal-buttons {
 			    display: flex;
-			    gap: 15px;
+			    gap: 10px;
 			    justify-content: center;
 			    margin-top: 25px;
+			    flex-wrap: wrap;
 			}
 
 			.modal-btn {
 			    background: #f9532d;
 			    color: white;
 			    border: none;
-			    padding: 12px 24px;
+			    padding: 12px 16px;
 			    border-radius: 8px;
-			    font-size: 1em;
+			    font-size: 0.9em;
 			    font-weight: bold;
 			    cursor: pointer;
 			    transition: background 0.3s ease;
+			    display: flex;
+			    align-items: center;
+			    gap: 5px;
+			    white-space: nowrap;
 			}
 
 			.modal-btn:hover {
@@ -339,6 +350,43 @@
 
 			.modal-btn.secondary:hover {
 			    background: #555;
+			}
+			/* Game Over Modal Specific Styles */
+
+			.gameover-title {
+			    font-size: 2.5em;
+			    color: #d32f2f;
+			    margin-bottom: 15px;
+			    font-weight: bold;
+			}
+
+			.gameover-subtitle {
+			    font-size: 1.2em;
+			    color: #666;
+			    margin-bottom: 25px;
+			}
+
+			.correct-word-display {
+			    text-align: center;
+			    margin-bottom: 25px;
+			    padding: 20px;
+			    background: #f5f5f5;
+			    border-radius: 12px;
+			    border-left: 4px solid #d32f2f;
+			}
+
+			.correct-word-display h3 {
+			    margin: 0 0 15px 0;
+			    color: #333;
+			    font-size: 1.1em;
+			}
+
+			.revealed-word {
+			    font-size: 2em;
+			    font-weight: bold;
+			    color: #d32f2f;
+			    letter-spacing: 3px;
+			    font-family: monospace;
 			}
 
 			@keyframes flip {
@@ -372,6 +420,19 @@
 			        opacity: 1;
 			    }
 			}
+			/* Responsive modal buttons */
+
+			@media (max-width: 480px) {
+			    .modal-buttons {
+			        flex-direction: column;
+			        align-items: center;
+			    }
+			    .modal-btn {
+			        width: 100%;
+			        max-width: 200px;
+			        justify-content: center;
+			    }
+			}
 			/* Dark mode styles */
 
 			body.dark-mode .wordle-container {
@@ -392,6 +453,24 @@
 			    border-color: #565758;
 			}
 
+			body.dark-mode .letter-box.correct {
+			    background: #6aaa64;
+			    color: white;
+			    border-color: #6aaa64;
+			}
+
+			body.dark-mode .letter-box.present {
+			    background: #c9b458;
+			    color: white;
+			    border-color: #c9b458;
+			}
+
+			body.dark-mode .letter-box.absent {
+			    background: #787c7e;
+			    color: white;
+			    border-color: #787c7e;
+			}
+
 			body.dark-mode .key {
 			    background: #565758;
 			    color: #e0e0e0;
@@ -399,6 +478,21 @@
 
 			body.dark-mode .key:hover {
 			    background: #6e7071;
+			}
+
+			body.dark-mode .key.correct {
+			    background: #6aaa64;
+			    color: white;
+			}
+
+			body.dark-mode .key.present {
+			    background: #c9b458;
+			    color: white;
+			}
+
+			body.dark-mode .key.absent {
+			    background: #787c7e;
+			    color: white;
 			}
 
 			body.dark-mode .game-stats {
@@ -460,6 +554,20 @@
 			body.dark-mode .guess-history-title {
 			    color: #e0e0e0;
 			}
+			/* Dark mode for Game Over Modal */
+
+			body.dark-mode .gameover-subtitle {
+			    color: #ccc;
+			}
+
+			body.dark-mode .correct-word-display {
+			    background: #2d2d2d;
+			    border-left-color: #d32f2f;
+			}
+
+			body.dark-mode .correct-word-display h3 {
+			    color: #e0e0e0;
+			}
 
 			.message {
 			    margin: 20px 0;
@@ -495,7 +603,9 @@
 
 		<section class="container wordle-container">
 			<h1 class="wordle-title">WORDLE</h1>
-			<p class="wordle-subtitle">Guess the WORDLE in 6 tries.</p>
+			<p id="gameSubtitle" class="wordle-subtitle">
+				Guess the WORDLE in 6 tries.
+			</p>
 
 			<div id="message" class="message"></div>
 			<div class="game-board" id="gameBoard">
@@ -592,9 +702,60 @@
 					<button class="modal-btn" onclick="startNewGame()">
 						Play Again
 					</button>
+					<button class="modal-btn" onclick="shareResults('win')">
+						<i class="bx bx-share"></i>
+						Share Results
+					</button>
+					<button
+						class="modal-btn secondary"
+						onclick="copyResults('win')">
+						<i class="bx bx-copy"></i>
+						Copy Results
+					</button>
 					<button
 						class="modal-btn secondary"
 						onclick="closeCongratsModal()">
+						Close
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Game Over Modal -->
+		<div class="modal-overlay" id="gameOverModal">
+			<div class="modal-content">
+				<h2 class="gameover-title">Game Over!</h2>
+				<p class="gameover-subtitle">Better luck next time!</p>
+
+				<div class="results-section">
+					<div class="correct-word-display">
+						<h3>The word was:</h3>
+						<div class="revealed-word" id="revealedWord">HELLO</div>
+					</div>
+
+					<div class="guess-history" id="gameOverGuessHistory">
+						<div class="guess-history-title">Your Guesses</div>
+						<!-- Guess items will be populated by JavaScript -->
+					</div>
+				</div>
+
+				<div class="modal-buttons">
+					<button class="modal-btn" onclick="startNewGame()">
+						Play Again
+					</button>
+					<button class="modal-btn" onclick="shareResults('lose')">
+						<i class="bx bx-share"></i>
+						Share Results
+					</button>
+					<button
+						class="modal-btn secondary"
+						onclick="copyResults('lose')">
+						<i class="bx bx-copy"></i>
+						Copy Results
+					</button>
+					<button
+						class="modal-btn secondary"
+						onclick="closeGameOverModal()">
 						Close
 					</button>
 				</div>

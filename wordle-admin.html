@@ -10,8 +10,6 @@
 		<link rel="stylesheet" href="index.css" />
 		<link rel="stylesheet" href="bookPage.css" />
 		<style>
-			/* Admin Wordle Styles */
-
 			.admin-container {
 			    max-width: 600px;
 			    margin: 0 auto;
@@ -160,22 +158,112 @@
 			    color: #856404;
 			    border: 1px solid #ffeaa7;
 			}
-			/* Dark mode styles */
+
+			.link-section {
+			    margin-top: 25px;
+			    padding-top: 20px;
+			    border-top: 1px solid #ddd;
+			}
+
+			.link-display {
+			    margin: 20px 0;
+			}
+
+			.link-display label {
+			    display: block;
+			    margin-bottom: 8px;
+			    font-weight: 600;
+			    color: #333;
+			}
+
+			.url-container {
+			    display: flex;
+			    gap: 10px;
+			    align-items: center;
+			}
+
+			.url-input {
+			    flex: 1;
+			    font-size: 1em;
+			    padding: 12px;
+			    border: 2px solid #ddd;
+			    border-radius: 8px;
+			    background: #f8f9fa;
+			    color: #333;
+			    font-family: monospace;
+			}
+
+			.copy-btn {
+			    background: #28a745;
+			    color: white;
+			    padding: 12px 16px;
+			    border: none;
+			    border-radius: 8px;
+			    cursor: pointer;
+			    font-weight: bold;
+			    display: flex;
+			    align-items: center;
+			    gap: 5px;
+			    transition: background 0.3s ease;
+			    white-space: nowrap;
+			}
+
+			.copy-btn:hover {
+			    background: #218838;
+			}
+
+			.copy-btn.copied {
+			    background: #17a2b8;
+			}
+
+			.share-buttons {
+			    display: flex;
+			    gap: 15px;
+			    margin: 20px 0;
+			    flex-wrap: wrap;
+			    justify-content: center;
+			}
+
+			@media (max-width: 768px) {
+			    .admin-container {
+			        padding: 15px;
+			    }
+			    .url-container {
+			        flex-direction: column;
+			        gap: 10px;
+			    }
+			    .url-input {
+			        width: 100%;
+			        box-sizing: border-box;
+			    }
+			    .copy-btn {
+			        width: 100%;
+			        justify-content: center;
+			    }
+			    .share-buttons {
+			        flex-direction: column;
+			        align-items: center;
+			    }
+			    .admin-btn {
+			        width: 100%;
+			        max-width: 250px;
+			        justify-content: center;
+			    }
+			}
 
 			body.dark-mode .admin-section {
 			    background: #1a1a1a;
 			    border: 1px solid #333;
 			}
 
-			body.dark-mode .section-title {
+			body.dark-mode .section-title,
+			body.dark-mode .input-group label,
+			body.dark-mode .link-display label {
 			    color: #e0e0e0;
 			}
 
-			body.dark-mode .input-group label {
-			    color: #e0e0e0;
-			}
-
-			body.dark-mode .word-input {
+			body.dark-mode .word-input,
+			body.dark-mode .url-input {
 			    background: #2d2d2d;
 			    border-color: #444;
 			    color: #e0e0e0;
@@ -216,6 +304,10 @@
 			body.dark-mode .current-word-display span {
 			    color: #f9532d;
 			}
+
+			body.dark-mode .link-section {
+			    border-top-color: #444;
+			}
 		</style>
 		<title>Wordle Admin</title>
 	</head>
@@ -226,15 +318,14 @@
 		<section class="container admin-container">
 			<h1 class="admin-title">WORDLE ADMIN</h1>
 			<p class="admin-subtitle">
-				Set the current word for the Wordle game
+				Create custom Wordle challenges with shareable links
 			</p>
 
 			<div id="message" class="message"></div>
 
-			<!-- Current Word Section -->
 			<div class="admin-section">
 				<h2 class="section-title">
-					<i class="bx bx-target-lock"></i> Set Current Word
+					<i class="bx bx-target-lock"></i> Create Custom Challenge
 				</h2>
 
 				<div class="input-group">
@@ -251,21 +342,50 @@
 				</div>
 
 				<div class="button-group">
-					<button class="admin-btn" onclick="setCurrentWord()">
-						<i class="bx bx-save"></i>
-						Set Current Word
-					</button>
-					<button
-						class="admin-btn secondary"
-						onclick="clearCurrentWord()">
-						<i class="bx bx-x"></i>
-						Clear (Use Random)
+					<button class="admin-btn" onclick="generateWordleLink()">
+						<i class="bx bx-link"></i>
+						Generate Wordle Link
 					</button>
 				</div>
 
-				<div class="current-word-display">
-					<strong>Current Word: </strong>
-					<span id="currentWordDisplay">Not set (using random)</span>
+				<div
+					id="linkSection"
+					class="link-section"
+					style="display: none;">
+					<div class="current-word-display">
+						<strong>Challenge Word: </strong>
+						<span id="currentWordDisplay"></span>
+					</div>
+
+					<div class="link-display">
+						<label for="generatedUrl">Shareable Link:</label>
+						<div class="url-container">
+							<input
+								type="text"
+								id="generatedUrl"
+								class="url-input"
+								readonly />
+							<button
+								class="copy-btn"
+								onclick="copyToClipboard()">
+								<i class="bx bx-copy"></i>
+								Copy
+							</button>
+						</div>
+					</div>
+
+					<div class="share-buttons">
+						<button class="admin-btn" onclick="shareLink()">
+							<i class="bx bx-share"></i>
+							Share Challenge
+						</button>
+						<button
+							class="admin-btn secondary"
+							onclick="openWordle()">
+							<i class="bx bx-play"></i>
+							Play Challenge
+						</button>
+					</div>
 				</div>
 			</div>
 		</section>
@@ -274,7 +394,6 @@
 		<script src="wordle-admin.js"></script>
 		<script src="header.js"></script>
 		<script>
-			// Load header using the header manager
 			window.headerManager.loadHeader();
 		</script>
 	</body>

@@ -35,7 +35,7 @@ window.headerManager = {
 			hideNavItems: [],
 		},
 		"wordle.html": {
-			logo: "&#x1F4DD; Wordle Game",
+			logo: "&#x1F4DD; Bailey Wordle",
 			hideNavItems: [],
 		},
 		"wordle-admin.html": {

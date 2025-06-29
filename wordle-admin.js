@@ -1,8 +1,7 @@
-// wordle-admin.js - Wordle Admin functionality (Current Word Management Only)
+// wordle-admin.js - Wordle Admin functionality (URL-based)
 
 document.addEventListener("DOMContentLoaded", function () {
 	console.log("Wordle admin loaded");
-	loadCurrentWord();
 	setupEventListeners();
 });
 
@@ -12,7 +11,7 @@ function setupEventListeners() {
 		.getElementById("currentWord")
 		.addEventListener("keypress", function (e) {
 			if (e.key === "Enter") {
-				setCurrentWord();
+				generateWordleLink();
 			}
 		});
 
@@ -62,8 +61,16 @@ function hideMessage() {
 	messageDiv.style.display = "none";
 }
 
-// Current word management functions
-function setCurrentWord() {
+// Simple encoding function (Base64 with custom transform)
+function encodeWord(word) {
+	// Convert to base64 and add some simple obfuscation
+	const encoded = btoa(word);
+	// Reverse the string and add a simple prefix
+	return "wrd_" + encoded.split("").reverse().join("");
+}
+
+// Generate Wordle link with encoded word
+function generateWordleLink() {
 	const input = document.getElementById("currentWord");
 	const word = input.value.trim().toUpperCase();
 
@@ -72,57 +79,96 @@ function setCurrentWord() {
 		return;
 	}
 
-	// Save current word
-	localStorage.setItem("currentWordleWord", word);
+	// Encode the word
+	const encodedWord = encodeWord(word);
 
-	// Update display
-	updateCurrentWordDisplay();
+	// Get current site URL (removing the admin page)
+	const currentUrl = window.location.href;
+	const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf("/") + 1);
+
+	// Create the wordle game URL with encoded word
+	const wordleUrl = `${baseUrl}wordle.html?word=${encodedWord}`;
+
+	// Update UI
+	document.getElementById("currentWordDisplay").textContent = word;
+	document.getElementById("generatedUrl").value = wordleUrl;
+	document.getElementById("linkSection").style.display = "block";
 
 	// Clear input
 	input.value = "";
 
-	showMessage(`Current word set to "${word}"!`, "success");
+	showMessage(`Challenge created for word "${word}"!`, "success");
+
+	// Scroll to the link section
+	document.getElementById("linkSection").scrollIntoView({
+		behavior: "smooth",
+		block: "nearest",
+	});
 }
 
-function clearCurrentWord() {
-	if (
-		confirm(
-			"Are you sure you want to clear the current word? The game will use random words."
-		)
-	) {
-		localStorage.removeItem("currentWordleWord");
-		updateCurrentWordDisplay();
-		showMessage(
-			"Current word cleared. Game will use random words.",
-			"info"
-		);
+// Copy URL to clipboard
+async function copyToClipboard() {
+	const urlInput = document.getElementById("generatedUrl");
+	const copyBtn = document.querySelector(".copy-btn");
+
+	try {
+		await navigator.clipboard.writeText(urlInput.value);
+
+		// Update button appearance
+		const originalText = copyBtn.innerHTML;
+		copyBtn.innerHTML = '<i class="bx bx-check"></i> Copied!';
+		copyBtn.classList.add("copied");
+
+		// Reset after 2 seconds
+		setTimeout(() => {
+			copyBtn.innerHTML = originalText;
+			copyBtn.classList.remove("copied");
+		}, 2000);
+
+		showMessage("Link copied to clipboard!", "success");
+	} catch (err) {
+		// Fallback for older browsers
+		urlInput.select();
+		urlInput.setSelectionRange(0, 99999);
+		document.execCommand("copy");
+
+		showMessage("Link copied to clipboard!", "success");
 	}
 }
 
-function loadCurrentWord() {
-	updateCurrentWordDisplay();
-}
+// Share using native Web Share API
+async function shareLink() {
+	const url = document.getElementById("generatedUrl").value;
+	const word = document.getElementById("currentWordDisplay").textContent;
 
-function updateCurrentWordDisplay() {
-	const currentWord = getCurrentWord();
-	const display = document.getElementById("currentWordDisplay");
+	const shareData = {
+		title: "Custom Wordle Challenge",
+		text: `I created a custom Wordle challenge! Can you guess my 5-letter word?`,
+		url: url,
+	};
 
-	if (currentWord) {
-		display.textContent = currentWord;
-		display.style.color = "#f9532d";
-	} else {
-		display.textContent = "Not set (using random)";
-		display.style.color = "#666";
+	try {
+		if (
+			navigator.share &&
+			navigator.canShare &&
+			navigator.canShare(shareData)
+		) {
+			await navigator.share(shareData);
+			showMessage("Challenge shared successfully!", "success");
+		} else {
+			// Fallback: copy to clipboard
+			await copyToClipboard();
+		}
+	} catch (err) {
+		if (err.name !== "AbortError") {
+			// User didn't cancel, so try clipboard fallback
+			await copyToClipboard();
+		}
 	}
 }
 
-function getCurrentWord() {
-	return localStorage.getItem("currentWordleWord");
+// Open the wordle game with the current word
+function openWordle() {
+	const url = document.getElementById("generatedUrl").value;
+	window.open(url, "_blank");
 }
-
-// Make functions available globally
-window.wordleAdmin = {
-	setCurrentWord: setCurrentWord,
-	clearCurrentWord: clearCurrentWord,
-	getCurrentWord: getCurrentWord,
-};

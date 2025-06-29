@@ -685,8 +685,33 @@ document.addEventListener("DOMContentLoaded", function () {
 	setupEventListeners();
 });
 
-function initializeGame() {
-	currentWord = getRandomWord();
+async function initializeGame() {
+	// First check for URL parameter (custom challenge)
+	const urlWord = getWordFromUrl();
+
+	if (urlWord) {
+		currentWord = urlWord;
+		console.log("Using custom challenge word:", currentWord);
+		// Update subtitle to indicate custom challenge
+		const subtitle = document.getElementById("gameSubtitle");
+		if (subtitle) {
+			subtitle.textContent =
+				"🎯 Bailey Custom Challenge - Guess the WORDLE in 6 tries!";
+			subtitle.classList.add("custom-challenge");
+		}
+	} else {
+		// Try to get word from admin (legacy support)
+		const adminWord = await getCurrentWordFromAdmin();
+
+		if (adminWord) {
+			currentWord = adminWord;
+			console.log("Using admin word:", currentWord);
+		} else {
+			currentWord = getRandomWord();
+			console.log("Using random word:", currentWord);
+		}
+	}
+
 	currentGuess = [];
 	currentRow = 0;
 	gameOver = false;
@@ -699,13 +724,7 @@ function initializeGame() {
 }
 
 function getRandomWord() {
-	// First check if there's a specific current word set by admin
-	const currentWord = getCurrentWordFromAdmin();
-	if (currentWord) {
-		return currentWord;
-	}
-
-	// Then check if there are custom words from admin
+	// Check if there are custom words from admin
 	const customWords = getCustomWords();
 	if (customWords.length > 0) {
 		return customWords[Math.floor(Math.random() * customWords.length)];
@@ -715,8 +734,64 @@ function getRandomWord() {
 	return wordList[Math.floor(Math.random() * wordList.length)];
 }
 
+function getWordFromUrl() {
+	const urlParams = new URLSearchParams(window.location.search);
+	const encodedWord = urlParams.get("word");
+
+	if (!encodedWord) {
+		return null;
+	}
+
+	try {
+		const decodedWord = decodeWord(encodedWord);
+		// Validate the decoded word
+		if (
+			decodedWord &&
+			decodedWord.length === 5 &&
+			/^[A-Z]+$/.test(decodedWord)
+		) {
+			return decodedWord;
+		}
+	} catch (error) {
+		console.log("Error decoding URL word:", error);
+	}
+
+	return null;
+}
+
+function decodeWord(encodedWord) {
+	try {
+		// Remove the prefix and reverse the string
+		if (!encodedWord.startsWith("wrd_")) {
+			return null;
+		}
+
+		const reversedEncoded = encodedWord
+			.substring(4)
+			.split("")
+			.reverse()
+			.join("");
+		// Decode from base64
+		const decoded = atob(reversedEncoded);
+		return decoded.toUpperCase();
+	} catch (error) {
+		console.log("Error in decodeWord:", error);
+		return null;
+	}
+}
+
 function getCurrentWordFromAdmin() {
-	return localStorage.getItem("currentWordleWord");
+	// Legacy support: Check localStorage for backward compatibility
+	try {
+		const localWord = localStorage.getItem("currentWordleWord");
+		if (localWord && localWord.length === 5 && /^[A-Z]+$/.test(localWord)) {
+			return Promise.resolve(localWord);
+		}
+	} catch (error) {
+		console.log("Error accessing localStorage:", error);
+	}
+
+	return Promise.resolve(null);
 }
 
 function getCustomWords() {
@@ -835,7 +910,7 @@ function submitGuess() {
 	} else if (currentRow === 5) {
 		// Player lost
 		setTimeout(() => {
-			showMessage(`Game over! The word was: ${currentWord}`, "error");
+			showGameOverModal();
 			endGame(false);
 		}, 1500);
 	} else {
@@ -979,6 +1054,7 @@ function showGameStats() {
 function startNewGame() {
 	document.getElementById("gameStats").style.display = "none";
 	closeCongratsModal(); // Close congratulations modal if open
+	closeGameOverModal(); // Close game over modal if open
 	guessHistory = []; // Reset guess history
 	resetKeyboard();
 	initializeGame();
@@ -1027,9 +1103,14 @@ function closeCongratsModal() {
 
 // Close modal when clicking outside
 document.addEventListener("click", function (event) {
-	const modal = document.getElementById("congratsModal");
-	if (modal && event.target === modal) {
+	const congratsModal = document.getElementById("congratsModal");
+	const gameOverModal = document.getElementById("gameOverModal");
+
+	if (congratsModal && event.target === congratsModal) {
 		closeCongratsModal();
+	}
+	if (gameOverModal && event.target === gameOverModal) {
+		closeGameOverModal();
 	}
 });
 
@@ -1037,6 +1118,7 @@ document.addEventListener("click", function (event) {
 document.addEventListener("keydown", function (event) {
 	if (event.key === "Escape") {
 		closeCongratsModal();
+		closeGameOverModal();
 	}
 });
 
@@ -1080,6 +1162,152 @@ function populateGuessHistory(container) {
 
 		container.appendChild(guessItem);
 	});
+}
+
+// Game Over modal functions
+function showGameOverModal() {
+	const modal = document.getElementById("gameOverModal");
+	const revealedWord = document.getElementById("revealedWord");
+	const guessHistoryContainer = document.getElementById(
+		"gameOverGuessHistory"
+	);
+
+	// Set the revealed word
+	revealedWord.textContent = currentWord;
+
+	// Populate guess history
+	populateGameOverGuessHistory(guessHistoryContainer);
+
+	// Show modal
+	modal.style.display = "flex";
+}
+
+function closeGameOverModal() {
+	const modal = document.getElementById("gameOverModal");
+	modal.style.display = "none";
+}
+
+function populateGameOverGuessHistory(container) {
+	// Clear existing content but keep title
+	const title = container.querySelector(".guess-history-title");
+	container.innerHTML = "";
+	container.appendChild(title);
+
+	// Add each guess
+	guessHistory.forEach((guess, index) => {
+		const guessItem = document.createElement("div");
+		guessItem.className = "guess-item";
+
+		// Create letter boxes
+		for (let i = 0; i < 5; i++) {
+			const letterBox = document.createElement("div");
+			letterBox.className = `guess-letter ${guess.result[i]}`;
+			letterBox.textContent = guess.word[i];
+			guessItem.appendChild(letterBox);
+		}
+
+		container.appendChild(guessItem);
+	});
+}
+
+// Results sharing functions
+function generateResultsText(gameResult) {
+	const isCustomChallenge = getWordFromUrl() !== null;
+	const gameTitle = isCustomChallenge ? "Bailey Wordle Challenge" : "Wordle";
+
+	let resultText = `${gameTitle}\n\n`;
+
+	if (gameResult === "win") {
+		const attempts = currentRow + 1;
+		resultText += `Solved in ${attempts}/6 attempts!\n`;
+	} else {
+		resultText += `${currentWord} - Not solved\n`;
+	}
+
+	resultText += "\n";
+
+	// Add guess pattern using emoji squares - only show attempted rows
+	guessHistory.forEach((guess, index) => {
+		guess.result.forEach((result) => {
+			if (result === "correct") {
+				resultText += "🟩";
+			} else if (result === "present") {
+				resultText += "🟨";
+			} else {
+				resultText += "⬜"; // Use white squares for wrong guesses
+			}
+		});
+		resultText += "\n";
+	});
+
+	if (isCustomChallenge) {
+		resultText += "\nTry this challenge yourself!";
+	}
+
+	return resultText.trim();
+}
+
+async function shareResults(gameResult) {
+	const resultsText = generateResultsText(gameResult);
+	const isCustomChallenge = getWordFromUrl() !== null;
+
+	const shareData = {
+		title: isCustomChallenge
+			? "Custom Wordle Challenge"
+			: "My Wordle Results",
+		text: resultsText,
+		url: isCustomChallenge ? window.location.href : undefined,
+	};
+
+	try {
+		if (
+			navigator.share &&
+			navigator.canShare &&
+			navigator.canShare(shareData)
+		) {
+			await navigator.share(shareData);
+			showMessage("Results shared successfully!", "success");
+		} else {
+			// Fallback: copy to clipboard
+			await copyResults(gameResult);
+		}
+	} catch (err) {
+		if (err.name !== "AbortError") {
+			// User didn't cancel, so try clipboard fallback
+			await copyResults(gameResult);
+		}
+	}
+}
+
+async function copyResults(gameResult) {
+	const resultsText = generateResultsText(gameResult);
+
+	try {
+		await navigator.clipboard.writeText(resultsText);
+		showMessage("Results copied to clipboard!", "success");
+
+		// Update button appearance temporarily
+		const button = event.target.closest("button");
+		if (button) {
+			const originalText = button.innerHTML;
+			button.innerHTML = '<i class="bx bx-check"></i> Copied!';
+
+			setTimeout(() => {
+				button.innerHTML = originalText;
+			}, 2000);
+		}
+	} catch (err) {
+		// Fallback for older browsers
+		const textArea = document.createElement("textarea");
+		textArea.value = resultsText;
+		document.body.appendChild(textArea);
+		textArea.select();
+		textArea.setSelectionRange(0, 99999);
+		document.execCommand("copy");
+		document.body.removeChild(textArea);
+
+		showMessage("Results copied to clipboard!", "success");
+	}
 }
 
 // Initialize on window load as well
