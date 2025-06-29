@@ -4,11 +4,11 @@ window.headerManager = {
 	pageConfig: {
 		"index.html": {
 			logo: "&#128640; Jia Ming - Coding Dreams into Reality",
-			hideNavItems: ["book-nav-item", "number-nav-item"],
+			hideNavItems: ["book-nav-item", "number-nav-item", "loan-nav-item"],
 		},
 		"portfolio.html": {
 			logo: "&#128640; Portfolio - My Professional Journey",
-			hideNavItems: ["book-nav-item", "number-nav-item"],
+			hideNavItems: ["book-nav-item", "number-nav-item", "loan-nav-item"],
 		},
 		"bookPage.html": {
 			logo: "&#x1F3F8; Badminton Booking",
@@ -16,6 +16,10 @@ window.headerManager = {
 		},
 		"number.html": {
 			logo: "&#x1F52E; Number Analysis",
+			hideNavItems: [],
+		},
+		"loan.html": {
+			logo: "&#x1F4B0; Loan Calculator",
 			hideNavItems: [],
 		},
 	},

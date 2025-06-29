@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link
+			href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+			rel="stylesheet" />
+		<link rel="stylesheet" href="index.css" />
+		<link rel="stylesheet" href="bookPage.css" />
+		<style>
+			/* Dark mode styles for loan calculator */
+
+			.loan-form {
+			    transition: background-color 0.3s ease, border-color 0.3s ease;
+			}
+
+			.input-group label {
+			    transition: color 0.3s ease;
+			}
+
+			.input-group input {
+			    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+			}
+
+			#loanResult {
+			    transition: background-color 0.3s ease, color 0.3s ease;
+			}
+			/* Light mode (default) */
+
+			.loan-form {
+			    background: #f8f9fa !important;
+			    border: 1px solid #e9ecef;
+			}
+
+			.input-group label {
+			    color: #333 !important;
+			}
+
+			.input-group input {
+			    background: white !important;
+			    border: 2px solid #ddd !important;
+			    color: #333 !important;
+			}
+
+			.input-group input:focus {
+			    border-color: #f9532d !important;
+			    outline: none;
+			    box-shadow: 0 0 0 2px rgba(249, 83, 45, 0.2);
+			}
+
+			#loanResult {
+			    background: white !important;
+			    color: #333 !important;
+			}
+			/* Dark mode */
+
+			body.dark-mode .loan-form {
+			    background: #1a1a1a !important;
+			    border: 1px solid #333;
+			}
+
+			body.dark-mode .input-group label {
+			    color: #e0e0e0 !important;
+			}
+
+			body.dark-mode .input-group input {
+			    background: #2d2d2d !important;
+			    border: 2px solid #444 !important;
+			    color: #e0e0e0 !important;
+			}
+
+			body.dark-mode .input-group input::placeholder {
+			    color: #888;
+			}
+
+			body.dark-mode .input-group input:focus {
+			    border-color: #f9532d !important;
+			    box-shadow: 0 0 0 2px rgba(249, 83, 45, 0.3);
+			}
+
+			body.dark-mode #loanResult {
+			    background: #1a1a1a !important;
+			    color: #e0e0e0 !important;
+			    border: 1px solid #333;
+			}
+			/* Dark mode for dynamically generated result content */
+
+			body.dark-mode #loanResult h2,
+			body.dark-mode #loanResult h3,
+			body.dark-mode #loanResult h4 {
+			    color: #e0e0e0 !important;
+			}
+
+			body.dark-mode #loanResult p {
+			    color: #e0e0e0 !important;
+			}
+			/* Target specific inline styles in dark mode */
+
+			body.dark-mode #loanResult [style*="background: #f8f9fa"],
+			body.dark-mode #loanResult [style*="background:#f8f9fa"] {
+			    background: #2d2d2d !important;
+			    border: 1px solid #444;
+			}
+
+			body.dark-mode #loanResult [style*="background: #f0f8ff"],
+			body.dark-mode #loanResult [style*="background:#f0f8ff"] {
+			    background: #2d2d2d !important;
+			    border: 1px solid #444;
+			    border-left: 4px solid #f9532d !important;
+			}
+
+			body.dark-mode #loanResult [style*="background: #fff3cd"],
+			body.dark-mode #loanResult [style*="background:#fff3cd"] {
+			    background: #3d3d1a !important;
+			    border-left: 4px solid #ffc107 !important;
+			}
+
+			body.dark-mode #loanResult [style*="color: #856404"],
+			body.dark-mode #loanResult [style*="color:#856404"] {
+			    color: #e6d700 !important;
+			}
+
+			body.dark-mode #loanResult [style*="color: #333"],
+			body.dark-mode #loanResult [style*="color:#333"] {
+			    color: #e0e0e0 !important;
+			}
+
+			body.dark-mode #loanResult [style*="color: #666"],
+			body.dark-mode #loanResult [style*="color:#666"] {
+			    color: #ccc !important;
+			}
+
+			body.dark-mode #loanResult [style*="border-top: 1px solid #ddd"],
+			body.dark-mode #loanResult [style*="border-top:1px solid #ddd"] {
+			    border-top: 1px solid #444 !important;
+			}
+			/* Dark mode for unit symbols */
+
+			body.dark-mode .input-group span {
+			    color: #ccc !important;
+			}
+		</style>
+		<title>Loan Calculator</title>
+	</head>
+
+	<body>
+		<div id="header-placeholder"></div>
+		<section
+			class="container"
+			id="loanSection"
+			style="text-align:center; margin-top:40px; max-width: 600px; margin-left: auto; margin-right: auto;">
+			<h1 style="color: #f9532d; margin-bottom: 30px;">
+				<i class="bx bx-calculator"></i> Loan Calculator
+			</h1>
+
+			<div
+				class="loan-form"
+				style="background: #f8f9fa; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+				<div
+					class="input-group"
+					style="margin-bottom: 20px; text-align: left;">
+					<label
+						for="loanPrice"
+						style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+						Price ($):
+					</label>
+					<div
+						style="position: relative; display: flex; align-items: center;">
+						<span
+							style="position: absolute; left: 12px; color: #666; font-weight: 500;"
+							>$</span
+						>
+						<input
+							type="text"
+							id="loanPrice"
+							placeholder="e.g., 500,000"
+							style="width: 100%; font-size: 1em; padding: 12px 16px 12px 28px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;" />
+					</div>
+				</div>
+
+				<div
+					class="input-group"
+					style="margin-bottom: 20px; text-align: left;">
+					<label
+						for="downPayment"
+						style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+						Down Payment (%):
+					</label>
+					<div
+						style="position: relative; display: flex; align-items: center;">
+						<input
+							type="number"
+							id="downPayment"
+							placeholder="e.g., 20"
+							min="0"
+							max="100"
+							step="0.01"
+							style="width: 100%; font-size: 1em; padding: 12px 28px 12px 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;" />
+						<span
+							style="position: absolute; right: 12px; color: #666; font-weight: 500;"
+							>%</span
+						>
+					</div>
+				</div>
+
+				<div
+					class="input-group"
+					style="margin-bottom: 20px; text-align: left;">
+					<label
+						for="interestRate"
+						style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+						Annual Interest Rate (%):
+					</label>
+					<div
+						style="position: relative; display: flex; align-items: center;">
+						<input
+							type="number"
+							id="interestRate"
+							placeholder="e.g., 3.5"
+							min="0"
+							max="1000"
+							step="0.01"
+							style="width: 100%; font-size: 1em; padding: 12px 28px 12px 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;" />
+						<span
+							style="position: absolute; right: 12px; color: #666; font-weight: 500;"
+							>%</span
+						>
+					</div>
+				</div>
+
+				<div
+					class="input-group"
+					style="margin-bottom: 30px; text-align: left;">
+					<label
+						for="loanPeriod"
+						style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+						Loan Period (Years):
+					</label>
+					<div
+						style="position: relative; display: flex; align-items: center;">
+						<input
+							type="number"
+							id="loanPeriod"
+							placeholder="e.g., 30"
+							min="1"
+							max="100"
+							style="width: 100%; font-size: 1em; padding: 12px 52px 12px 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;" />
+						<span
+							style="position: absolute; right: 12px; color: #666; font-weight: 500;"
+							>years</span
+						>
+					</div>
+				</div>
+
+				<button
+					id="calculateLoanBtn"
+					style="width: 100%; padding: 15px; font-size: 1.2em; background: #f9532d; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.3s ease;">
+					<i class="bx bx-calculator"></i> Calculate Payment
+				</button>
+			</div>
+
+			<div
+				id="loanResult"
+				style="margin-top: 30px; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none;"></div>
+		</section>
+
+		<script src="shared.js"></script>
+		<script src="loan.js"></script>
+		<script src="header.js"></script>
+		<script>
+			// Load header using the header manager
+			window.headerManager.loadHeader();
+		</script>
+	</body>
+</html>
