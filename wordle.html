@@ -432,6 +432,61 @@
 			        max-width: 200px;
 			        justify-content: center;
 			    }
+			    .keyboard {
+			        margin-top: 15px;
+			        gap: 6px;
+			    }
+			    .keyboard-row {
+			        gap: 3px;
+			    }
+			    .key {
+			        min-width: 28px;
+			        height: 50px;
+			        font-size: 12px;
+			        border-radius: 3px;
+			    }
+			    .key.wide {
+			        min-width: 50px;
+			        font-size: 10px;
+			    }
+			    .wordle-container {
+			        padding: 15px;
+			    }
+			    .game-board {
+			        gap: 3px;
+			        margin-bottom: 20px;
+			    }
+			    .word-row {
+			        gap: 3px;
+			    }
+			    .letter-box {
+			        width: 50px;
+			        height: 50px;
+			        font-size: 1.6em;
+			    }
+			}
+
+			@media (max-width: 360px) {
+			    .key {
+			        min-width: 24px;
+			        height: 45px;
+			        font-size: 11px;
+			    }
+			    .key.wide {
+			        min-width: 42px;
+			        font-size: 9px;
+			    }
+			    .keyboard-row {
+			        gap: 2px;
+			    }
+			    .letter-box {
+			        width: 45px;
+			        height: 45px;
+			        font-size: 1.4em;
+			    }
+			    .wordle-container {
+			        padding: 10px;
+			    }
 			}
 			/* Dark mode styles */
 
