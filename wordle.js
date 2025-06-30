@@ -822,15 +822,60 @@ function createGameBoard() {
 function setupEventListeners() {
 	// Keyboard event listeners
 	document.addEventListener("keydown", handleKeyPress);
-
 	// On-screen keyboard
 	const keys = document.querySelectorAll(".key");
 	keys.forEach((key) => {
-		key.addEventListener("click", () => {
+		// Make keys unfocusable
+		key.setAttribute("tabindex", "-1");
+
+		// Handle click events (mouse and touch)
+		key.addEventListener("click", (event) => {
 			const keyValue = key.getAttribute("data-key");
 			handleKeyPress({key: keyValue});
+			removeFocus(event.target);
 		});
+
+		// Handle mousedown to prevent focus
+		key.addEventListener("mousedown", (event) => {
+			event.preventDefault();
+		});
+
+		// Handle touchstart for mobile devices
+		key.addEventListener(
+			"touchstart",
+			(event) => {
+				event.preventDefault();
+				const keyValue = key.getAttribute("data-key");
+				handleKeyPress({key: keyValue});
+				removeFocus(event.target);
+			},
+			{passive: false}
+		);
+
+		// Handle touchend for mobile devices
+		key.addEventListener(
+			"touchend",
+			(event) => {
+				event.preventDefault();
+				removeFocus(event.target);
+			},
+			{passive: false}
+		);
 	});
+
+	// Helper function to remove focus completely
+	function removeFocus(element) {
+		element.blur();
+		setTimeout(() => {
+			element.blur();
+			if (document.activeElement === element) {
+				document.activeElement.blur();
+			}
+			// Force focus to body as fallback
+			document.body.focus();
+			document.body.blur();
+		}, 50);
+	}
 }
 
 function handleKeyPress(event) {
@@ -899,7 +944,11 @@ function submitGuess() {
 	});
 
 	animateRow(currentRow, result);
-	updateKeyboard(guessWord, result);
+
+	// Update keyboard after a short delay to ensure animations complete
+	setTimeout(() => {
+		updateKeyboard(guessWord, result);
+	}, 600);
 
 	if (guessWord === currentWord) {
 		// Player won
@@ -1256,7 +1305,6 @@ async function shareResults(gameResult) {
 			? "Custom Wordle Challenge"
 			: "My Wordle Results",
 		text: resultsText,
-		url: isCustomChallenge ? window.location.href : undefined,
 	};
 
 	try {

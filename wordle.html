@@ -3,7 +3,9 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no" />
 		<link
 			href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
 			rel="stylesheet" />
@@ -11,20 +13,28 @@
 		<link rel="stylesheet" href="bookPage.css" />
 		<style>
 			/* Wordle Game Styles */
+			/* Prevent zoom and text selection */
+
+			* {
+			    -webkit-user-select: none;
+			    -moz-user-select: none;
+			    -ms-user-select: none;
+			    user-select: none;
+			    -webkit-touch-callout: none;
+			    -webkit-tap-highlight-color: transparent;
+			}
+
+			html,
+			body {
+			    touch-action: manipulation;
+			    -ms-touch-action: manipulation;
+			}
 
 			.wordle-container {
 			    max-width: 500px;
 			    margin: 0 auto;
 			    padding: 20px;
 			    text-align: center;
-			}
-
-			.wordle-title {
-			    font-size: 2.5em;
-			    font-weight: bold;
-			    color: #f9532d;
-			    margin-bottom: 10px;
-			    letter-spacing: 2px;
 			}
 
 			.wordle-subtitle {
@@ -69,7 +79,6 @@
 
 			.letter-box.filled {
 			    border-color: #878a8c;
-			    animation: flip 0.6s ease forwards;
 			}
 
 			.letter-box.correct {
@@ -117,16 +126,47 @@
 			    align-items: center;
 			    justify-content: center;
 			    text-transform: uppercase;
-			    transition: background-color 0.1s ease;
+			    transition: all 0.1s ease;
+			    outline: none;
+			    -webkit-tap-highlight-color: transparent;
+			    -webkit-touch-callout: none;
+			    -webkit-user-select: none;
+			    user-select: none;
+			    touch-action: manipulation;
+			    -webkit-appearance: none;
+			    -moz-appearance: none;
+			    appearance: none;
 			}
 
 			.key:hover {
 			    background: #bbb;
 			}
 
+			.key:focus {
+			    outline: none !important;
+			    box-shadow: none !important;
+			    border: none !important;
+			}
+
+			.key:focus-visible {
+			    outline: none !important;
+			    box-shadow: none !important;
+			}
+
+			.key:active {
+			    outline: none;
+			    box-shadow: none;
+			    transform: scale(0.98);
+			}
+
 			.key.wide {
 			    min-width: 65px;
 			    font-size: 12px;
+			}
+
+			.key.backspace {
+			    min-width: 75px;
+			    font-size: 18px;
 			}
 
 			.key.correct {
@@ -449,6 +489,10 @@
 			        min-width: 50px;
 			        font-size: 10px;
 			    }
+			    .key.backspace {
+			        min-width: 60px;
+			        font-size: 14px;
+			    }
 			    .wordle-container {
 			        padding: 15px;
 			    }
@@ -475,6 +519,10 @@
 			    .key.wide {
 			        min-width: 42px;
 			        font-size: 9px;
+			    }
+			    .key.backspace {
+			        min-width: 50px;
+			        font-size: 12px;
 			    }
 			    .keyboard-row {
 			        gap: 2px;
@@ -657,7 +705,6 @@
 		<div id="header-placeholder"></div>
 
 		<section class="container wordle-container">
-			<h1 class="wordle-title">WORDLE</h1>
 			<p id="gameSubtitle" class="wordle-subtitle">
 				Guess the WORDLE in 6 tries.
 			</p>
@@ -700,8 +747,8 @@
 					<button class="key" data-key="b">B</button>
 					<button class="key" data-key="n">N</button>
 					<button class="key" data-key="m">M</button>
-					<button class="key wide" data-key="Backspace">
-						<i class="bx bx-backspace"></i>
+					<button class="key wide backspace" data-key="Backspace">
+						⌫
 					</button>
 				</div>
 			</div>
@@ -823,6 +870,30 @@
 		<script>
 			// Load header using the header manager
 			window.headerManager.loadHeader();
+
+			// Prevent double-tap zoom on mobile devices
+			let lastTouchEnd = 0;
+			document.addEventListener('touchend', function(event) {
+			    const now = (new Date()).getTime();
+			    if (now - lastTouchEnd <= 300) {
+			        event.preventDefault();
+			    }
+			    lastTouchEnd = now;
+			}, false);
+
+			// Prevent pinch-to-zoom
+			document.addEventListener('touchmove', function(event) {
+			    if (event.scale !== 1) {
+			        event.preventDefault();
+			    }
+			}, {
+			    passive: false
+			});
+
+			// Prevent zoom on double-tap for specific browsers
+			document.addEventListener('dblclick', function(event) {
+			    event.preventDefault();
+			});
 		</script>
 	</body>
 </html>
