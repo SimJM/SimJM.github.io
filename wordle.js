@@ -1273,7 +1273,7 @@ function generateResultsText(gameResult) {
 		resultText += `${currentWord} - Not solved\n`;
 	}
 
-	resultText += "\n";
+	resultText += `Answer: ${currentWord}\n\n`;
 
 	// Add guess pattern using emoji squares - only show attempted rows
 	guessHistory.forEach((guess, index) => {
@@ -1288,6 +1288,14 @@ function generateResultsText(gameResult) {
 		});
 		resultText += "\n";
 	});
+
+	// Add guess history
+	if (guessHistory.length > 0) {
+		resultText += "\nGuess History:\n";
+		guessHistory.forEach((guess, index) => {
+			resultText += `${index + 1}. ${guess.word}\n`;
+		});
+	}
 
 	if (isCustomChallenge) {
 		resultText += "\nTry this challenge yourself!";
