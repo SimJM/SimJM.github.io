@@ -141,6 +141,57 @@
 			body.dark-mode .input-group span {
 			    color: #ccc !important;
 			}
+			/* Dark mode for readonly fields */
+
+			body.dark-mode .input-group input[readonly] {
+			    background-color: #2d2d2d !important;
+			    color: #ccc !important;
+			}
+
+			body.dark-mode #earlyRepaymentResult {
+			    background: #1a1a1a !important;
+			    color: #e0e0e0 !important;
+			    border: 1px solid #333;
+			}
+			/* Dark mode for early repayment result content */
+
+			body.dark-mode #earlyRepaymentResult h2,
+			body.dark-mode #earlyRepaymentResult h3,
+			body.dark-mode #earlyRepaymentResult h4 {
+			    color: #e0e0e0 !important;
+			}
+
+			body.dark-mode #earlyRepaymentResult p {
+			    color: #e0e0e0 !important;
+			}
+
+			body.dark-mode #earlyRepaymentResult [style*="background: #f8f9fa"] {
+			    background: #2d2d2d !important;
+			    border: 1px solid #444;
+			}
+
+			body.dark-mode #earlyRepaymentResult [style*="background: #e8f5e8"] {
+			    background: #1a3d1a !important;
+			    border-left: 4px solid #28a745 !important;
+			}
+
+			body.dark-mode #earlyRepaymentResult [style*="background: #e8f4fd"] {
+			    background: #1a2a3d !important;
+			    border-left: 4px solid #007bff !important;
+			}
+
+			body.dark-mode #earlyRepaymentResult [style*="background: #fff3cd"] {
+			    background: #3d3d1a !important;
+			    border-left: 4px solid #ffc107 !important;
+			}
+
+			body.dark-mode #earlyRepaymentResult [style*="color: #333"] {
+			    color: #e0e0e0 !important;
+			}
+
+			body.dark-mode #earlyRepaymentResult [style*="color: #666"] {
+			    color: #ccc !important;
+			}
 		</style>
 		<title>Loan Calculator</title>
 	</head>
@@ -261,8 +312,122 @@
 				</button>
 			</div>
 
+			<!-- Early Repayment Calculator -->
+			<div
+				id="earlyRepaymentSection"
+				class="loan-form"
+				style="background: #f8f9fa; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-top: 30px; display: none;">
+				<h3
+					style="color: #f9532d; margin-bottom: 20px; text-align: center;">
+					<i class="bx bx-money"></i> Early Repayment Calculator
+				</h3>
+
+				<div
+					class="input-group"
+					style="margin-bottom: 20px; text-align: left;">
+					<label
+						for="currentLoanBalance"
+						style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+						Current Loan Balance ($):
+						<small
+							style="font-weight: normal; color: #666; font-style: italic;">
+							(auto-calculated when months paid is entered)
+						</small>
+					</label>
+					<div
+						style="position: relative; display: flex; align-items: center;">
+						<span
+							style="position: absolute; left: 12px; color: #666; font-weight: 500;"
+							>$</span
+						>
+						<input
+							type="text"
+							id="currentLoanBalance"
+							placeholder="Remaining balance"
+							style="width: 100%; font-size: 1em; padding: 12px 16px 12px 28px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;" />
+					</div>
+				</div>
+
+				<div
+					class="input-group"
+					style="margin-bottom: 20px; text-align: left;">
+					<label
+						for="monthsPaid"
+						style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+						Months Already Paid:
+					</label>
+					<div
+						style="position: relative; display: flex; align-items: center;">
+						<input
+							type="number"
+							id="monthsPaid"
+							placeholder="e.g., 24"
+							min="0"
+							style="width: 100%; font-size: 1em; padding: 12px 52px 12px 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;" />
+						<span
+							style="position: absolute; right: 12px; color: #666; font-weight: 500;"
+							>months</span
+						>
+					</div>
+				</div>
+
+				<div
+					class="input-group"
+					style="margin-bottom: 20px; text-align: left;">
+					<label
+						for="extraPayment"
+						style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+						Extra Monthly Payment ($):
+					</label>
+					<div
+						style="position: relative; display: flex; align-items: center;">
+						<span
+							style="position: absolute; left: 12px; color: #666; font-weight: 500;"
+							>$</span
+						>
+						<input
+							type="text"
+							id="extraPayment"
+							placeholder="e.g., 200 (optional)"
+							style="width: 100%; font-size: 1em; padding: 12px 16px 12px 28px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;" />
+					</div>
+				</div>
+
+				<div
+					class="input-group"
+					style="margin-bottom: 30px; text-align: left;">
+					<label
+						for="lumpSumPayment"
+						style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+						One-time Lump Sum Payment ($):
+					</label>
+					<div
+						style="position: relative; display: flex; align-items: center;">
+						<span
+							style="position: absolute; left: 12px; color: #666; font-weight: 500;"
+							>$</span
+						>
+						<input
+							type="text"
+							id="lumpSumPayment"
+							placeholder="e.g., 10,000 (optional)"
+							style="width: 100%; font-size: 1em; padding: 12px 16px 12px 28px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;" />
+					</div>
+				</div>
+
+				<button
+					id="calculateEarlyRepaymentBtn"
+					style="width: 100%; padding: 15px; font-size: 1.2em; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.3s ease;">
+					<i class="bx bx-calculator"></i> Calculate Early Repayment
+				</button>
+			</div>
+
 			<div
 				id="loanResult"
+				style="margin-top: 30px; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none;"></div>
+
+			<div
+				id="earlyRepaymentResult"
 				style="margin-top: 30px; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none;"></div>
 		</section>
 

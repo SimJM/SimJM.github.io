@@ -1,21 +1,138 @@
-//document.addEventListener("DOMContentLoaded", function () {
-console.log("Loan calculator loaded");
+document.addEventListener("DOMContentLoaded", function () {
+	console.log("Loan calculator loaded");
 
-const calculateBtn = document.getElementById("calculateLoanBtn");
-const resultDiv = document.getElementById("loanResult");
-const priceInput = document.getElementById("loanPrice");
-const downPaymentInput = document.getElementById("downPayment");
-const interestRateInput = document.getElementById("interestRate");
-const loanPeriodInput = document.getElementById("loanPeriod");
+	const calculateBtn = document.getElementById("calculateLoanBtn");
+	const earlyRepaymentBtn = document.getElementById(
+		"calculateEarlyRepaymentBtn"
+	);
+	const resultDiv = document.getElementById("loanResult");
+	const earlyRepaymentSection = document.getElementById(
+		"earlyRepaymentSection"
+	);
+	const earlyRepaymentResult = document.getElementById(
+		"earlyRepaymentResult"
+	);
+	const priceInput = document.getElementById("loanPrice");
+	const downPaymentInput = document.getElementById("downPayment");
+	const interestRateInput = document.getElementById("interestRate");
+	const loanPeriodInput = document.getElementById("loanPeriod");
+	const currentLoanBalanceInput =
+		document.getElementById("currentLoanBalance");
+	const extraPaymentInput = document.getElementById("extraPayment");
+	const lumpSumPaymentInput = document.getElementById("lumpSumPayment");
+	const monthsPaidInput = document.getElementById("monthsPaid");
 
-// Add number formatting for price input
-priceInput.addEventListener("input", function (e) {
-	formatPriceInput(e.target);
-});
+	// Add number formatting for price and early repayment inputs
+	priceInput.addEventListener("input", function (e) {
+		formatPriceInput(e.target);
+	});
 
-// Add blur event to ensure proper formatting when user leaves the field
-priceInput.addEventListener("blur", function (e) {
-	formatPriceInput(e.target);
+	currentLoanBalanceInput.addEventListener("input", function (e) {
+		formatPriceInput(e.target);
+		// Clear auto-calculated styling when user manually edits
+		e.target.style.backgroundColor = "";
+		e.target.title = "";
+	});
+
+	extraPaymentInput.addEventListener("input", function (e) {
+		formatPriceInput(e.target);
+	});
+
+	lumpSumPaymentInput.addEventListener("input", function (e) {
+		formatPriceInput(e.target);
+	});
+
+	// Add blur events
+	priceInput.addEventListener("blur", function (e) {
+		formatPriceInput(e.target);
+	});
+
+	currentLoanBalanceInput.addEventListener("blur", function (e) {
+		formatPriceInput(e.target);
+	});
+
+	extraPaymentInput.addEventListener("blur", function (e) {
+		formatPriceInput(e.target);
+	});
+
+	lumpSumPaymentInput.addEventListener("blur", function (e) {
+		formatPriceInput(e.target);
+	});
+
+	// Add input validation
+	downPaymentInput.addEventListener("input", function (e) {
+		validatePercentageInput(e.target, 0, 100);
+	});
+
+	interestRateInput.addEventListener("input", function (e) {
+		validatePercentageInput(e.target, 0, 1000);
+	});
+
+	loanPeriodInput.addEventListener("input", function (e) {
+		validateIntegerInput(e.target, 1, 100);
+	});
+
+	monthsPaidInput.addEventListener("input", function (e) {
+		validateIntegerInput(e.target, 0, 1200);
+	});
+
+	// Auto-calculate loan balance when months paid changes
+	monthsPaidInput.addEventListener("input", function (e) {
+		autoCalculateLoanBalance();
+	});
+
+	monthsPaidInput.addEventListener("blur", function (e) {
+		autoCalculateLoanBalance();
+	});
+
+	// Add hover effects
+	calculateBtn.addEventListener("mouseenter", function () {
+		this.style.background = "#e84419";
+	});
+
+	calculateBtn.addEventListener("mouseleave", function () {
+		this.style.background = "#f9532d";
+	});
+
+	earlyRepaymentBtn.addEventListener("mouseenter", function () {
+		this.style.background = "#218838";
+	});
+
+	earlyRepaymentBtn.addEventListener("mouseleave", function () {
+		this.style.background = "#28a745";
+	});
+
+	// Add event listeners
+	calculateBtn.addEventListener("click", function () {
+		// Reset Early Repayment Calculator first
+		resetEarlyRepaymentCalculator();
+
+		// Then calculate the new loan
+		calculateLoan();
+
+		// Show early repayment section after main calculation
+		earlyRepaymentSection.style.display = "block";
+	});
+
+	earlyRepaymentBtn.addEventListener("click", calculateEarlyRepayment);
+
+	// Allow Enter key to trigger calculation
+	document.addEventListener("keypress", function (e) {
+		if (e.key === "Enter") {
+			if (document.activeElement.closest("#earlyRepaymentSection")) {
+				calculateEarlyRepayment();
+			} else {
+				// Reset Early Repayment Calculator first
+				resetEarlyRepaymentCalculator();
+
+				// Then calculate the new loan
+				calculateLoan();
+
+				// Show early repayment section after main calculation
+				earlyRepaymentSection.style.display = "block";
+			}
+		}
+	});
 });
 
 // Add input validation for down payment (0-100%)
@@ -33,43 +150,43 @@ loanPeriodInput.addEventListener("input", function (e) {
 	validateIntegerInput(e.target, 1, 100);
 });
 
-// ...existing code...lculator functionality
+// Add input validation for months paid
+const monthsPaidInput = document.getElementById("monthsPaid");
+monthsPaidInput.addEventListener("input", function (e) {
+	validateIntegerInput(e.target, 0, 1200); // Up to 100 years
+});
 
-document.addEventListener("DOMContentLoaded", function () {
-	console.log("Loan calculator loaded");
+// Add hover effects
+calculateBtn.addEventListener("mouseenter", function () {
+	this.style.background = "#e84419";
+});
 
-	const calculateBtn = document.getElementById("calculateLoanBtn");
-	const resultDiv = document.getElementById("loanResult");
-	const priceInput = document.getElementById("loanPrice");
+calculateBtn.addEventListener("mouseleave", function () {
+	this.style.background = "#f9532d";
+});
 
-	// Add number formatting for price input
-	priceInput.addEventListener("input", function (e) {
-		formatPriceInput(e.target);
-	});
+earlyRepaymentBtn.addEventListener("mouseenter", function () {
+	this.style.background = "#218838";
+});
 
-	// Add blur event to ensure proper formatting when user leaves the field
-	priceInput.addEventListener("blur", function (e) {
-		formatPriceInput(e.target);
-	});
+earlyRepaymentBtn.addEventListener("mouseleave", function () {
+	this.style.background = "#28a745";
+});
 
-	// Add hover effect to button
-	calculateBtn.addEventListener("mouseenter", function () {
-		this.style.background = "#e84419";
-	});
+// Add event listeners
+calculateBtn.addEventListener("click", calculateLoan);
+earlyRepaymentBtn.addEventListener("click", calculateEarlyRepayment);
 
-	calculateBtn.addEventListener("mouseleave", function () {
-		this.style.background = "#f9532d";
-	});
-
-	// Add input validation and calculation
-	calculateBtn.addEventListener("click", calculateLoan);
-
-	// Allow Enter key to trigger calculation
-	document.addEventListener("keypress", function (e) {
-		if (e.key === "Enter") {
+// Allow Enter key to trigger calculation
+document.addEventListener("keypress", function (e) {
+	if (e.key === "Enter") {
+		if (document.activeElement.closest("#earlyRepaymentSection")) {
+			calculateEarlyRepayment();
+		} else {
 			calculateLoan();
+			earlyRepaymentSection.style.display = "block";
 		}
-	});
+	}
 });
 
 // Format price input with comma separators
@@ -402,7 +519,686 @@ function formatNumber(num) {
 	}).format(num);
 }
 
+// Early repayment calculator functionality
+function calculateEarlyRepayment() {
+	console.log("Calculating early repayment...");
+
+	// Get early repayment inputs
+	const currentBalance = parsePriceInput(
+		document.getElementById("currentLoanBalance")
+	);
+	const monthsPaid =
+		parseInt(document.getElementById("monthsPaid").value) || 0;
+	const extraPayment =
+		parsePriceInput(document.getElementById("extraPayment")) || 0;
+	const lumpSumPayment =
+		parsePriceInput(document.getElementById("lumpSumPayment")) || 0;
+	const earlyRepaymentResult = document.getElementById(
+		"earlyRepaymentResult"
+	);
+
+	// Get original loan details from main calculator
+	const originalLoanAmount =
+		parsePriceInput(document.getElementById("loanPrice")) -
+		parsePriceInput(document.getElementById("loanPrice")) *
+			(parseFloat(document.getElementById("downPayment").value) / 100);
+	const annualInterestRate = parseFloat(
+		document.getElementById("interestRate").value
+	);
+	const originalLoanPeriodYears = parseInt(
+		document.getElementById("loanPeriod").value
+	);
+
+	// Validate inputs
+	if (
+		!validateEarlyRepaymentInputs(
+			currentBalance,
+			monthsPaid,
+			annualInterestRate,
+			originalLoanPeriodYears
+		)
+	) {
+		showEarlyRepaymentError(
+			"Please ensure you have calculated the main loan first and entered a valid current balance and months paid."
+		);
+		return;
+	}
+
+	try {
+		// Calculate original loan details first
+		const originalMonthlyPayment = calculateMonthlyPayment(
+			originalLoanAmount,
+			annualInterestRate,
+			originalLoanPeriodYears
+		);
+
+		// Calculate payment breakdown (principal and interest paid so far)
+		const paymentBreakdown = calculatePaymentBreakdown(
+			originalLoanAmount,
+			originalMonthlyPayment,
+			annualInterestRate,
+			monthsPaid
+		);
+
+		// Calculate remaining loan details
+		const monthlyInterestRate = annualInterestRate / 100 / 12;
+		const remainingMonths = originalLoanPeriodYears * 12 - monthsPaid;
+
+		// Calculate scenarios
+		const currentScenario = calculateRemainingPayments(
+			currentBalance,
+			originalMonthlyPayment,
+			monthlyInterestRate
+		);
+		const extraPaymentScenario =
+			extraPayment > 0
+				? calculateRemainingPayments(
+						currentBalance,
+						originalMonthlyPayment + extraPayment,
+						monthlyInterestRate
+				  )
+				: null;
+		const lumpSumScenario =
+			lumpSumPayment > 0
+				? calculateRemainingPayments(
+						Math.max(0, currentBalance - lumpSumPayment),
+						originalMonthlyPayment,
+						monthlyInterestRate
+				  )
+				: null;
+		const bothScenario =
+			extraPayment > 0 && lumpSumPayment > 0
+				? calculateRemainingPayments(
+						Math.max(0, currentBalance - lumpSumPayment),
+						originalMonthlyPayment + extraPayment,
+						monthlyInterestRate
+				  )
+				: null;
+
+		// Calculate effective interest rate
+		const effectiveInterestRate = calculateEffectiveInterestRate(
+			originalLoanAmount,
+			paymentBreakdown.totalPaymentsMade,
+			paymentBreakdown.interestPaid,
+			monthsPaid
+		);
+
+		// Display results
+		displayEarlyRepaymentResults({
+			originalLoanAmount,
+			originalMonthlyPayment,
+			monthsPaid,
+			interestPaidSoFar: paymentBreakdown.interestPaid,
+			principalPaidSoFar: paymentBreakdown.principalPaid,
+			totalPaymentsMade: paymentBreakdown.totalPaymentsMade,
+			effectiveInterestRate: effectiveInterestRate,
+			currentBalance,
+			extraPayment,
+			lumpSumPayment,
+			currentScenario,
+			extraPaymentScenario,
+			lumpSumScenario,
+			bothScenario,
+		});
+	} catch (error) {
+		console.error("Early repayment calculation error:", error);
+		showEarlyRepaymentError(
+			"An error occurred during calculation. Please check your inputs."
+		);
+	}
+}
+
+function validateEarlyRepaymentInputs(
+	currentBalance,
+	monthsPaid,
+	interestRate,
+	loanPeriod
+) {
+	if (isNaN(currentBalance) || currentBalance <= 0) {
+		return false;
+	}
+	if (isNaN(monthsPaid) || monthsPaid < 0) {
+		return false;
+	}
+	if (isNaN(interestRate) || interestRate < 0) {
+		return false;
+	}
+	if (isNaN(loanPeriod) || loanPeriod <= 0) {
+		return false;
+	}
+	return true;
+}
+
+function calculateMonthlyPayment(
+	loanAmount,
+	annualInterestRate,
+	loanPeriodYears
+) {
+	const monthlyInterestRate = annualInterestRate / 100 / 12;
+	const totalPayments = loanPeriodYears * 12;
+
+	if (monthlyInterestRate > 0) {
+		return (
+			(loanAmount *
+				(monthlyInterestRate *
+					Math.pow(1 + monthlyInterestRate, totalPayments))) /
+			(Math.pow(1 + monthlyInterestRate, totalPayments) - 1)
+		);
+	} else {
+		return loanAmount / totalPayments;
+	}
+}
+
+function calculateInterestPaidSoFar(
+	loanAmount,
+	monthlyPayment,
+	annualInterestRate,
+	monthsPaid
+) {
+	const monthlyInterestRate = annualInterestRate / 100 / 12;
+	let remainingBalance = loanAmount;
+	let totalInterestPaid = 0;
+
+	for (let month = 1; month <= monthsPaid; month++) {
+		const interestPayment = remainingBalance * monthlyInterestRate;
+		const principalPayment = monthlyPayment - interestPayment;
+
+		totalInterestPaid += interestPayment;
+		remainingBalance -= principalPayment;
+
+		if (remainingBalance <= 0) break;
+	}
+
+	return totalInterestPaid;
+}
+
+// Calculate both principal and interest paid so far
+function calculatePaymentBreakdown(
+	loanAmount,
+	monthlyPayment,
+	annualInterestRate,
+	monthsPaid
+) {
+	const monthlyInterestRate = annualInterestRate / 100 / 12;
+	let remainingBalance = loanAmount;
+	let totalInterestPaid = 0;
+	let totalPrincipalPaid = 0;
+
+	for (let month = 1; month <= monthsPaid; month++) {
+		const interestPayment = remainingBalance * monthlyInterestRate;
+		const principalPayment = monthlyPayment - interestPayment;
+
+		totalInterestPaid += interestPayment;
+		totalPrincipalPaid += principalPayment;
+		remainingBalance -= principalPayment;
+
+		if (remainingBalance <= 0) break;
+	}
+
+	return {
+		principalPaid: totalPrincipalPaid,
+		interestPaid: totalInterestPaid,
+		totalPaymentsMade: totalPrincipalPaid + totalInterestPaid,
+		remainingBalance: Math.max(0, remainingBalance),
+	};
+}
+
+function calculateRemainingPayments(
+	balance,
+	monthlyPayment,
+	monthlyInterestRate
+) {
+	if (balance <= 0) {
+		return {
+			monthsToPayoff: 0,
+			totalInterest: 0,
+			totalPayments: 0,
+		};
+	}
+
+	let remainingBalance = balance;
+	let months = 0;
+	let totalInterest = 0;
+	const maxMonths = 600; // 50 years maximum
+
+	while (remainingBalance > 0.01 && months < maxMonths) {
+		const interestPayment = remainingBalance * monthlyInterestRate;
+		const principalPayment = Math.min(
+			monthlyPayment - interestPayment,
+			remainingBalance
+		);
+
+		if (principalPayment <= 0) {
+			// Payment doesn't cover interest
+			return {
+				monthsToPayoff: Infinity,
+				totalInterest: Infinity,
+				totalPayments: Infinity,
+			};
+		}
+
+		totalInterest += interestPayment;
+		remainingBalance -= principalPayment;
+		months++;
+	}
+
+	return {
+		monthsToPayoff: months,
+		totalInterest: totalInterest,
+		totalPayments: months * monthlyPayment,
+	};
+}
+
+// Calculate effective interest rate for early repayment scenarios
+function calculateEffectiveInterestRate(
+	originalLoanAmount,
+	totalPaymentsMade,
+	totalInterestPaid,
+	monthsPaid
+) {
+	if (monthsPaid <= 0 || totalPaymentsMade <= 0) {
+		return 0;
+	}
+
+	// Calculate the effective annual rate using the formula: (interest/principal) * 100 / months * 12
+	const principalPaid = totalPaymentsMade - totalInterestPaid;
+
+	if (principalPaid <= 0) {
+		return 0;
+	}
+
+	// Effective annual rate = (interest / principal) * 100 / months * 12
+	const effectiveRate =
+		(((totalInterestPaid / principalPaid) * 100) / monthsPaid) * 12;
+
+	return Math.max(0, effectiveRate);
+}
+
+function displayEarlyRepaymentResults(data) {
+	const resultDiv = document.getElementById("earlyRepaymentResult");
+
+	const html = `
+		<h2 style="color: #28a745; margin-bottom: 25px; border-bottom: 2px solid #28a745; padding-bottom: 10px;">
+			<i class="bx bx-money"></i> Early Repayment Analysis
+		</h2>
+		
+		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+			<div class="summary-item">
+				<h3 style="color: #333; margin-bottom: 8px; font-size: 1.1em;">Total Payments Made</h3>
+				<p style="font-size: 1.3em; font-weight: bold; color: #007bff; margin: 0;">
+					$${formatNumber(data.totalPaymentsMade)}
+				</p>
+				<p style="font-size: 0.9em; color: #666; margin: 0;">
+					(${data.monthsPaid} payments made)
+				</p>
+			</div>
+			
+			<div class="summary-item">
+				<h3 style="color: #333; margin-bottom: 8px; font-size: 1.1em;">Effective Interest Rate</h3>
+				<p style="font-size: 1.3em; font-weight: bold; color: #6f42c1; margin: 0;">
+					${data.effectiveInterestRate.toFixed(2)}%
+				</p>
+				<p style="font-size: 0.9em; color: #666; margin: 0;">
+					(actual rate paid so far)
+				</p>
+			</div>
+		</div>
+
+		<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+			<div class="summary-item">
+				<h3 style="color: #333; margin-bottom: 8px; font-size: 1.1em;">Interest Paid So Far</h3>
+				<p style="font-size: 1.3em; font-weight: bold; color: #dc3545; margin: 0;">
+					$${formatNumber(data.interestPaidSoFar)}
+				</p>
+				<p style="font-size: 0.9em; color: #666; margin: 0;">
+					(part of total payments)
+				</p>
+			</div>
+			
+			<div class="summary-item">
+				<h3 style="color: #333; margin-bottom: 8px; font-size: 1.1em;">Principal Paid So Far</h3>
+				<p style="font-size: 1.3em; font-weight: bold; color: #28a745; margin: 0;">
+					$${formatNumber(data.principalPaidSoFar)}
+				</p>
+				<p style="font-size: 0.9em; color: #666; margin: 0;">
+					(towards loan balance)
+				</p>
+			</div>
+			
+			<div class="summary-item">
+				<h3 style="color: #333; margin-bottom: 8px; font-size: 1.1em;">Current Balance</h3>
+				<p style="font-size: 1.3em; font-weight: bold; color: #f9532d; margin: 0;">
+					$${formatNumber(data.currentBalance)}
+				</p>
+			</div>
+		</div>
+
+		<div style="margin-bottom: 30px;">
+			<h3 style="color: #333; margin-bottom: 15px;">Payment Scenarios</h3>
+			
+			<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+				<h4 style="color: #333; margin-bottom: 10px;">
+					<i class="bx bx-time"></i> Continue Current Payments ($${formatNumber(
+						data.originalMonthlyPayment
+					)}/month)
+				</h4>
+				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666;">Months Remaining</p>
+						<p style="margin: 0; font-weight: bold; color: #333;">${
+							data.currentScenario.monthsToPayoff
+						}</p>
+					</div>
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666;">Remaining Interest</p>
+						<p style="margin: 0; font-weight: bold; color: #dc3545;">$${formatNumber(
+							data.currentScenario.totalInterest
+						)}</p>
+					</div>
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666;">Total Interest (Lifetime)</p>
+						<p style="margin: 0; font-weight: bold; color: #dc3545;">$${formatNumber(
+							data.interestPaidSoFar +
+								data.currentScenario.totalInterest
+						)}</p>
+					</div>
+				</div>
+			</div>
+
+			${
+				data.extraPaymentScenario
+					? `
+			<div style="background: #e8f5e8; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #28a745;">
+				<h4 style="color: #333; margin-bottom: 10px;">
+					<i class="bx bx-plus-circle"></i> With Extra Payment (+$${formatNumber(
+						data.extraPayment
+					)}/month)
+				</h4>
+				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666;">Months Remaining</p>
+						<p style="margin: 0; font-weight: bold; color: #28a745;">${
+							data.extraPaymentScenario.monthsToPayoff
+						}</p>
+						<p style="margin: 0; font-size: 0.8em; color: #28a745;">
+							(${
+								data.currentScenario.monthsToPayoff -
+								data.extraPaymentScenario.monthsToPayoff
+							} months saved)
+						</p>
+					</div>
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666;">Remaining Interest</p>
+						<p style="margin: 0; font-weight: bold; color: #28a745;">$${formatNumber(
+							data.extraPaymentScenario.totalInterest
+						)}</p>
+						<p style="margin: 0; font-size: 0.8em; color: #28a745;">
+							($${formatNumber(
+								data.currentScenario.totalInterest -
+									data.extraPaymentScenario.totalInterest
+							)} saved)
+						</p>
+					</div>
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666;">Total Interest (Lifetime)</p>
+						<p style="margin: 0; font-weight: bold; color: #28a745;">$${formatNumber(
+							data.interestPaidSoFar +
+								data.extraPaymentScenario.totalInterest
+						)}</p>
+					</div>
+				</div>
+			</div>
+			`
+					: ""
+			}
+
+			${
+				data.lumpSumScenario
+					? `
+			<div style="background: #e8f4fd; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #007bff;">
+				<h4 style="color: #333; margin-bottom: 10px;">
+					<i class="bx bx-dollar-circle"></i> With Lump Sum Payment ($${formatNumber(
+						data.lumpSumPayment
+					)})
+				</h4>
+				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666;">Months Remaining</p>
+						<p style="margin: 0; font-weight: bold; color: #007bff;">${
+							data.lumpSumScenario.monthsToPayoff
+						}</p>
+						<p style="margin: 0; font-size: 0.8em; color: #007bff;">
+							(${
+								data.currentScenario.monthsToPayoff -
+								data.lumpSumScenario.monthsToPayoff
+							} months saved)
+						</p>
+					</div>
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666;">Remaining Interest</p>
+						<p style="margin: 0; font-weight: bold; color: #007bff;">$${formatNumber(
+							data.lumpSumScenario.totalInterest
+						)}</p>
+						<p style="margin: 0; font-size: 0.8em; color: #007bff;">
+							($${formatNumber(
+								data.currentScenario.totalInterest -
+									data.lumpSumScenario.totalInterest
+							)} saved)
+						</p>
+					</div>
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666;">Total Interest (Lifetime)</p>
+						<p style="margin: 0; font-weight: bold; color: #007bff;">$${formatNumber(
+							data.interestPaidSoFar +
+								data.lumpSumScenario.totalInterest
+						)}</p>
+					</div>
+				</div>
+			</div>
+			`
+					: ""
+			}
+
+			${
+				data.bothScenario
+					? `
+			<div style="background: #fff3cd; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ffc107;">
+				<h4 style="color: #333; margin-bottom: 10px;">
+					<i class="bx bx-star"></i> Combined: Lump Sum + Extra Payment
+				</h4>
+				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666;">Months Remaining</p>
+						<p style="margin: 0; font-weight: bold; color: #856404;">${
+							data.bothScenario.monthsToPayoff
+						}</p>
+						<p style="margin: 0; font-size: 0.8em; color: #856404;">
+							(${
+								data.currentScenario.monthsToPayoff -
+								data.bothScenario.monthsToPayoff
+							} months saved)
+						</p>
+					</div>
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666;">Remaining Interest</p>
+						<p style="margin: 0; font-weight: bold; color: #856404;">$${formatNumber(
+							data.bothScenario.totalInterest
+						)}</p>
+						<p style="margin: 0; font-size: 0.8em; color: #856404;">
+							($${formatNumber(
+								data.currentScenario.totalInterest -
+									data.bothScenario.totalInterest
+							)} saved)
+						</p>
+					</div>
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666;">Total Interest (Lifetime)</p>
+						<p style="margin: 0; font-weight: bold; color: #856404;">$${formatNumber(
+							data.interestPaidSoFar +
+								data.bothScenario.totalInterest
+						)}</p>
+					</div>
+				</div>
+			</div>
+			`
+					: ""
+			}
+		</div>
+		
+		<div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+			<p style="margin: 0; font-size: 0.9em; color: #856404;">
+				<i class="bx bx-info-circle"></i> 
+				<strong>Note:</strong> These calculations assume consistent payments and interest rates. Actual results may vary based on loan terms and payment schedules.
+			</p>
+		</div>
+	`;
+
+	resultDiv.innerHTML = html;
+	resultDiv.style.display = "block";
+
+	// Smooth scroll to results
+	resultDiv.scrollIntoView({behavior: "smooth", block: "nearest"});
+}
+
+function showEarlyRepaymentError(message) {
+	const resultDiv = document.getElementById("earlyRepaymentResult");
+
+	resultDiv.innerHTML = `
+		<div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; border-left: 4px solid #dc3545;">
+			<i class="bx bx-error"></i> 
+			<strong>Error:</strong> ${message}
+		</div>
+	`;
+
+	resultDiv.style.display = "block";
+}
+
 // Initialize on window load as well
 window.initLoanPage = function () {
 	console.log("Loan page initialized");
 };
+
+// Auto-calculate loan balance when months paid changes
+function autoCalculateLoanBalance() {
+	// Check if we have enough data to calculate
+	const price = parsePriceInput(document.getElementById("loanPrice"));
+	const downPaymentPercent = parseFloat(
+		document.getElementById("downPayment").value
+	);
+	const annualInterestRate = parseFloat(
+		document.getElementById("interestRate").value
+	);
+	const loanPeriodYears = parseInt(
+		document.getElementById("loanPeriod").value
+	);
+	const monthsPaid = parseInt(document.getElementById("monthsPaid").value);
+
+	// Only calculate if we have all required data and months paid is valid
+	if (
+		price > 0 &&
+		!isNaN(downPaymentPercent) &&
+		downPaymentPercent >= 0 &&
+		!isNaN(annualInterestRate) &&
+		annualInterestRate >= 0 &&
+		!isNaN(loanPeriodYears) &&
+		loanPeriodYears > 0 &&
+		!isNaN(monthsPaid) &&
+		monthsPaid >= 0
+	) {
+		try {
+			// Calculate original loan details
+			const loanDetails = calculateLoanDetails(
+				price,
+				downPaymentPercent,
+				annualInterestRate,
+				loanPeriodYears
+			);
+
+			// Calculate remaining balance and payment breakdown after months paid
+			const paymentBreakdown = calculatePaymentBreakdown(
+				loanDetails.loanAmount,
+				loanDetails.monthlyPayment,
+				annualInterestRate,
+				monthsPaid
+			);
+
+			// Auto-fill the current loan balance field
+			const currentLoanBalanceInput =
+				document.getElementById("currentLoanBalance");
+			currentLoanBalanceInput.value = paymentBreakdown.remainingBalance
+				.toFixed(0)
+				.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+			// Add visual indicator that this was auto-calculated
+			currentLoanBalanceInput.style.backgroundColor = "#e8f5e8";
+			currentLoanBalanceInput.title =
+				"Auto-calculated based on months paid";
+
+			// Remove the highlight after a few seconds
+			setTimeout(() => {
+				currentLoanBalanceInput.style.backgroundColor = "";
+			}, 2000);
+		} catch (error) {
+			console.error("Auto-calculation error:", error);
+		}
+	}
+}
+
+// Clear auto-calculated fields when user changes base loan parameters
+function clearAutoCalculatedFields() {
+	const currentLoanBalanceInput =
+		document.getElementById("currentLoanBalance");
+
+	currentLoanBalanceInput.value = "";
+	currentLoanBalanceInput.style.backgroundColor = "";
+	currentLoanBalanceInput.title = "";
+}
+
+// Clear auto-calculated fields when base loan parameters change
+priceInput.addEventListener("input", clearAutoCalculatedFields);
+downPaymentInput.addEventListener("input", clearAutoCalculatedFields);
+interestRateInput.addEventListener("input", clearAutoCalculatedFields);
+loanPeriodInput.addEventListener("input", clearAutoCalculatedFields);
+
+// Function to reset Early Repayment Calculator
+function resetEarlyRepaymentCalculator() {
+	// Clear all input fields
+	document.getElementById("currentLoanBalance").value = "";
+	document.getElementById("monthsPaid").value = "";
+	document.getElementById("extraPayment").value = "";
+	document.getElementById("lumpSumPayment").value = "";
+
+	// Clear any auto-calculated styling
+	const currentLoanBalanceInput =
+		document.getElementById("currentLoanBalance");
+	currentLoanBalanceInput.style.backgroundColor = "";
+	currentLoanBalanceInput.title = "";
+
+	// Hide the early repayment section and results
+	earlyRepaymentSection.style.display = "none";
+	earlyRepaymentResult.style.display = "none";
+
+	// Clear results content
+	earlyRepaymentResult.innerHTML = "";
+}
+
+// Add event listeners
+calculateBtn.addEventListener("click", function () {
+	calculateLoan();
+	// Show early repayment section after main calculation
+	earlyRepaymentSection.style.display = "block";
+});
+
+earlyRepaymentBtn.addEventListener("click", calculateEarlyRepayment);
+
+// Allow Enter key to trigger calculation
+document.addEventListener("keypress", function (e) {
+	if (e.key === "Enter") {
+		if (document.activeElement.closest("#earlyRepaymentSection")) {
+			calculateEarlyRepayment();
+		} else {
+			calculateLoan();
+			earlyRepaymentSection.style.display = "block";
+		}
+	}
+});
