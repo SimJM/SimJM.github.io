@@ -125,6 +125,16 @@ window.portfolioContent = {
 	].map(addDurationToEntry),
 	projects: [
 		{
+			title: "Wordle Game",
+			date: "Jun 2025 – Jun 2025",
+			bullets: [
+				"Developed an interactive Wordle word-guessing game with custom word generation and hint system.",
+				"Implemented prompt engineering techniques to create dynamic word clues and difficulty scaling based on user performance.",
+				"Designed responsive UI with real-time feedback and color-coded letter validation for enhanced user experience.",
+				'<a href="https://simjm.github.io/wordle.html?word=wrd_=QURSlES" target="_blank">Play the Game</a>',
+			],
+		},
+		{
 			title: "Database Management System (DMS)",
 			date: "Sep 2023 – Oct 2023",
 			bullets: [
