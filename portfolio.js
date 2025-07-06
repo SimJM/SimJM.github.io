@@ -2,6 +2,7 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 	if (!window.portfolioContent) return;
+
 	// Experience
 	const expSection = document.getElementById("experience");
 	if (expSection) {
@@ -13,7 +14,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 <div class="experience-entry">
                     <div class="experience-title">${exp.title}</div>
                     <div class="experience-company">${exp.company}</div>
-                    <div class="experience-date">${exp.date}</div>
+                    <div class="experience-date">${
+						exp.dateWithDuration || exp.date
+					}</div>
                     <ul class="bullet-list">
                         ${exp.bullets.map((b) => `<li>${b}</li>`).join("")}
                     </ul>
