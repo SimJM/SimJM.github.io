@@ -404,6 +404,7 @@ function calculateLoanDetails(
 
 function displayResults(loan) {
 	const resultDiv = document.getElementById("loanResult");
+	const investment = calculateInvestmentAnalysis(loan);
 
 	const html = `
 		<h2 style="color: #f9532d; margin-bottom: 25px; border-bottom: 2px solid #f9532d; padding-bottom: 10px;">
@@ -466,7 +467,7 @@ function displayResults(loan) {
 			</div>
 		</div>
 		
-		<div style="border-top: 1px solid #ddd; padding-top: 20px;">
+		<div style="border-top: 1px solid #ddd; padding-top: 20px; margin-bottom: 25px;">
 			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
 				<div style="text-align: center;">
 					<h4 style="color: #333; margin-bottom: 8px;">Total Amount Paid</h4>
@@ -480,6 +481,60 @@ function displayResults(loan) {
 					<p style="font-size: 1.2em; font-weight: bold; color: #e84419; margin: 0;">
 						$${formatNumber(loan.totalInterest)}
 					</p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Investment Analysis Section -->
+		<div style="background: #e8f5e8; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #28a745;">
+			<h3 style="color: #333; margin-bottom: 15px; font-size: 1.2em;">
+				<i class="bx bx-trending-up"></i> Investment Analysis
+			</h3>
+			
+			<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+				<div style="text-align: center;">
+					<h4 style="color: #333; margin-bottom: 8px; font-size: 0.95em;">Total Cash Invested</h4>
+					<p style="font-weight: bold; color: #28a745; margin: 0; font-size: 1.1em;">
+						$${formatNumber(investment.totalCashInvested)}
+					</p>
+					<p style="font-size: 0.8em; color: #666; margin: 0;">
+						Down payment + loan payments
+					</p>
+				</div>
+				
+				<div style="text-align: center;">
+					<h4 style="color: #333; margin-bottom: 8px; font-size: 0.95em;">Investment Efficiency</h4>
+					<p style="font-weight: bold; color: #28a745; margin: 0; font-size: 1.1em;">
+						${investment.investmentEfficiencyRatio.toFixed(2)}x
+					</p>
+					<p style="font-size: 0.8em; color: #666; margin: 0;">
+						Property value per $1 invested
+					</p>
+				</div>
+				
+				<div style="text-align: center;">
+					<h4 style="color: #333; margin-bottom: 8px; font-size: 0.95em;">Leverage Ratio</h4>
+					<p style="font-weight: bold; color: #28a745; margin: 0; font-size: 1.1em;">
+						${investment.leverageRatio.toFixed(1)}:1
+					</p>
+					<p style="font-size: 0.8em; color: #666; margin: 0;">
+						Loan to down payment
+					</p>
+				</div>
+			</div>
+			
+			<div style="background: rgba(255,255,255,0.3); padding: 15px; border-radius: 6px;">
+				<h4 style="color: #333; margin-bottom: 10px; font-size: 1em;">Cash Flow Timeline (Major Milestones)</h4>
+				<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
+					${investment.cashFlowMilestones.slice(0, 6).map(milestone => `
+						<div style="text-align: center; background: rgba(255,255,255,0.5); padding: 8px; border-radius: 4px;">
+							<p style="margin: 0; font-size: 0.8em; color: #666; font-weight: 600;">${milestone.period}</p>
+							<p style="margin: 0; font-size: 0.9em; font-weight: bold; color: #28a745;">
+								$${formatNumber(milestone.cumulativeCash)}
+							</p>
+							<p style="margin: 0; font-size: 0.7em; color: #666;">${milestone.description}</p>
+						</div>
+					`).join('')}
 				</div>
 			</div>
 		</div>
@@ -517,6 +572,118 @@ function formatNumber(num) {
 		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
 	}).format(num);
+}
+
+// Investment analysis calculations
+function calculateInvestmentAnalysis(loan) {
+	const totalCashInvested = loan.downPaymentAmount + loan.totalPaid;
+	const totalCashOutlay = loan.downPaymentAmount + loan.totalPaid;
+	const effectiveInvestmentCost = totalCashInvested;
+	const monthlyInvestmentCost = loan.downPaymentAmount / loan.totalPayments + loan.monthlyPayment;
+	
+	// Calculate cash flow timeline (showing major milestones)
+	const cashFlowMilestones = [];
+	
+	// Initial cash (downpayment)
+	cashFlowMilestones.push({
+		period: "Initial",
+		cashOut: loan.downPaymentAmount,
+		cumulativeCash: loan.downPaymentAmount,
+		description: "Down Payment"
+	});
+	
+	// Year markers
+	for (let year = 1; year <= Math.min(loan.loanPeriodYears, 10); year++) {
+		const monthsElapsed = year * 12;
+		const cumulativePayments = monthsElapsed * loan.monthlyPayment;
+		const totalCashAtYear = loan.downPaymentAmount + cumulativePayments;
+		
+		cashFlowMilestones.push({
+			period: `Year ${year}`,
+			cashOut: cumulativePayments,
+			cumulativeCash: totalCashAtYear,
+			description: `After ${year} year${year > 1 ? 's' : ''}`
+		});
+	}
+	
+	// Final payment
+	if (loan.loanPeriodYears > 10) {
+		cashFlowMilestones.push({
+			period: `Year ${loan.loanPeriodYears}`,
+			cashOut: loan.totalPaid,
+			cumulativeCash: totalCashInvested,
+			description: "Loan Paid Off"
+		});
+	}
+	
+	return {
+		totalCashInvested,
+		totalCashOutlay,
+		effectiveInvestmentCost,
+		monthlyInvestmentCost,
+		cashFlowMilestones,
+		investmentEfficiencyRatio: loan.price / totalCashInvested,
+		downPaymentRatio: loan.downPaymentAmount / loan.price,
+		leverageRatio: loan.loanAmount / loan.downPaymentAmount
+	};
+}
+
+// Calculate comprehensive cash flow for early repayment scenarios
+function calculateCashFlowAnalysis(data) {
+	const downPayment = data.originalLoanAmount * (data.downPaymentPercent || 0) / 100;
+	
+	// Current scenario cash flow
+	const currentCashFlow = {
+		downPayment: downPayment,
+		paymentsToDate: data.totalPaymentsMade,
+		remainingPayments: data.currentScenario.totalPayments,
+		totalCashInvested: downPayment + data.totalPaymentsMade + data.currentScenario.totalPayments,
+		totalInterestLifetime: data.interestPaidSoFar + data.currentScenario.totalInterest
+	};
+	
+	// Early repayment scenarios
+	const scenarios = {
+		current: currentCashFlow
+	};
+	
+	if (data.extraPaymentScenario) {
+		scenarios.extraPayment = {
+			downPayment: downPayment,
+			paymentsToDate: data.totalPaymentsMade,
+			extraPaymentTotal: data.extraPayment * data.extraPaymentScenario.monthsToPayoff,
+			remainingPayments: data.extraPaymentScenario.totalPayments,
+			totalCashInvested: downPayment + data.totalPaymentsMade + data.extraPaymentScenario.totalPayments,
+			totalInterestLifetime: data.interestPaidSoFar + data.extraPaymentScenario.totalInterest,
+			totalSavings: currentCashFlow.totalCashInvested - (downPayment + data.totalPaymentsMade + data.extraPaymentScenario.totalPayments)
+		};
+	}
+	
+	if (data.lumpSumScenario) {
+		scenarios.lumpSum = {
+			downPayment: downPayment,
+			paymentsToDate: data.totalPaymentsMade,
+			lumpSumPayment: data.lumpSumPayment,
+			remainingPayments: data.lumpSumScenario.totalPayments,
+			totalCashInvested: downPayment + data.totalPaymentsMade + data.lumpSumPayment + data.lumpSumScenario.totalPayments,
+			totalInterestLifetime: data.interestPaidSoFar + data.lumpSumScenario.totalInterest,
+			totalSavings: currentCashFlow.totalCashInvested - (downPayment + data.totalPaymentsMade + data.lumpSumPayment + data.lumpSumScenario.totalPayments)
+		};
+	}
+	
+	if (data.bothScenario) {
+		scenarios.both = {
+			downPayment: downPayment,
+			paymentsToDate: data.totalPaymentsMade,
+			lumpSumPayment: data.lumpSumPayment,
+			extraPaymentTotal: data.extraPayment * data.bothScenario.monthsToPayoff,
+			remainingPayments: data.bothScenario.totalPayments,
+			totalCashInvested: downPayment + data.totalPaymentsMade + data.lumpSumPayment + data.bothScenario.totalPayments,
+			totalInterestLifetime: data.interestPaidSoFar + data.bothScenario.totalInterest,
+			totalSavings: currentCashFlow.totalCashInvested - (downPayment + data.totalPaymentsMade + data.lumpSumPayment + data.bothScenario.totalPayments)
+		};
+	}
+	
+	return scenarios;
 }
 
 // Early repayment calculator functionality
@@ -639,6 +806,7 @@ function calculateEarlyRepayment() {
 			extraPaymentScenario,
 			lumpSumScenario,
 			bothScenario,
+			downPaymentPercent: parseFloat(document.getElementById("downPayment").value) || 0,
 		});
 	} catch (error) {
 		console.error("Early repayment calculation error:", error);
@@ -816,6 +984,7 @@ function calculateEffectiveInterestRate(
 
 function displayEarlyRepaymentResults(data) {
 	const resultDiv = document.getElementById("earlyRepaymentResult");
+	const cashFlowAnalysis = calculateCashFlowAnalysis(data);
 
 	const html = `
 		<h2 style="color: #28a745; margin-bottom: 25px; border-bottom: 2px solid #28a745; padding-bottom: 10px;">
@@ -873,8 +1042,39 @@ function displayEarlyRepaymentResults(data) {
 			</div>
 		</div>
 
+		<!-- Total Cash Flow Analysis Section -->
+		<div style="background: #e8f4fd; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #007bff;">
+			<h3 style="color: #333; margin-bottom: 15px; font-size: 1.2em;">
+				<i class="bx bx-bar-chart-alt-2"></i> Total Cash Flow Analysis
+			</h3>
+			
+			<div style="background: rgba(255,255,255,0.6); padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+				<h4 style="color: #333; margin-bottom: 10px; font-size: 1em;">Current Investment Overview</h4>
+				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666; font-weight: 600;">Down Payment</p>
+						<p style="margin: 0; font-size: 1.1em; font-weight: bold; color: #007bff;">
+							$${formatNumber(cashFlowAnalysis.current.downPayment)}
+						</p>
+					</div>
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666; font-weight: 600;">Loan Payments to Date</p>
+						<p style="margin: 0; font-size: 1.1em; font-weight: bold; color: #007bff;">
+							$${formatNumber(cashFlowAnalysis.current.paymentsToDate)}
+						</p>
+					</div>
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666; font-weight: 600;">Total Cash Invested</p>
+						<p style="margin: 0; font-size: 1.2em; font-weight: bold; color: #007bff;">
+							$${formatNumber(cashFlowAnalysis.current.downPayment + cashFlowAnalysis.current.paymentsToDate)}
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<div style="margin-bottom: 30px;">
-			<h3 style="color: #333; margin-bottom: 15px;">Payment Scenarios</h3>
+			<h3 style="color: #333; margin-bottom: 15px;">Payment Scenarios with Total Cash Overlay</h3>
 			
 			<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
 				<h4 style="color: #333; margin-bottom: 10px;">
@@ -882,7 +1082,7 @@ function displayEarlyRepaymentResults(data) {
 						data.originalMonthlyPayment
 					)}/month)
 				</h4>
-				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px;">
 					<div style="text-align: center;">
 						<p style="margin: 0; font-size: 0.9em; color: #666;">Months Remaining</p>
 						<p style="margin: 0; font-weight: bold; color: #333;">${
@@ -902,6 +1102,12 @@ function displayEarlyRepaymentResults(data) {
 								data.currentScenario.totalInterest
 						)}</p>
 					</div>
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666; font-weight: 600;">Total Cash Investment</p>
+						<p style="margin: 0; font-weight: bold; color: #f9532d; font-size: 1.1em;">$${formatNumber(
+							cashFlowAnalysis.current.totalCashInvested
+						)}</p>
+					</div>
 				</div>
 			</div>
 
@@ -914,7 +1120,7 @@ function displayEarlyRepaymentResults(data) {
 						data.extraPayment
 					)}/month)
 				</h4>
-				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px;">
 					<div style="text-align: center;">
 						<p style="margin: 0; font-size: 0.9em; color: #666;">Months Remaining</p>
 						<p style="margin: 0; font-weight: bold; color: #28a745;">${
@@ -946,6 +1152,17 @@ function displayEarlyRepaymentResults(data) {
 								data.extraPaymentScenario.totalInterest
 						)}</p>
 					</div>
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666; font-weight: 600;">Total Cash Investment</p>
+						<p style="margin: 0; font-weight: bold; color: #28a745; font-size: 1.1em;">$${formatNumber(
+							cashFlowAnalysis.extraPayment ? cashFlowAnalysis.extraPayment.totalCashInvested : 0
+						)}</p>
+						<p style="margin: 0; font-size: 0.8em; color: #28a745;">
+							($${formatNumber(
+								cashFlowAnalysis.extraPayment ? cashFlowAnalysis.extraPayment.totalSavings : 0
+							)} saved)
+						</p>
+					</div>
 				</div>
 			</div>
 			`
@@ -961,7 +1178,7 @@ function displayEarlyRepaymentResults(data) {
 						data.lumpSumPayment
 					)})
 				</h4>
-				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px;">
 					<div style="text-align: center;">
 						<p style="margin: 0; font-size: 0.9em; color: #666;">Months Remaining</p>
 						<p style="margin: 0; font-weight: bold; color: #007bff;">${
@@ -993,6 +1210,17 @@ function displayEarlyRepaymentResults(data) {
 								data.lumpSumScenario.totalInterest
 						)}</p>
 					</div>
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666; font-weight: 600;">Total Cash Investment</p>
+						<p style="margin: 0; font-weight: bold; color: #007bff; font-size: 1.1em;">$${formatNumber(
+							cashFlowAnalysis.lumpSum ? cashFlowAnalysis.lumpSum.totalCashInvested : 0
+						)}</p>
+						<p style="margin: 0; font-size: 0.8em; color: #007bff;">
+							($${formatNumber(
+								cashFlowAnalysis.lumpSum ? cashFlowAnalysis.lumpSum.totalSavings : 0
+							)} saved)
+						</p>
+					</div>
 				</div>
 			</div>
 			`
@@ -1006,7 +1234,7 @@ function displayEarlyRepaymentResults(data) {
 				<h4 style="color: #333; margin-bottom: 10px;">
 					<i class="bx bx-star"></i> Combined: Lump Sum + Extra Payment
 				</h4>
-				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 15px;">
 					<div style="text-align: center;">
 						<p style="margin: 0; font-size: 0.9em; color: #666;">Months Remaining</p>
 						<p style="margin: 0; font-weight: bold; color: #856404;">${
@@ -1038,6 +1266,17 @@ function displayEarlyRepaymentResults(data) {
 								data.bothScenario.totalInterest
 						)}</p>
 					</div>
+					<div style="text-align: center;">
+						<p style="margin: 0; font-size: 0.9em; color: #666; font-weight: 600;">Total Cash Investment</p>
+						<p style="margin: 0; font-weight: bold; color: #856404; font-size: 1.1em;">$${formatNumber(
+							cashFlowAnalysis.both ? cashFlowAnalysis.both.totalCashInvested : 0
+						)}</p>
+						<p style="margin: 0; font-size: 0.8em; color: #856404;">
+							($${formatNumber(
+								cashFlowAnalysis.both ? cashFlowAnalysis.both.totalSavings : 0
+							)} saved)
+						</p>
+					</div>
 				</div>
 			</div>
 			`
@@ -1048,7 +1287,7 @@ function displayEarlyRepaymentResults(data) {
 		<div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
 			<p style="margin: 0; font-size: 0.9em; color: #856404;">
 				<i class="bx bx-info-circle"></i> 
-				<strong>Note:</strong> These calculations assume consistent payments and interest rates. Actual results may vary based on loan terms and payment schedules.
+				<strong>Cash Flow Note:</strong> Total Cash Investment includes down payment plus all loan payments. This represents your complete financial commitment to the property.
 			</p>
 		</div>
 	`;
