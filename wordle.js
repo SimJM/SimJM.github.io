@@ -1297,10 +1297,6 @@ function generateResultsText(gameResult) {
 		});
 	}
 
-	if (isCustomChallenge) {
-		resultText += "\nTry this challenge yourself!";
-	}
-
 	return resultText.trim();
 }
 
