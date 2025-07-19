@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Oakley Tango - Admin Panel</title>
+		<link
+			href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+			rel="stylesheet" />
+		<link rel="icon" type="image/x-icon" href="person.png" />
+		<script src="shared.js" defer></script>
+		<script src="tango-admin.js" defer></script>
+		<script src="header.js" defer></script>
+		<link rel="stylesheet" href="index.css" />
+		<link rel="stylesheet" href="bookPage.css" />
+		<style>
+			.admin-container {
+			    max-width: 600px;
+			    margin: 0 auto;
+			    padding: 20px;
+			}
+
+			.admin-title {
+			    font-size: 2.5em;
+			    font-weight: bold;
+			    color: #f9532d;
+			    margin-bottom: 10px;
+			    text-align: center;
+			    letter-spacing: 2px;
+			}
+
+			.admin-subtitle {
+			    color: #666;
+			    margin-bottom: 30px;
+			    font-size: 1.1em;
+			    text-align: center;
+			}
+
+			.admin-section {
+			    background: #f8f9fa;
+			    padding: 30px;
+			    border-radius: 12px;
+			    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			    margin-bottom: 30px;
+			}
+
+			.section-title {
+			    font-size: 1.5em;
+			    font-weight: bold;
+			    color: #333;
+			    margin-bottom: 20px;
+			    display: flex;
+			    align-items: center;
+			    gap: 10px;
+			}
+
+			.admin-grid {
+			    display: block;
+			}
+
+			.instructions {
+			    background: #f8f9fa;
+			    padding: 30px;
+			    border-radius: 12px;
+			    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			    margin-bottom: 30px;
+			}
+
+			.instruction-title {
+			    font-size: 1.3rem;
+			    font-weight: bold;
+			    color: #f9532d;
+			    margin-bottom: 15px;
+			    display: flex;
+			    align-items: center;
+			    gap: 10px;
+			}
+
+			.instruction-list {
+			    list-style: none;
+			    padding: 0;
+			    margin: 0;
+			}
+
+			.instruction-list li {
+			    margin: 10px 0;
+			    padding: 8px 0;
+			    display: flex;
+			    align-items: flex-start;
+			    gap: 12px;
+			}
+
+			.instruction-list .step-number {
+			    background: #f9532d;
+			    color: white;
+			    border-radius: 50%;
+			    width: 24px;
+			    height: 24px;
+			    display: flex;
+			    align-items: center;
+			    justify-content: center;
+			    font-size: 0.9rem;
+			    font-weight: 600;
+			    flex-shrink: 0;
+			}
+
+			.action-btn {
+			    background: #f9532d;
+			    color: white;
+			    border: none;
+			    padding: 15px 30px;
+			    border-radius: 8px;
+			    font-size: 1.1em;
+			    font-weight: bold;
+			    cursor: pointer;
+			    transition: background 0.3s ease;
+			    display: flex;
+			    align-items: center;
+			    gap: 8px;
+			    margin: 0 auto;
+			}
+
+			.action-btn:hover {
+			    background: #e84419;
+			}
+
+			.action-btn.success {
+			    background: #28a745;
+			}
+
+			.action-btn.success:hover {
+			    background: #218838;
+			}
+
+			.puzzle-output {
+			    margin: 20px 0;
+			}
+
+			.output-title {
+			    font-weight: bold;
+			    color: #333;
+			    margin-bottom: 15px;
+			    display: flex;
+			    align-items: center;
+			    gap: 8px;
+			}
+
+			.output-content {
+			    width: 100%;
+			    font-size: 1em;
+			    padding: 12px;
+			    border: 2px solid #ddd;
+			    border-radius: 8px;
+			    background: #f8f9fa;
+			    color: #333;
+			    font-family: monospace;
+			    resize: vertical;
+			    min-height: 50px;
+			    box-sizing: border-box;
+			}
+
+			.copy-btn {
+			    background: #28a745;
+			    color: white;
+			    padding: 12px 16px;
+			    border: none;
+			    border-radius: 8px;
+			    cursor: pointer;
+			    font-weight: bold;
+			    display: flex;
+			    align-items: center;
+			    gap: 5px;
+			    transition: background 0.3s ease;
+			    white-space: nowrap;
+			}
+
+			.copy-btn:hover {
+			    background: #218838;
+			}
+
+			.copy-btn.copied {
+			    background: #17a2b8;
+			}
+
+			.share-buttons {
+			    display: flex;
+			    gap: 15px;
+			    margin: 20px 0;
+			    flex-wrap: wrap;
+			    justify-content: center;
+			}
+
+			.admin-btn {
+			    background: #f9532d;
+			    color: white;
+			    border: none;
+			    padding: 15px 30px;
+			    border-radius: 8px;
+			    font-size: 1.1em;
+			    font-weight: bold;
+			    cursor: pointer;
+			    transition: background 0.3s ease;
+			    display: flex;
+			    align-items: center;
+			    gap: 8px;
+			    margin: 0 auto;
+			}
+
+			.admin-btn:hover {
+			    background: #e84419;
+			}
+
+			.admin-btn.secondary {
+			    background: #666;
+			    margin: 5px;
+			}
+
+			.admin-btn.secondary:hover {
+			    background: #555;
+			}
+
+			.message {
+			    margin: 20px 0;
+			    padding: 15px;
+			    border-radius: 8px;
+			    font-weight: bold;
+			    display: none;
+			}
+
+			.message.success {
+			    background: #d4edda;
+			    color: #155724;
+			    border: 1px solid #c3e6cb;
+			}
+
+			.message.error {
+			    background: #f8d7da;
+			    color: #721c24;
+			    border: 1px solid #f5c6cb;
+			}
+
+			.message.info {
+			    background: #d1ecf1;
+			    color: #0c5460;
+			    border: 1px solid #bee5eb;
+			}
+
+			/* Dark Mode Styles */
+			body.dark-mode .admin-section,
+			body.dark-mode .instructions {
+			    background: #1a1a1a;
+			    border: 1px solid #333;
+			}
+
+			body.dark-mode .section-title,
+			body.dark-mode .output-title {
+			    color: #e0e0e0;
+			}
+
+			body.dark-mode .instruction-title {
+			    color: #f9532d;
+			}
+
+			body.dark-mode .output-content {
+			    background: #2d2d2d;
+			    border-color: #444;
+			    color: #e0e0e0;
+			}
+
+			body.dark-mode .admin-subtitle {
+			    color: #ccc;
+			}
+
+			body.dark-mode .message.success {
+			    background: #2d4a35;
+			    color: #a3d9a5;
+			    border-color: #3e5e42;
+			}
+
+			body.dark-mode .message.error {
+			    background: #4a2d2d;
+			    color: #d9a3a3;
+			    border-color: #5e3e3e;
+			}
+
+			body.dark-mode .message.info {
+			    background: #2d3e4a;
+			    color: #a3c7d9;
+			    border-color: #3e4e5e;
+			}
+
+			body.dark-mode .instruction-list span {
+			    color: #e0e0e0;
+			}
+
+			/* Mobile responsiveness */
+			@media (max-width: 768px) {
+			    .admin-container {
+			        padding: 15px;
+			    }
+
+			    .admin-title {
+			        font-size: 2rem;
+			    }
+
+			    .action-btn {
+			        width: 100%;
+			        max-width: 250px;
+			        justify-content: center;
+			    }
+
+			    .copy-btn {
+			        width: 100%;
+			        justify-content: center;
+			    }
+
+			    .share-buttons {
+			        flex-direction: column;
+			        align-items: center;
+			    }
+
+			    .admin-btn {
+			        width: 100%;
+			        max-width: 300px;
+			        justify-content: center;
+			    }
+			}
+		</style>
+	</head>
+	<body>
+		<div id="header-placeholder"></div>
+
+		<div class="admin-container">
+			<h1 class="admin-title">TANGO ADMIN</h1>
+			<p class="admin-subtitle">
+				Generate Challenge URLs for Puzzle Sharing
+			</p>
+
+			<div class="admin-section">
+				<div class="section-title">
+					<span>⚡</span>
+					Puzzle Generator
+				</div>
+
+				<button
+					class="action-btn"
+					id="generateBtn"
+					onclick="generatePuzzle()">
+					<span>🎲</span>
+					Generate Random Puzzle
+				</button>
+
+				<div
+					class="puzzle-output"
+					id="puzzleOutput"
+					style="display: none;">
+					<div class="output-title">
+						<span>🔗</span>
+						Challenge URL:
+					</div>
+					<textarea
+						class="output-content"
+						id="challengeUrl"
+						readonly></textarea>
+					<div
+						style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+						<button
+							class="copy-btn"
+							id="copyUrlBtn"
+							onclick="copyURL()">
+							<i class="bx bx-copy"></i>
+							Copy
+						</button>
+					</div>
+
+					<div class="share-buttons">
+						<button
+							class="admin-btn"
+							id="shareUrlBtn"
+							onclick="shareURL()"
+							style="display: none;">
+							<i class="bx bx-share"></i>
+							Share Challenge
+						</button>
+					</div>
+				</div>
+
+				<div class="message" id="message"></div>
+			</div>
+
+			<div class="instructions">
+				<div class="instruction-title">
+					<span>📝</span>
+					How to Generate a Challenge:
+				</div>
+				<ol class="instruction-list">
+					<li>
+						<span class="step-number">1</span
+						><span
+							>Click "Generate Random Puzzle" to create a new
+							challenge</span
+						>
+					</li>
+					<li>
+						<span class="step-number">2</span
+						><span
+							>A valid puzzle with 2-5 pre-filled solution cells
+							will be automatically generated</span
+						>
+					</li>
+					<li>
+						<span class="step-number">3</span
+						><span
+							>Copy the Challenge URL to share with friends</span
+						>
+					</li>
+					<li>
+						<span class="step-number">4</span
+						><span
+							>Players will see given cells that cannot be changed
+							and solve the rest</span
+						>
+					</li>
+				</ol>
+			</div>
+		</div>
+	</body>
+</html>

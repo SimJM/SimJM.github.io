@@ -10,6 +10,7 @@ window.headerManager = {
 				"loan-nav-item",
 				"wordle-nav-item",
 				"admin-nav-item",
+				"tango-nav-item",
 			],
 		},
 		"portfolio.html": {
@@ -20,6 +21,7 @@ window.headerManager = {
 				"loan-nav-item",
 				"wordle-nav-item",
 				"admin-nav-item",
+				"tango-nav-item",
 			],
 		},
 		"bookPage.html": {
@@ -42,10 +44,26 @@ window.headerManager = {
 				"loan-nav-item",
 				"wordle-nav-item",
 				"admin-nav-item",
+				"tango-nav-item",
 			],
 		},
 		"wordle-admin.html": {
 			logo: "&#x1F6E0; Wordle Admin",
+			hideNavItems: [],
+		},
+		"tango.html": {
+			logo: "&#x1F3AF; Oakley Tango",
+			hideNavItems: [
+				"book-nav-item",
+				"number-nav-item",
+				"loan-nav-item",
+				"wordle-nav-item",
+				"admin-nav-item",
+				"tango-nav-item",
+			],
+		},
+		"tango-admin.html": {
+			logo: "&#x1F6E0; Tango Admin",
 			hideNavItems: [],
 		},
 	},
