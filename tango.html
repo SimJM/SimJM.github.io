@@ -104,6 +104,8 @@
 			    color: #666;
 			    cursor: default;
 			    user-select: none;
+			    min-width: 25px;
+			    min-height: 25px;
 			}
 
 			.separator.equals {
@@ -393,22 +395,39 @@
 			/* Mobile responsive */
 			@media (max-width: 768px) {
 			    .tango-container {
-			        padding: 15px;
+			        padding: 10px;
 			    }
 
 			    .game-board {
 			        max-width: 100%;
-			        gap: 4px;
+			        padding: 10px;
+			        gap: 1px;
+			        grid-template-columns: repeat(11, minmax(25px, 1fr));
+			        grid-template-rows: repeat(11, minmax(25px, 1fr));
 			    }
 
 			    .cell {
-			        width: 50px;
-			        height: 50px;
-			        font-size: 2em;
+			        min-width: 35px;
+			        min-height: 35px;
+			        max-width: 45px;
+			        max-height: 45px;
+			        font-size: 1.6em;
+			        border-radius: 4px;
+			        border-width: 1px;
+			    }
+
+			    .separator {
+			        font-size: 1em;
+			        font-weight: 900;
+			        min-width: 20px;
+			        min-height: 20px;
+			        display: flex;
+			        align-items: center;
+			        justify-content: center;
 			    }
 
 			    .cell.constraint {
-			        font-size: 1.2em;
+			        font-size: 1em;
 			    }
 
 			    .controls {
@@ -428,22 +447,89 @@
 			        width: 100%;
 			        justify-content: center;
 			    }
+
+			    .puzzle-info {
+			        padding: 10px;
+			        font-size: 0.9em;
+			    }
 			}
 
 			@media (max-width: 480px) {
+			    .tango-container {
+			        padding: 8px;
+			    }
+
+			    .game-board {
+			        padding: 8px;
+			        grid-template-columns: repeat(11, minmax(22px, 1fr));
+			        grid-template-rows: repeat(11, minmax(22px, 1fr));
+			        gap: 1px;
+			    }
+
 			    .cell {
-			        width: 45px;
-			        height: 45px;
-			        font-size: 1.8em;
+			        min-width: 28px;
+			        min-height: 28px;
+			        max-width: 35px;
+			        max-height: 35px;
+			        font-size: 1.4em;
+			        border-radius: 3px;
+			    }
+
+			    .separator {
+			        font-size: 0.9em;
+			        font-weight: 900;
+			        min-width: 18px;
+			        min-height: 18px;
 			    }
 
 			    .cell.constraint {
-			        font-size: 1em;
+			        font-size: 0.9em;
 			    }
 
 			    .stats-grid {
 			        grid-template-columns: repeat(2, 1fr);
 			        gap: 10px;
+			    }
+
+			    .puzzle-info {
+			        padding: 8px;
+			        font-size: 0.85em;
+			    }
+
+			    .puzzle-info h3 {
+			        font-size: 1em;
+			    }
+			}
+
+			@media (max-width: 360px) {
+			    .tango-container {
+			        padding: 5px;
+			    }
+
+			    .game-board {
+			        padding: 5px;
+			        grid-template-columns: repeat(11, minmax(20px, 1fr));
+			        grid-template-rows: repeat(11, minmax(20px, 1fr));
+			    }
+
+			    .cell {
+			        min-width: 25px;
+			        min-height: 25px;
+			        max-width: 30px;
+			        max-height: 30px;
+			        font-size: 1.2em;
+			    }
+
+			    .separator {
+			        font-size: 0.8em;
+			        font-weight: 900;
+			        min-width: 15px;
+			        min-height: 15px;
+			    }
+
+			    .control-btn {
+			        padding: 8px 12px;
+			        font-size: 0.9em;
 			    }
 			}
 
