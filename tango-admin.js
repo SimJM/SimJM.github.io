@@ -89,6 +89,7 @@ function displayPuzzleResults(challengeUrl) {
 	document.getElementById("challengeUrl").value = challengeUrl;
 	document.getElementById("puzzleOutput").style.display = "block";
 	document.getElementById("copyUrlBtn").style.display = "inline-flex";
+	document.getElementById("playUrlBtn").style.display = "inline-flex";
 	document.getElementById("shareUrlBtn").style.display = "inline-flex";
 }
 
@@ -162,6 +163,19 @@ async function shareURL() {
 		}
 		// If AbortError, user cancelled - don't show any message
 	}
+}
+
+// Play the generated challenge
+function playChallenge() {
+	const url = document.getElementById("challengeUrl").value;
+
+	if (!url) {
+		showMessage("No URL to play. Generate a puzzle first!", "error");
+		return;
+	}
+
+	// Navigate to the challenge URL in the same tab
+	window.location.href = url;
 }
 
 // Puzzle generation algorithm
@@ -524,3 +538,5 @@ window.initTangoAdminPage = function () {
 // Export functions for global access
 window.generatePuzzle = generatePuzzle;
 window.copyURL = copyURL;
+window.shareURL = shareURL;
+window.playChallenge = playChallenge;
