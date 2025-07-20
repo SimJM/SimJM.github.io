@@ -91,6 +91,25 @@ function displayPuzzleResults(challengeUrl) {
 	document.getElementById("copyUrlBtn").style.display = "inline-flex";
 	document.getElementById("playUrlBtn").style.display = "inline-flex";
 	document.getElementById("shareUrlBtn").style.display = "inline-flex";
+
+	// Auto-resize textarea to fit content
+	autoResizeTextarea(document.getElementById("challengeUrl"));
+}
+
+// Auto-resize textarea function
+function autoResizeTextarea(textarea) {
+	// Reset height to recalculate
+	textarea.style.height = "auto";
+
+	// Set height based on scroll height with min/max constraints
+	const minHeight = 50; // Minimum height in pixels
+	const maxHeight = 200; // Maximum height in pixels
+	const newHeight = Math.min(
+		Math.max(textarea.scrollHeight, minHeight),
+		maxHeight
+	);
+
+	textarea.style.height = newHeight + "px";
 }
 
 // Copy URL to clipboard
@@ -540,3 +559,4 @@ window.generatePuzzle = generatePuzzle;
 window.copyURL = copyURL;
 window.shareURL = shareURL;
 window.playChallenge = playChallenge;
+window.autoResizeTextarea = autoResizeTextarea;

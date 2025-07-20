@@ -154,24 +154,29 @@
 			    background: #f8f9fa;
 			    color: #333;
 			    font-family: monospace;
-			    resize: vertical;
+			    resize: none;
 			    min-height: 50px;
+			    max-height: 200px;
+			    height: auto;
 			    box-sizing: border-box;
+			    overflow: hidden;
 			}
 
 			.copy-btn {
 			    background: #28a745;
 			    color: white;
-			    padding: 12px 16px;
+			    padding: 15px 30px;
 			    border: none;
 			    border-radius: 8px;
 			    cursor: pointer;
 			    font-weight: bold;
 			    display: flex;
 			    align-items: center;
-			    gap: 5px;
+			    gap: 8px;
 			    transition: background 0.3s ease;
 			    white-space: nowrap;
+			    flex-shrink: 0;
+			    font-size: 1.1em;
 			}
 
 			.copy-btn:hover {
@@ -182,12 +187,31 @@
 			    background: #17a2b8;
 			}
 
+			.url-input-wrapper {
+			    width: 100%;
+			    margin-bottom: 20px;
+			}
+
 			.share-buttons {
 			    display: flex;
 			    gap: 15px;
 			    margin: 20px 0;
 			    flex-wrap: wrap;
 			    justify-content: center;
+			}
+
+			/* Desktop: Equal width buttons in a row */
+			@media (min-width: 769px) {
+			    .share-buttons {
+			        gap: 10px;
+			    }
+
+			    .copy-btn,
+			    .admin-btn {
+			        flex: 1;
+			        min-width: 0;
+			        justify-content: center;
+			    }
 			}
 
 			.admin-btn {
@@ -311,6 +335,7 @@
 
 			    .copy-btn {
 			        width: 100%;
+			        max-width: 300px;
 			        justify-content: center;
 			    }
 
@@ -358,12 +383,14 @@
 						<span>🔗</span>
 						Challenge URL:
 					</div>
-					<textarea
-						class="output-content"
-						id="challengeUrl"
-						readonly></textarea>
-					<div
-						style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+					<div class="url-input-wrapper">
+						<textarea
+							class="output-content"
+							id="challengeUrl"
+							readonly></textarea>
+					</div>
+
+					<div class="share-buttons">
 						<button
 							class="copy-btn"
 							id="copyUrlBtn"
@@ -371,16 +398,13 @@
 							<i class="bx bx-copy"></i>
 							Copy
 						</button>
-					</div>
-
-					<div class="share-buttons">
 						<button
 							class="admin-btn"
 							id="playUrlBtn"
 							onclick="playChallenge()"
 							style="display: none;">
 							<i class="bx bx-play"></i>
-							Play Challenge
+							Play
 						</button>
 						<button
 							class="admin-btn"
@@ -388,7 +412,7 @@
 							onclick="shareURL()"
 							style="display: none;">
 							<i class="bx bx-share"></i>
-							Share Challenge
+							Share
 						</button>
 					</div>
 				</div>
