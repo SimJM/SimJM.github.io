@@ -475,7 +475,7 @@ function handleCellClick(row, col) {
 		// Add a small delay to ensure the UI is updated
 		setTimeout(() => {
 			checkSolution();
-		}, 100);
+		}, 500);
 	}
 }
 
@@ -901,8 +901,6 @@ function generateResultsText() {
 		}
 		resultText += rowText + "\n";
 	}
-
-	resultText += "\nPlay at: " + window.location.origin + "/tango.html";
 
 	return resultText.trim();
 }
