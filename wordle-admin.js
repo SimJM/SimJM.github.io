@@ -106,13 +106,26 @@ function generateWordleLink() {
 	});
 }
 
+// Generate date prefix for sharing
+function generateDatePrefix(gameTitle) {
+	const now = new Date();
+	const dateStr = now.toLocaleDateString("en-GB", {
+		year: "numeric",
+		month: "short",
+		day: "2-digit",
+	});
+	return `${gameTitle} - ${dateStr}\n`;
+}
+
 // Copy URL to clipboard
 async function copyToClipboard() {
 	const urlInput = document.getElementById("generatedUrl");
 	const copyBtn = document.querySelector(".copy-btn");
+	const prefix = generateDatePrefix("Wordle Challenge");
+	const fullText = prefix + urlInput.value;
 
 	try {
-		await navigator.clipboard.writeText(urlInput.value);
+		await navigator.clipboard.writeText(fullText);
 
 		// Update button appearance
 		const originalText = copyBtn.innerHTML;
@@ -128,9 +141,13 @@ async function copyToClipboard() {
 		showMessage("Link copied to clipboard!", "success");
 	} catch (err) {
 		// Fallback for older browsers
-		urlInput.select();
-		urlInput.setSelectionRange(0, 99999);
+		const textArea = document.createElement("textarea");
+		textArea.value = fullText;
+		document.body.appendChild(textArea);
+		textArea.select();
+		textArea.setSelectionRange(0, 99999);
 		document.execCommand("copy");
+		document.body.removeChild(textArea);
 
 		showMessage("Link copied to clipboard!", "success");
 	}
@@ -140,10 +157,14 @@ async function copyToClipboard() {
 async function shareLink() {
 	const url = document.getElementById("generatedUrl").value;
 	const word = document.getElementById("currentWordDisplay").textContent;
+	const prefix = generateDatePrefix("Wordle Challenge");
+	const fullText =
+		prefix +
+		`I created a Wordle challenge! Can you guess my 5-letter word?\n${url}`;
 
 	const shareData = {
-		title: "Custom Wordle Challenge",
-		text: `I created a custom Wordle challenge! Can you guess my 5-letter word?`,
+		title: "Wordle Challenge",
+		text: fullText,
 		url: url,
 	};
 

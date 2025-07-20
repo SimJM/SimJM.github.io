@@ -907,15 +907,28 @@ function generateResultsText() {
 	return resultText.trim();
 }
 
+// Generate date prefix for sharing
+function generateDatePrefix(gameTitle) {
+	const now = new Date();
+	const dateStr = now.toLocaleDateString("en-GB", {
+		year: "numeric",
+		month: "short",
+		day: "2-digit",
+	});
+	return `${gameTitle} - ${dateStr}\n`;
+}
+
 async function shareResults() {
 	const resultsText = generateResultsText();
 	const isCustomChallenge = getPuzzleFromUrl() !== null;
+	const prefix = generateDatePrefix("Oakley Tango");
+	const fullText = prefix + resultsText;
 
 	const shareData = {
 		title: isCustomChallenge
 			? "Oakley Tango Challenge"
 			: "My Oakley Tango Results",
-		text: resultsText,
+		text: fullText,
 	};
 
 	try {
@@ -940,9 +953,11 @@ async function shareResults() {
 
 async function copyResults() {
 	const resultsText = generateResultsText();
+	const prefix = generateDatePrefix("Oakley Tango");
+	const fullText = prefix + resultsText;
 
 	try {
-		await navigator.clipboard.writeText(resultsText);
+		await navigator.clipboard.writeText(fullText);
 		showMessage("Results copied to clipboard!", "success");
 
 		// Update button appearance temporarily
@@ -958,7 +973,7 @@ async function copyResults() {
 	} catch (err) {
 		// Fallback for older browsers
 		const textArea = document.createElement("textarea");
-		textArea.value = resultsText;
+		textArea.value = fullText;
 		document.body.appendChild(textArea);
 		textArea.select();
 		textArea.setSelectionRange(0, 99999);

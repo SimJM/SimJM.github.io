@@ -112,13 +112,26 @@ function autoResizeTextarea(textarea) {
 	textarea.style.height = newHeight + "px";
 }
 
+// Generate date prefix for sharing
+function generateDatePrefix(gameTitle) {
+	const now = new Date();
+	const dateStr = now.toLocaleDateString("en-GB", {
+		year: "numeric",
+		month: "short",
+		day: "2-digit",
+	});
+	return `${gameTitle} - ${dateStr}\n`;
+}
+
 // Copy URL to clipboard
 async function copyURL() {
 	const urlInput = document.getElementById("challengeUrl");
 	const copyBtn = document.getElementById("copyUrlBtn");
+	const prefix = generateDatePrefix("Oakley Tango Challenge");
+	const fullText = prefix + urlInput.value;
 
 	try {
-		await navigator.clipboard.writeText(urlInput.value);
+		await navigator.clipboard.writeText(fullText);
 
 		// Update button appearance
 		const originalText = copyBtn.innerHTML;
@@ -134,9 +147,13 @@ async function copyURL() {
 		showMessage("Challenge URL copied to clipboard!", "success");
 	} catch (err) {
 		// Fallback for older browsers
-		urlInput.select();
-		urlInput.setSelectionRange(0, 99999);
+		const textArea = document.createElement("textarea");
+		textArea.value = fullText;
+		document.body.appendChild(textArea);
+		textArea.select();
+		textArea.setSelectionRange(0, 99999);
 		document.execCommand("copy");
+		document.body.removeChild(textArea);
 
 		showMessage("Challenge URL copied to clipboard!", "success");
 	}
@@ -151,9 +168,12 @@ async function shareURL() {
 		return;
 	}
 
+	const prefix = generateDatePrefix("Oakley Tango Challenge");
+	const fullText = prefix + url;
+
 	const shareData = {
 		title: "Oakley Tango Challenge",
-		text: `Tango:\n${url}`,
+		text: fullText,
 		url: url,
 	};
 

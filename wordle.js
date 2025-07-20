@@ -1300,15 +1300,26 @@ function generateResultsText(gameResult) {
 	return resultText.trim();
 }
 
+// Generate date prefix for sharing
+function generateDatePrefix(gameTitle) {
+	const now = new Date();
+	const dateStr = now.toLocaleDateString("en-GB", {
+		year: "numeric",
+		month: "short",
+		day: "2-digit",
+	});
+	return `${gameTitle} - ${dateStr}\n`;
+}
+
 async function shareResults(gameResult) {
 	const resultsText = generateResultsText(gameResult);
 	const isCustomChallenge = getWordFromUrl() !== null;
+	const prefix = generateDatePrefix("Wordle");
+	const fullText = prefix + resultsText;
 
 	const shareData = {
-		title: isCustomChallenge
-			? "Custom Wordle Challenge"
-			: "My Wordle Results",
-		text: resultsText,
+		title: isCustomChallenge ? "Wordle Challenge" : "My Wordle Results",
+		text: fullText,
 	};
 
 	try {
@@ -1333,9 +1344,11 @@ async function shareResults(gameResult) {
 
 async function copyResults(gameResult) {
 	const resultsText = generateResultsText(gameResult);
+	const prefix = generateDatePrefix("Wordle");
+	const fullText = prefix + resultsText;
 
 	try {
-		await navigator.clipboard.writeText(resultsText);
+		await navigator.clipboard.writeText(fullText);
 		showMessage("Results copied to clipboard!", "success");
 
 		// Update button appearance temporarily
@@ -1351,7 +1364,7 @@ async function copyResults(gameResult) {
 	} catch (err) {
 		// Fallback for older browsers
 		const textArea = document.createElement("textarea");
-		textArea.value = resultsText;
+		textArea.value = fullText;
 		document.body.appendChild(textArea);
 		textArea.select();
 		textArea.setSelectionRange(0, 99999);
