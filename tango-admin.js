@@ -386,8 +386,8 @@ function isValidGrid(grid) {
 function createConstraintsFromSolution(solution) {
 	const constraints = [];
 
-	// First, add 7-10 solution cells (givens) to ensure unique solution
-	const numGivens = 7 + Math.floor(Math.random() * 4); // 7-10 givens
+	// First, add 9-12 solution cells (givens) to ensure unique solution
+	const numGivens = 9 + Math.floor(Math.random() * 4);
 	const givenPositions = [];
 
 	// Get all positions and shuffle them
@@ -409,8 +409,8 @@ function createConstraintsFromSolution(solution) {
 		});
 	}
 
-	// Then add relationship constraints (8-12 constraints)
-	const numRelationships = 8 + Math.floor(Math.random() * 5); // 8-12 constraints
+	// Then add relationship constraints (9-13 constraints)
+	const numRelationships = 9 + Math.floor(Math.random() * 5);
 	const usedPairs = new Set();
 
 	for (let i = 0; i < numRelationships; i++) {
