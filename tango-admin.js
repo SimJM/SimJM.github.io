@@ -386,8 +386,8 @@ function isValidGrid(grid) {
 function createConstraintsFromSolution(solution) {
 	const constraints = [];
 
-	// First, add 5-8 solution cells (givens) to ensure unique solution
-	const numGivens = 5 + Math.floor(Math.random() * 4); // 5-8 givens
+	// First, add 7-10 solution cells (givens) to ensure unique solution
+	const numGivens = 7 + Math.floor(Math.random() * 4); // 7-10 givens
 	const givenPositions = [];
 
 	// Get all positions and shuffle them
