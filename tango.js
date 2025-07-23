@@ -398,21 +398,21 @@ function findVerticalConstraint(row1, col, row2) {
 
 function setupEventListeners() {
 	// Clear all button
-	document.getElementById("clearAllBtn").addEventListener("click", clearAll);
+	document.getElementById("clearAllBtn").addEventListener("click", clearAll, { passive: true });
 
 	// Undo button
-	document.getElementById("undoBtn").addEventListener("click", undoLastMove);
+	document.getElementById("undoBtn").addEventListener("click", undoLastMove, { passive: true });
 
-	// Keyboard shortcuts
+	// Keyboard shortcuts - using passive listeners where possible
 	document.addEventListener("keydown", handleKeyPress);
 
-	// Close modal when clicking outside
+	// Close modal when clicking outside - optimized for performance
 	document.addEventListener("click", function (event) {
 		const successModal = document.getElementById("successModal");
 		if (successModal && event.target === successModal) {
 			closeSuccessModal();
 		}
-	});
+	}, { passive: true });
 
 	// Close modal with Escape key
 	document.addEventListener("keydown", function (event) {
@@ -1071,9 +1071,14 @@ function updateTimerDisplay() {
 	const seconds = Math.floor((elapsedTime % 60000) / 1000);
 	const milliseconds = Math.floor((elapsedTime % 1000) / 10);
 
-	timerDisplay.textContent = `${minutes}:${seconds
+	const timeText = `${minutes}:${seconds
 		.toString()
 		.padStart(2, "0")}.${milliseconds.toString().padStart(2, "0")}`;
+	
+	// Only update if the display text has actually changed to reduce DOM operations
+	if (timerDisplay.textContent !== timeText) {
+		timerDisplay.textContent = timeText;
+	}
 }
 
 function getFormattedTime() {
