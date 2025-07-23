@@ -16,6 +16,11 @@ let gameStats = {
 	maxStreak: 0,
 };
 
+// Performance optimizations - cached DOM elements and debouncing
+let cellElementCache = new Map();
+let lastClickTime = 0;
+const CLICK_DEBOUNCE_MS = 100; // Prevent rapid clicks
+
 // Cell types
 const CELL_TYPES = {
 	EMPTY: 0,
@@ -269,6 +274,9 @@ function isGivenCell(row, col) {
 function createGameBoard() {
 	const gameBoard = document.getElementById("gameBoard");
 	gameBoard.innerHTML = "";
+	
+	// Clear the DOM element cache since we're recreating elements
+	cellElementCache.clear();
 
 	// Create 11x11 grid: cells at even positions (0,2,4,6,8,10), separators at odd positions
 	for (let gridRow = 0; gridRow < 11; gridRow++) {
@@ -288,8 +296,9 @@ function createGameBoard() {
 					element.id = `cell-${gameRow}-${gameCol}`;
 
 					if (!isGiven) {
+						// Use optimized event listener with pre-bound function
 						element.addEventListener("click", () =>
-							handleCellClick(gameRow, gameCol)
+							handleCellClick(gameRow, gameCol), { passive: true }
 						);
 					}
 					updateCellDisplay(gameRow, gameCol);
@@ -429,6 +438,13 @@ function handleKeyPress(event) {
 
 function handleCellClick(row, col) {
 	if (gameCompleted) return;
+	
+	// Debounce rapid clicks
+	const now = Date.now();
+	if (now - lastClickTime < CLICK_DEBOUNCE_MS) {
+		return;
+	}
+	lastClickTime = now;
 
 	// Start timer on first interaction
 	if (!gameStarted) {
@@ -465,24 +481,36 @@ function handleCellClick(row, col) {
 	// Apply the move
 	gameGrid[row][col] = newState;
 
-	updateCellDisplay(row, col);
+	// Use requestAnimationFrame for smoother visual updates
+	requestAnimationFrame(() => {
+		updateCellDisplay(row, col);
+		
+		// Update undo button state
+		updateUndoButton();
 
-	// Update undo button state
-	updateUndoButton();
-
-	// Check if all cells are filled and auto-check solution
-	if (isGridComplete()) {
-		// Add a small delay to ensure the UI is updated
-		setTimeout(() => {
-			checkSolution();
-		}, 500);
-	}
+		// Check if all cells are filled and auto-check solution immediately
+		if (isGridComplete()) {
+			// Check solution immediately without delay for better responsiveness
+			requestAnimationFrame(() => {
+				checkSolution();
+			});
+		}
+	});
 }
 
 function updateCellDisplay(row, col) {
-	const cell = document.getElementById(`cell-${row}-${col}`);
+	// Use cached DOM element for better performance
+	const cellId = `cell-${row}-${col}`;
+	let cell = cellElementCache.get(cellId);
+	if (!cell) {
+		cell = document.getElementById(cellId);
+		if (cell) {
+			cellElementCache.set(cellId, cell);
+		}
+	}
 	if (!cell) return;
 
+	// Batch DOM updates for better performance
 	cell.classList.remove("sun", "moon");
 
 	if (gameGrid[row][col] === CELL_TYPES.SUN) {
@@ -694,29 +722,51 @@ function checkSolution() {
 }
 
 function highlightErrors(errors) {
+	// Batch error highlighting for better performance
+	const cellsToHighlight = [];
+	
 	errors.forEach((error) => {
 		if (error.type === "adjacency" || error.type === "constraint") {
 			if (error.cells) {
 				error.cells.forEach((cell) => {
-					const cellElement = document.getElementById(
-						`cell-${cell.row}-${cell.col}`
-					);
-					if (cellElement) cellElement.classList.add("error");
+					cellsToHighlight.push(`cell-${cell.row}-${cell.col}`);
 				});
 			} else if (error.row !== undefined && error.col !== undefined) {
-				const cellElement = document.getElementById(
-					`cell-${error.row}-${error.col}`
-				);
-				if (cellElement) cellElement.classList.add("error");
+				cellsToHighlight.push(`cell-${error.row}-${error.col}`);
 			}
 		}
 	});
+	
+	// Apply all highlights in a single animation frame
+	if (cellsToHighlight.length > 0) {
+		requestAnimationFrame(() => {
+			cellsToHighlight.forEach((cellId) => {
+				// Use cached element if available
+				let cellElement = cellElementCache.get(cellId);
+				if (!cellElement) {
+					cellElement = document.getElementById(cellId);
+					if (cellElement) {
+						cellElementCache.set(cellId, cellElement);
+					}
+				}
+				if (cellElement) {
+					cellElement.classList.add("error");
+				}
+			});
+		});
+	}
 }
 
 function clearErrorHighlights() {
-	document.querySelectorAll(".cell.error").forEach((cell) => {
-		cell.classList.remove("error");
-	});
+	// Batch DOM operations for better performance
+	const errorCells = document.querySelectorAll(".cell.error");
+	if (errorCells.length > 0) {
+		requestAnimationFrame(() => {
+			errorCells.forEach((cell) => {
+				cell.classList.remove("error");
+			});
+		});
+	}
 }
 
 function clearAll() {
@@ -779,11 +829,14 @@ function updateUndoButton() {
 }
 
 function updateGameBoard() {
-	for (let row = 0; row < 6; row++) {
-		for (let col = 0; col < 6; col++) {
-			updateCellDisplay(row, col);
+	// Batch all cell updates for better performance
+	requestAnimationFrame(() => {
+		for (let row = 0; row < 6; row++) {
+			for (let col = 0; col < 6; col++) {
+				updateCellDisplay(row, col);
+			}
 		}
-	}
+	});
 }
 
 function showMessage(text, type) {
