@@ -80,18 +80,22 @@
 			    font-size: 2em;
 			    background: white;
 			    cursor: pointer;
-			    transition: all 0.3s ease;
+			    /* Optimized transitions - only animate background and border for performance */
+			    transition: background-color 0.15s ease, border-color 0.15s ease;
 			    border-radius: 6px;
 			    user-select: none;
 			    border: 2px solid #d3d6da;
 			    min-height: 45px;
 			    min-width: 45px;
+			    /* Use transform3d to enable hardware acceleration */
+			    transform: translate3d(0, 0, 0);
+			    will-change: background-color, border-color;
 			}
 
 			.cell.playable:hover {
 			    background: #f0f0f0;
-			    transform: scale(1.05);
-			    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+			    /* Removed heavy transform and box-shadow for better performance */
+			    border-color: #bbb;
 			}
 
 			.separator {
@@ -120,12 +124,16 @@
 			    background: #ffd700;
 			    color: #333;
 			    border-color: #ffa500;
+			    /* Faster transition for frequent updates */
+			    transition: all 0.1s ease;
 			}
 
 			.cell.moon {
 			    background: #007bff;
 			    color: white;
 			    border-color: #0056b3;
+			    /* Faster transition for frequent updates */
+			    transition: all 0.1s ease;
 			}
 
 			.cell.constraint {
@@ -917,29 +925,27 @@
 			// Load header using the header manager
 			window.headerManager.loadHeader();
 
-			// Prevent double-tap zoom on mobile devices
+			// Optimized mobile touch handling for better performance
 			let lastTouchEnd = 0;
 			document.addEventListener('touchend', function(event) {
-			    const now = (new Date()).getTime();
-			    if (now - lastTouchEnd <= 300) {
+			    const now = Date.now();
+			    if (now - lastTouchEnd <= 200) { // Reduced from 300ms to 200ms for better responsiveness
 			        event.preventDefault();
 			    }
 			    lastTouchEnd = now;
-			}, false);
+			}, { passive: false });
 
-			// Prevent pinch-to-zoom
+			// Prevent pinch-to-zoom with optimized handling
 			document.addEventListener('touchmove', function(event) {
-			    if (event.scale !== 1) {
+			    if (event.touches.length > 1) { // Only prevent when multi-touch
 			        event.preventDefault();
 			    }
-			}, {
-			    passive: false
-			});
+			}, { passive: false });
 
-			// Prevent zoom on double-tap for specific browsers
+			// Prevent zoom on double-tap with faster response
 			document.addEventListener('dblclick', function(event) {
 			    event.preventDefault();
-			});
+			}, { passive: false });
 		</script>
 	</body>
 </html>
