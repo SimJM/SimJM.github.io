@@ -5,6 +5,28 @@ const CELL_EMPTY = 0;
 const CELL_SUN = 1;
 const CELL_MOON = 2;
 
+// Difficulty settings
+const DIFFICULTY_SETTINGS = {
+	easy: {
+		givens: {min: 10, max: 12},
+		relationships: {min: 9, max: 11},
+		description: "🟢 Easy: More clues, easier to solve",
+	},
+	medium: {
+		givens: {min: 8, max: 10},
+		relationships: {min: 8, max: 10},
+		description: "🟡 Medium: Balanced challenge",
+	},
+	hard: {
+		givens: {min: 7, max: 9},
+		relationships: {min: 7, max: 9},
+		description: "🔴 Hard: Fewer clues, more challenging",
+	},
+};
+
+// Current difficulty setting
+let currentDifficulty = "easy";
+
 // Fallback puzzles in case generation fails
 const FALLBACK_SOLUTIONS = [
 	[
@@ -53,9 +75,74 @@ function setupEventListeners() {
 	console.log("Event listeners ready");
 }
 
+// Difficulty selection function
+function selectDifficulty(difficulty) {
+	// Update current difficulty
+	currentDifficulty = difficulty;
+
+	// Update button states
+	document.querySelectorAll(".difficulty-btn").forEach((btn) => {
+		btn.classList.remove("active");
+	});
+	document.getElementById(difficulty + "Btn").classList.add("active");
+
+	// Update difficulty info
+	const difficultyInfo = document.getElementById("difficultyInfo");
+	difficultyInfo.textContent = DIFFICULTY_SETTINGS[difficulty].description;
+
+	// Update info background color based on difficulty
+	difficultyInfo.className = "difficulty-info";
+
+	// Check if dark mode is active
+	const isDarkMode = document.body.classList.contains("dark-mode");
+
+	if (difficulty === "medium") {
+		if (isDarkMode) {
+			difficultyInfo.style.background = "#3d3416";
+			difficultyInfo.style.color = "#f4d03f";
+			difficultyInfo.style.borderLeftColor = "#f39c12";
+		} else {
+			difficultyInfo.style.background = "#fff3cd";
+			difficultyInfo.style.color = "#856404";
+			difficultyInfo.style.borderLeftColor = "#ffc107";
+		}
+	} else if (difficulty === "hard") {
+		if (isDarkMode) {
+			difficultyInfo.style.background = "#3d1a1a";
+			difficultyInfo.style.color = "#f1948a";
+			difficultyInfo.style.borderLeftColor = "#e74c3c";
+		} else {
+			difficultyInfo.style.background = "#f8d7da";
+			difficultyInfo.style.color = "#721c24";
+			difficultyInfo.style.borderLeftColor = "#dc3545";
+		}
+	} else {
+		if (isDarkMode) {
+			difficultyInfo.style.background = "#1a3d1a";
+			difficultyInfo.style.color = "#82e0aa";
+			difficultyInfo.style.borderLeftColor = "#27ae60";
+		} else {
+			difficultyInfo.style.background = "#e8f5e8";
+			difficultyInfo.style.color = "#2d5016";
+			difficultyInfo.style.borderLeftColor = "#28a745";
+		}
+	}
+
+	console.log(`Difficulty set to: ${difficulty}`);
+}
+
 // Main puzzle generation function
 function generatePuzzle() {
-	showMessage("🎲 Generating new puzzle...", "info");
+	const difficultyEmoji =
+		currentDifficulty === "easy"
+			? "🟢"
+			: currentDifficulty === "medium"
+			? "🟡"
+			: "🔴";
+	showMessage(
+		`🎲 Generating new ${difficultyEmoji} ${currentDifficulty} puzzle...`,
+		"info"
+	);
 
 	try {
 		const puzzle = generateValidPuzzle();
@@ -70,7 +157,10 @@ function generatePuzzle() {
 
 		const challengeUrl = createChallengeURL(puzzle);
 		displayPuzzleResults(challengeUrl);
-		showMessage("✅ New puzzle generated successfully!", "success");
+		showMessage(
+			`✅ New ${difficultyEmoji} ${currentDifficulty} puzzle generated successfully!`,
+			"success"
+		);
 	} catch (error) {
 		console.error("Error generating puzzle:", error);
 		showMessage("❌ Error generating puzzle. Please try again.", "error");
@@ -385,9 +475,14 @@ function isValidGrid(grid) {
 
 function createConstraintsFromSolution(solution) {
 	const constraints = [];
+	const settings = DIFFICULTY_SETTINGS[currentDifficulty];
 
-	// First, add 9-12 solution cells (givens) to ensure unique solution
-	const numGivens = 9 + Math.floor(Math.random() * 4);
+	// Add solution cells (givens) based on difficulty
+	const numGivens =
+		settings.givens.min +
+		Math.floor(
+			Math.random() * (settings.givens.max - settings.givens.min + 1)
+		);
 	const givenPositions = [];
 
 	// Get all positions and shuffle them
@@ -409,9 +504,18 @@ function createConstraintsFromSolution(solution) {
 		});
 	}
 
-	// Then add relationship constraints (9-13 constraints)
-	const numRelationships = 9 + Math.floor(Math.random() * 5);
+	// Then add relationship constraints based on difficulty
+	const numRelationships =
+		settings.relationships.min +
+		Math.floor(
+			Math.random() *
+				(settings.relationships.max - settings.relationships.min + 1)
+		);
 	const usedPairs = new Set();
+
+	console.log(
+		`Generating ${currentDifficulty} puzzle: ${numGivens} givens, ${numRelationships} relationships`
+	);
 
 	for (let i = 0; i < numRelationships; i++) {
 		let attempts = 0;
@@ -580,3 +684,4 @@ window.copyURL = copyURL;
 window.shareURL = shareURL;
 window.playChallenge = playChallenge;
 window.autoResizeTextarea = autoResizeTextarea;
+window.selectDifficulty = selectDifficulty;
