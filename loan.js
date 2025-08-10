@@ -333,7 +333,11 @@ function calculateLoan() {
 			loanPeriodYears
 		);
 
+		// Calculate BSD
+		const bsdData = calculateBSD(price);
+
 		// Display results
+		displayBSDResults(bsdData);
 		displayResults(loanDetails);
 	} catch (error) {
 		console.error("Calculation error:", error);
@@ -517,6 +521,128 @@ function formatNumber(num) {
 		minimumFractionDigits: 2,
 		maximumFractionDigits: 2,
 	}).format(num);
+}
+
+// Format numbers without decimals (for whole dollar amounts)
+function formatWholeNumber(num) {
+	return new Intl.NumberFormat("en-US", {
+		minimumFractionDigits: 0,
+		maximumFractionDigits: 0,
+	}).format(Math.round(num));
+}
+
+// Buyer's Stamp Duty (BSD) calculator for Singapore residential properties
+function calculateBSD(propertyPrice) {
+	// BSD rates effective from 15 Feb 2023 for residential properties
+	const bsdRates = [
+		{min: 0, max: 180000, rate: 0.01}, // First $180,000 → 1%
+		{min: 180000, max: 360000, rate: 0.02}, // Next $180,000 → 2%
+		{min: 360000, max: 1000000, rate: 0.03}, // Next $640,000 → 3%
+		{min: 1000000, max: 1500000, rate: 0.04}, // Next $500,000 → 4%
+		{min: 1500000, max: 3000000, rate: 0.05}, // Next $1,500,000 → 5%
+		{min: 3000000, max: Infinity, rate: 0.06}, // Remaining amount → 6%
+	];
+
+	let totalBSD = 0;
+	let remainingAmount = propertyPrice;
+	const breakdown = [];
+
+	for (const tier of bsdRates) {
+		if (remainingAmount <= 0) break;
+
+		const tierMax =
+			tier.max === Infinity ? remainingAmount + tier.min : tier.max;
+		const taxableInThisTier = Math.min(remainingAmount, tierMax - tier.min);
+
+		if (taxableInThisTier > 0) {
+			const bsdForThisTier = taxableInThisTier * tier.rate;
+			totalBSD += bsdForThisTier;
+
+			breakdown.push({
+				range:
+					tier.max === Infinity
+						? `Remaining $${formatWholeNumber(taxableInThisTier)}`
+						: `$${formatWholeNumber(
+								tier.min + 1
+						  )} - $${formatWholeNumber(
+								Math.min(propertyPrice, tier.max)
+						  )}`,
+				amount: taxableInThisTier,
+				rate: tier.rate * 100,
+				bsd: bsdForThisTier,
+			});
+
+			remainingAmount -= taxableInThisTier;
+		}
+	}
+
+	// Round down to nearest dollar with minimum of $1
+	totalBSD = Math.max(1, Math.floor(totalBSD));
+
+	return {
+		totalBSD,
+		breakdown,
+		propertyPrice,
+	};
+}
+
+function displayBSDResults(bsdData) {
+	const resultDiv = document.getElementById("bsdResult");
+
+	let breakdownHtml = "";
+	bsdData.breakdown.forEach((tier) => {
+		breakdownHtml += `
+			<div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid #eee; align-items: center;">
+				<div style="font-size: 0.9em; color: #666;">${tier.range}</div>
+				<div style="text-align: right; font-size: 0.9em;">$${formatWholeNumber(
+					tier.amount
+				)}</div>
+				<div style="text-align: center; font-size: 0.9em;">${tier.rate}%</div>
+				<div style="text-align: right; font-weight: bold;">$${formatWholeNumber(
+					tier.bsd
+				)}</div>
+			</div>
+		`;
+	});
+
+	const html = `
+		<h2 style="color: #f9532d; margin-bottom: 25px; border-bottom: 2px solid #f9532d; padding-bottom: 10px;">
+			<i class="bx bx-receipt"></i> Buyer's Stamp Duty (BSD)
+		</h2>
+		
+		<div style="background: #f0f8ff; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #f9532d;">
+			<h3 style="color: #333; margin-bottom: 15px; font-size: 1.2em;">
+				<i class="bx bx-money"></i> Total BSD Payable
+			</h3>
+			<p style="font-size: 2em; font-weight: bold; color: #f9532d; margin: 0; text-align: center;">
+				$${formatWholeNumber(bsdData.totalBSD)}
+			</p>
+		</div>
+
+		<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+			<h3 style="color: #333; margin-bottom: 15px; font-size: 1.1em;">BSD Calculation Breakdown</h3>
+			
+			<div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; padding: 10px 0; font-weight: bold; border-bottom: 2px solid #ddd; background: #e9ecef; margin: 0 -10px 10px -10px; padding-left: 10px; padding-right: 10px;">
+				<div>Price Range</div>
+				<div style="text-align: right;">Amount</div>
+				<div style="text-align: center;">Rate</div>
+				<div style="text-align: right;">BSD</div>
+			</div>
+			
+			${breakdownHtml}
+		</div>
+
+		<div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+			<p style="margin: 0; font-size: 0.9em; color: #856404;">
+				<i class="bx bx-info-circle"></i> 
+				<strong>Note:</strong> This BSD calculation is based on Singapore residential property rates effective from 15 Feb 2023. 
+				BSD is rounded down to the nearest dollar with a minimum of $1. Additional Buyer's Stamp Duty (ABSD) may apply for non-residents, second properties, or other qualifying circumstances.
+			</p>
+		</div>
+	`;
+
+	resultDiv.innerHTML = html;
+	resultDiv.style.display = "block";
 }
 
 // Early repayment calculator functionality
@@ -1177,6 +1303,13 @@ function resetEarlyRepaymentCalculator() {
 	// Hide the early repayment section and results
 	earlyRepaymentSection.style.display = "none";
 	earlyRepaymentResult.style.display = "none";
+
+	// Hide BSD results
+	const bsdResult = document.getElementById("bsdResult");
+	if (bsdResult) {
+		bsdResult.style.display = "none";
+		bsdResult.innerHTML = "";
+	}
 
 	// Clear results content
 	earlyRepaymentResult.innerHTML = "";

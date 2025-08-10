@@ -192,6 +192,62 @@
 			body.dark-mode #earlyRepaymentResult [style*="color: #666"] {
 			    color: #ccc !important;
 			}
+
+			/* Dark mode for BSD result section */
+			body.dark-mode #bsdResult {
+			    background: #1a1a1a !important;
+			    color: #e0e0e0 !important;
+			    border: 1px solid #333;
+			}
+
+			body.dark-mode #bsdResult h2,
+			body.dark-mode #bsdResult h3,
+			body.dark-mode #bsdResult h4 {
+			    color: #e0e0e0 !important;
+			}
+
+			body.dark-mode #bsdResult p {
+			    color: #e0e0e0 !important;
+			}
+
+			body.dark-mode #bsdResult [style*="background: #f8f9fa"] {
+			    background: #2d2d2d !important;
+			    border: 1px solid #444;
+			}
+
+			body.dark-mode #bsdResult [style*="background: #f0f8ff"] {
+			    background: #2d2d2d !important;
+			    border-left: 4px solid #f9532d !important;
+			}
+
+			body.dark-mode #bsdResult [style*="background: #fff3cd"] {
+			    background: #3d3d1a !important;
+			    border-left: 4px solid #ffc107 !important;
+			}
+
+			body.dark-mode #bsdResult [style*="background: #e9ecef"] {
+			    background: #3d3d3d !important;
+			}
+
+			body.dark-mode #bsdResult [style*="color: #856404"] {
+			    color: #e6d700 !important;
+			}
+
+			body.dark-mode #bsdResult [style*="color: #333"] {
+			    color: #e0e0e0 !important;
+			}
+
+			body.dark-mode #bsdResult [style*="color: #666"] {
+			    color: #ccc !important;
+			}
+
+			body.dark-mode #bsdResult [style*="border-bottom: 1px solid #eee"] {
+			    border-bottom: 1px solid #444 !important;
+			}
+
+			body.dark-mode #bsdResult [style*="border-bottom: 2px solid #ddd"] {
+			    border-bottom: 2px solid #555 !important;
+			}
 		</style>
 		<title>Loan Calculator</title>
 	</head>
@@ -421,6 +477,10 @@
 					<i class="bx bx-calculator"></i> Calculate Early Repayment
 				</button>
 			</div>
+
+			<div
+				id="bsdResult"
+				style="margin-top: 30px; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none;"></div>
 
 			<div
 				id="loanResult"
