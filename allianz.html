@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link
+			href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+			rel="stylesheet" />
+		<link rel="stylesheet" href="index.css" />
+		<style>
+			/* Allianz-specific styles */
+			.allianz-container {
+				max-width: 1000px;
+				margin: 2rem auto;
+				padding: 2rem;
+			}
+
+			.allianz-title {
+				text-align: center;
+				margin-bottom: 3rem;
+				color: var(--primary-color);
+				font-size: 2.5rem;
+				font-weight: 700;
+			}
+
+			.allianz-subtitle {
+				text-align: center;
+				margin-bottom: 2rem;
+				color: #666;
+				font-size: 1.1rem;
+			}
+
+			.dark-mode .allianz-subtitle {
+				color: #ccc;
+			}
+
+			.months-grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+				gap: 2rem;
+				margin-top: 2rem;
+			}
+
+			.month-card {
+				background: #fff;
+				border-radius: 15px;
+				padding: 1.5rem;
+				box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+				border: 1px solid #f0f0f0;
+				transition: all 0.3s ease;
+			}
+
+			.month-card:hover {
+				transform: translateY(-5px);
+				box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+			}
+
+			.dark-mode .month-card {
+				background: #2e3239;
+				border: 1px solid #444;
+				box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+			}
+
+			.dark-mode .month-card:hover {
+				box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+			}
+
+			.month-header {
+				text-align: center;
+				margin-bottom: 1.5rem;
+				padding-bottom: 1rem;
+				border-bottom: 2px solid var(--primary-color);
+			}
+
+			.month-name {
+				font-size: 1.5rem;
+				font-weight: 600;
+				color: var(--primary-color);
+				margin-bottom: 0.5rem;
+			}
+
+			.month-year {
+				font-size: 1rem;
+				color: #666;
+			}
+
+			.dark-mode .month-year {
+				color: #ccc;
+			}
+
+			.date-item {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				padding: 1rem;
+				margin-bottom: 0.75rem;
+				background: #f8f9fa;
+				border-radius: 10px;
+				border-left: 4px solid transparent;
+				transition: all 0.3s ease;
+			}
+
+			.date-item:hover {
+				transform: translateX(5px);
+			}
+
+			.dark-mode .date-item {
+				background: #1f252e;
+			}
+
+			.date-item.record {
+				border-left-color: #28a745;
+			}
+
+			.date-item.ex-dividend {
+				border-left-color: #ffc107;
+			}
+
+			.date-item.payable {
+				border-left-color: #007bff;
+			}
+
+			.date-label {
+				font-weight: 600;
+				font-size: 0.9rem;
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+
+			.date-label.record {
+				color: #28a745;
+			}
+
+			.date-label.ex-dividend {
+				color: #ffc107;
+			}
+
+			.date-label.payable {
+				color: #007bff;
+			}
+
+			.date-info {
+				text-align: right;
+			}
+
+			.date-value {
+				font-weight: 600;
+				font-size: 1rem;
+				margin-bottom: 0.25rem;
+			}
+
+			.date-day {
+				font-size: 0.85rem;
+				color: #666;
+			}
+
+			.dark-mode .date-day {
+				color: #ccc;
+			}
+
+			.legend {
+				display: flex;
+				justify-content: center;
+				gap: 2rem;
+				margin: 2rem 0;
+				flex-wrap: wrap;
+			}
+
+			.legend-item {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				font-size: 0.9rem;
+			}
+
+			.legend-color {
+				width: 16px;
+				height: 16px;
+				border-radius: 3px;
+			}
+
+			.legend-color.record {
+				background-color: #28a745;
+			}
+
+			.legend-color.ex-dividend {
+				background-color: #ffc107;
+			}
+
+			.legend-color.payable {
+				background-color: #007bff;
+			}
+
+			.info-section {
+				background: #f8f9fa;
+				border-radius: 15px;
+				padding: 1.5rem;
+				margin: 2rem 0;
+				border-left: 4px solid var(--primary-color);
+			}
+
+			.dark-mode .info-section {
+				background: #2e3239;
+			}
+
+			.info-title {
+				font-size: 1.2rem;
+				font-weight: 600;
+				color: var(--primary-color);
+				margin-bottom: 1rem;
+			}
+
+			.info-text {
+				line-height: 1.6;
+				color: #666;
+			}
+
+			.dark-mode .info-text {
+				color: #ccc;
+			}
+
+			/* Responsive design */
+			@media (max-width: 768px) {
+				.allianz-container {
+					padding: 1rem;
+				}
+
+				.allianz-title {
+					font-size: 2rem;
+				}
+
+				.months-grid {
+					grid-template-columns: 1fr;
+					gap: 1.5rem;
+				}
+
+				.legend {
+					flex-direction: column;
+					align-items: center;
+					gap: 1rem;
+				}
+
+				.date-item {
+					flex-direction: column;
+					text-align: center;
+					gap: 0.5rem;
+				}
+
+				.date-info {
+					text-align: center;
+				}
+			}
+		</style>
+		<title>Allianz Dividend Calendar</title>
+	</head>
+
+	<body>
+		<div id="header-placeholder"></div>
+
+		<section class="container allianz-container">
+			<h1 class="allianz-title">
+				<i class="bx bx-calendar-check"></i>
+				Allianz Dividend Calendar
+			</h1>
+			<p class="allianz-subtitle">
+				Track important dividend dates for the next 6 months
+			</p>
+
+			<div class="info-section">
+				<h3 class="info-title">
+					<i class="bx bx-info-circle"></i>
+					Important Dates Explained
+				</h3>
+				<p class="info-text">
+					<strong>Record Date:</strong> 10th working day - The date
+					you must own shares to be eligible for dividends<br />
+					<strong>Ex-Dividend Date:</strong> 11th working day - The
+					first trading day when shares trade without dividend
+					rights<br />
+					<strong>Payable Date:</strong> 13th working day - The date
+					dividends are actually paid to shareholders
+				</p>
+			</div>
+
+			<div class="legend">
+				<div class="legend-item">
+					<div class="legend-color record"></div>
+					<span>Record Date</span>
+				</div>
+				<div class="legend-item">
+					<div class="legend-color ex-dividend"></div>
+					<span>Ex-Dividend Date</span>
+				</div>
+				<div class="legend-item">
+					<div class="legend-color payable"></div>
+					<span>Payable Date</span>
+				</div>
+			</div>
+
+			<div class="months-grid" id="monthsGrid">
+				<!-- Months will be populated by JavaScript -->
+			</div>
+		</section>
+
+		<script src="shared.js"></script>
+		<script src="header.js"></script>
+		<script>
+			// Working days calculation function
+			function getWorkingDay(year, month, workingDayNumber) {
+				const firstDay = new Date(year, month, 1);
+				let currentDate = new Date(firstDay);
+				let workingDaysCount = 0;
+
+				// Find the nth working day of the month
+				while (workingDaysCount < workingDayNumber) {
+					const dayOfWeek = currentDate.getDay();
+
+					// Skip weekends (0 = Sunday, 6 = Saturday)
+					if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+						workingDaysCount++;
+
+						if (workingDaysCount === workingDayNumber) {
+							return new Date(currentDate);
+						}
+					}
+
+					currentDate.setDate(currentDate.getDate() + 1);
+
+					// Safety check: don't go beyond the month
+					if (currentDate.getMonth() !== month) {
+						// If we run out of days in this month, return the last working day
+						currentDate.setDate(currentDate.getDate() - 1);
+						while (currentDate.getDay() === 0 || currentDate.getDay() === 6) {
+							currentDate.setDate(currentDate.getDate() - 1);
+						}
+						return new Date(currentDate);
+					}
+				}
+
+				return currentDate;
+			}
+
+			function formatDate(date) {
+				return date.toLocaleDateString('en-US', {
+					day: '2-digit',
+					month: 'short',
+					year: 'numeric'
+				});
+			}
+
+			function formatDay(date) {
+				return date.toLocaleDateString('en-US', {
+					weekday: 'long'
+				});
+			}
+
+			function generateDividendCalendar() {
+				const monthsGrid = document.getElementById('monthsGrid');
+				const currentDate = new Date();
+
+				// Generate for current month + next 5 months
+				for (let i = 0; i < 6; i++) {
+					const targetDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
+					const year = targetDate.getFullYear();
+					const month = targetDate.getMonth();
+
+					// Calculate the three important dates
+					const recordDate = getWorkingDay(year, month, 10);
+					const exDividendDate = getWorkingDay(year, month, 11);
+					const payableDate = getWorkingDay(year, month, 13);
+
+					// Create month card
+					const monthCard = document.createElement('div');
+					monthCard.className = 'month-card';
+
+					monthCard.innerHTML = `
+						<div class="month-header">
+							<div class="month-name">${targetDate.toLocaleDateString('en-US', { month: 'long' })}</div>
+							<div class="month-year">${year}</div>
+						</div>
+
+						<div class="date-item record">
+							<div class="date-label record">
+								<i class="bx bx-bookmark"></i>
+								Record Date
+							</div>
+							<div class="date-info">
+								<div class="date-value">${formatDate(recordDate)}</div>
+								<div class="date-day">${formatDay(recordDate)}</div>
+							</div>
+						</div>
+
+						<div class="date-item ex-dividend">
+							<div class="date-label ex-dividend">
+								<i class="bx bx-calendar-minus"></i>
+								Ex-Dividend Date
+							</div>
+							<div class="date-info">
+								<div class="date-value">${formatDate(exDividendDate)}</div>
+								<div class="date-day">${formatDay(exDividendDate)}</div>
+							</div>
+						</div>
+
+						<div class="date-item payable">
+							<div class="date-label payable">
+								<i class="bx bx-money"></i>
+								Payable Date
+							</div>
+							<div class="date-info">
+								<div class="date-value">${formatDate(payableDate)}</div>
+								<div class="date-day">${formatDay(payableDate)}</div>
+							</div>
+						</div>
+					`;
+
+					monthsGrid.appendChild(monthCard);
+				}
+			}
+
+			// Initialize the page
+			document.addEventListener('DOMContentLoaded', function() {
+				// Load header
+				window.headerManager.loadHeader();
+
+				// Generate dividend calendar
+				generateDividendCalendar();
+
+				// Initialize dark mode
+				if (window.shared && window.shared.handleDarkMode) {
+					window.shared.handleDarkMode();
+				}
+			});
+		</script>
+	</body>
+</html>
