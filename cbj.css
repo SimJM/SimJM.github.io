@@ -57,6 +57,61 @@ h1 {
 	letter-spacing: 2px;
 }
 
+.stats-panel {
+	display: grid;
+	grid-template-columns: repeat(6, 1fr);
+	gap: 10px;
+	margin-bottom: 20px;
+	background: rgba(0, 0, 0, 0.4);
+	padding: 15px;
+	border-radius: 10px;
+	border: 2px solid #ffd700;
+}
+
+.stat-group {
+	text-align: center;
+	padding: 10px;
+	background: rgba(0, 0, 0, 0.3);
+	border-radius: 8px;
+}
+
+.stat-label {
+	color: #ffd700;
+	font-size: 0.75em;
+	margin-bottom: 5px;
+	font-weight: bold;
+	letter-spacing: 0.5px;
+}
+
+.stat-value {
+	color: white;
+	font-size: 1.4em;
+	font-weight: bold;
+	text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.stat-value.win {
+	color: #2ecc71;
+	text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+}
+
+.stat-value.lose {
+	color: #e74c3c;
+	text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+}
+
+@media (max-width: 768px) {
+	.stats-panel {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+@media (max-width: 480px) {
+	.stats-panel {
+		grid-template-columns: repeat(2, 1fr);
+	}
+}
+
 .info-panel {
 	display: flex;
 	justify-content: space-around;

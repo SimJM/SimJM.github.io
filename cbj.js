@@ -11,6 +11,16 @@ let canDouble = true;
 let canSplit = false;
 let dealerHoleCard = null;
 
+// Statistics
+let stats = {
+	handsPlayed: 0,
+	wins: 0,
+	losses: 0,
+	pushes: 0,
+	streak: 0,
+	streakType: null, // 'win' or 'loss'
+};
+
 // Card suits and values
 const suits = ["♠️", "♥️", "♦️", "♣️"];
 const values = [
@@ -44,6 +54,14 @@ const standBtn = document.getElementById("standBtn");
 const doubleBtn = document.getElementById("doubleBtn");
 const splitBtn = document.getElementById("splitBtn");
 const newRoundBtn = document.getElementById("newRoundBtn");
+
+// Stats elements
+const handsPlayedEl = document.getElementById("handsPlayed");
+const winsEl = document.getElementById("wins");
+const lossesEl = document.getElementById("losses");
+const pushesEl = document.getElementById("pushes");
+const streakEl = document.getElementById("streak");
+const shoeCardsEl = document.getElementById("shoeCards");
 
 // Create a 6-deck shoe (312 cards)
 function createShoe() {
@@ -154,6 +172,24 @@ function addDealerCard(card, hidden = false) {
 function updateDisplay() {
 	bankrollEl.textContent = `$${bankroll}`;
 	currentBetEl.textContent = `$${currentBet}`;
+
+	// Update stats
+	handsPlayedEl.textContent = stats.handsPlayed;
+	winsEl.textContent = stats.wins;
+	lossesEl.textContent = stats.losses;
+	pushesEl.textContent = stats.pushes;
+	shoeCardsEl.textContent = shoe.length;
+
+	if (stats.streak === 0) {
+		streakEl.textContent = "-";
+		streakEl.className = "stat-value";
+	} else if (stats.streakType === "win") {
+		streakEl.textContent = `W${stats.streak}`;
+		streakEl.className = "stat-value win";
+	} else {
+		streakEl.textContent = `L${stats.streak}`;
+		streakEl.className = "stat-value lose";
+	}
 
 	// Display dealer cards
 	dealerCardsEl.innerHTML = "";
@@ -372,15 +408,35 @@ function checkBlackjacks() {
 			dealerHoleCard = null;
 			updateDisplay();
 
+			// Update statistics
+			stats.handsPlayed++;
+
 			if (playerBlackjack && dealerBlackjack) {
 				bankroll += currentBet;
 				showMessage("Both Blackjack! Push", "info");
+				stats.pushes++;
+				stats.streak = 0;
+				stats.streakType = null;
 			} else if (playerBlackjack) {
 				const winnings = Math.floor(currentBet * 2.5);
 				bankroll += winnings;
 				showMessage("Blackjack! You win 3:2", "win");
+				stats.wins++;
+				if (stats.streakType === "win") {
+					stats.streak++;
+				} else {
+					stats.streak = 1;
+					stats.streakType = "win";
+				}
 			} else {
 				showMessage("Dealer Blackjack! You lose", "lose");
+				stats.losses++;
+				if (stats.streakType === "loss") {
+					stats.streak++;
+				} else {
+					stats.streak = 1;
+					stats.streakType = "loss";
+				}
 			}
 			endRound();
 		}, 1000);
@@ -520,6 +576,9 @@ function resolveRound() {
 
 	let totalWinnings = 0;
 	let resultMessages = [];
+	let hasWin = false;
+	let hasLoss = false;
+	let allPush = true;
 
 	playerHands.forEach((hand, index) => {
 		const playerValue = calculateHandValue(hand);
@@ -528,21 +587,62 @@ function resolveRound() {
 
 		if (playerBust) {
 			resultMessages.push(`Hand ${index + 1}: Bust`);
+			hasLoss = true;
+			allPush = false;
 		} else if (dealerBust) {
 			totalWinnings += bet * 2;
 			resultMessages.push(`Hand ${index + 1}: Win!`);
+			hasWin = true;
+			allPush = false;
 		} else if (playerValue > dealerValue) {
 			totalWinnings += bet * 2;
 			resultMessages.push(`Hand ${index + 1}: Win!`);
+			hasWin = true;
+			allPush = false;
 		} else if (playerValue === dealerValue) {
 			totalWinnings += bet;
 			resultMessages.push(`Hand ${index + 1}: Push`);
 		} else {
 			resultMessages.push(`Hand ${index + 1}: Lose`);
+			hasLoss = true;
+			allPush = false;
 		}
 	});
 
 	bankroll += totalWinnings;
+
+	// Update statistics
+	stats.handsPlayed++;
+	if (allPush) {
+		stats.pushes++;
+		stats.streak = 0;
+		stats.streakType = null;
+	} else if (hasWin && !hasLoss) {
+		stats.wins++;
+		if (stats.streakType === "win") {
+			stats.streak++;
+		} else {
+			stats.streak = 1;
+			stats.streakType = "win";
+		}
+	} else if (hasLoss && !hasWin) {
+		stats.losses++;
+		if (stats.streakType === "loss") {
+			stats.streak++;
+		} else {
+			stats.streak = 1;
+			stats.streakType = "loss";
+		}
+	} else {
+		// Mixed results
+		if (totalWinnings - currentBet > 0) {
+			stats.wins++;
+		} else {
+			stats.losses++;
+		}
+		stats.streak = 0;
+		stats.streakType = null;
+	}
 
 	let message = resultMessages.join(" | ");
 	if (dealerBust) {
