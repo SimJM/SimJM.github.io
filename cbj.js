@@ -676,6 +676,107 @@ function showMessage(text, type = "info") {
 	messageEl.className = `message ${type}`;
 }
 
+// Calculate win probability for a given action using Monte Carlo simulation
+function calculateWinProbability(playerHand, dealerUpcard, action) {
+	const simulations = 10000; // Number of simulations to run
+	let wins = 0;
+	let losses = 0;
+	let pushes = 0;
+
+	// Dealer probabilities based on upcard (standard infinite deck probabilities)
+	const dealerFinalValues = simulateDealerOutcomes(dealerUpcard, simulations);
+
+	for (let i = 0; i < simulations; i++) {
+		let playerValue = calculateHandValue(playerHand);
+		let playerBusted = false;
+
+		// Simulate player action
+		if (action === "hit" || action === "double") {
+			// Draw one card (for double) or keep hitting (for hit)
+			const drawCount =
+				action === "double" ? 1 : getHitSimulation(playerValue);
+			for (let j = 0; j < drawCount; j++) {
+				const card = getRandomCardValue();
+				playerValue = addCardToValue(playerValue, card, playerHand);
+				if (playerValue > 21) {
+					playerBusted = true;
+					break;
+				}
+			}
+		}
+		// For 'stand', player value stays the same
+		// For 'split', we'll calculate based on one hand averaging
+
+		// Compare with dealer outcome
+		const dealerValue = dealerFinalValues[i];
+		const dealerBusted = dealerValue > 21;
+
+		if (playerBusted) {
+			losses++;
+		} else if (dealerBusted) {
+			wins++;
+		} else if (playerValue > dealerValue) {
+			wins++;
+		} else if (playerValue < dealerValue) {
+			losses++;
+		} else {
+			pushes++;
+		}
+	}
+
+	const winRate = (wins / simulations) * 100;
+	const loseRate = (losses / simulations) * 100;
+	const pushRate = (pushes / simulations) * 100;
+
+	return {winRate, loseRate, pushRate};
+}
+
+// Simulate dealer final outcomes based on upcard
+function simulateDealerOutcomes(dealerUpcard, count) {
+	const outcomes = [];
+	for (let i = 0; i < count; i++) {
+		let dealerValue = dealerUpcard;
+		// Dealer draws hole card
+		const holeCard = getRandomCardValue();
+		dealerValue = addCardToValue(dealerValue, holeCard, []);
+
+		// Dealer hits until 17+
+		while (dealerValue < 17) {
+			const card = getRandomCardValue();
+			dealerValue = addCardToValue(dealerValue, card, []);
+			if (dealerValue > 21) break;
+		}
+		outcomes.push(dealerValue);
+	}
+	return outcomes;
+}
+
+// Get random card value (1-11, where 1 is Ace, 10 for face cards)
+function getRandomCardValue() {
+	const rand = Math.random();
+	if (rand < 1 / 13) return 11; // Ace (treated as 11 initially)
+	if (rand < 5 / 13) return Math.floor(rand * 13) + 2; // 2-5
+	if (rand < 9 / 13) return Math.floor((rand - 5 / 13) * (13 * 4)) + 6; // 6-9
+	return 10; // 10, J, Q, K (4 cards worth 10)
+}
+
+// Add card value to total, handling soft aces
+function addCardToValue(currentValue, cardValue, hand) {
+	let newValue = currentValue + cardValue;
+	// If bust and we have a soft ace, convert it
+	if (newValue > 21 && cardValue === 11) {
+		newValue -= 10; // Convert ace from 11 to 1
+	}
+	return newValue;
+}
+
+// Simulate how many hits a player would take for a given value (conservative)
+function getHitSimulation(playerValue) {
+	if (playerValue >= 17) return 0;
+	if (playerValue >= 12) return 1; // Conservative, typically would stand on some
+	return Math.floor(Math.random() * 2) + 1; // 1-2 hits for low values
+}
+
 // Show hint dialog
 function showHint() {
 	if (!gameInProgress) return;
@@ -704,6 +805,79 @@ function showHint() {
 
 	const situation = `You have: ${handType}<br>Dealer shows: ${dealerCard}`;
 
+	// Calculate probabilities for each possible action
+	const standProb = calculateWinProbability(
+		currentHand,
+		dealerUpcard,
+		"stand"
+	);
+	const hitProb = calculateWinProbability(currentHand, dealerUpcard, "hit");
+
+	let probabilities = `
+		<div class="probability-grid">
+			<div class="prob-item ${move === "stand" ? "recommended" : ""}">
+				<div class="prob-action">STAND</div>
+				<div class="prob-stats">
+					<span class="prob-win">Win: ${standProb.winRate.toFixed(1)}%</span>
+					<span class="prob-lose">Lose: ${standProb.loseRate.toFixed(1)}%</span>
+					<span class="prob-push">Push: ${standProb.pushRate.toFixed(1)}%</span>
+				</div>
+			</div>
+			<div class="prob-item ${move === "hit" ? "recommended" : ""}">
+				<div class="prob-action">HIT</div>
+				<div class="prob-stats">
+					<span class="prob-win">Win: ${hitProb.winRate.toFixed(1)}%</span>
+					<span class="prob-lose">Lose: ${hitProb.loseRate.toFixed(1)}%</span>
+					<span class="prob-push">Push: ${hitProb.pushRate.toFixed(1)}%</span>
+				</div>
+			</div>
+	`;
+
+	// Add double probability if available
+	if (
+		currentHand.length === 2 &&
+		canDouble &&
+		bankroll >= playerBets[currentHandIndex]
+	) {
+		const doubleProb = calculateWinProbability(
+			currentHand,
+			dealerUpcard,
+			"double"
+		);
+		probabilities += `
+			<div class="prob-item ${move === "double" ? "recommended" : ""}">
+				<div class="prob-action">DOUBLE</div>
+				<div class="prob-stats">
+					<span class="prob-win">Win: ${doubleProb.winRate.toFixed(1)}%</span>
+					<span class="prob-lose">Lose: ${doubleProb.loseRate.toFixed(1)}%</span>
+					<span class="prob-push">Push: ${doubleProb.pushRate.toFixed(1)}%</span>
+				</div>
+			</div>
+		`;
+	}
+
+	// Add split probability if available
+	if (isPair && canSplit && bankroll >= currentBet) {
+		const splitProb = calculateWinProbability(
+			[currentHand[0]],
+			dealerUpcard,
+			"hit"
+		);
+		probabilities += `
+			<div class="prob-item ${move === "split" ? "recommended" : ""}">
+				<div class="prob-action">SPLIT</div>
+				<div class="prob-stats">
+					<span class="prob-win">Win: ${splitProb.winRate.toFixed(1)}%</span>
+					<span class="prob-lose">Lose: ${splitProb.loseRate.toFixed(1)}%</span>
+					<span class="prob-push">Push: ${splitProb.pushRate.toFixed(1)}%</span>
+				</div>
+				<div class="prob-note">Per hand average</div>
+			</div>
+		`;
+	}
+
+	probabilities += `</div>`;
+
 	// Get action text
 	const actionText = move.toUpperCase();
 
@@ -717,7 +891,8 @@ function showHint() {
 	// Update dialog content
 	hintSituation.innerHTML = situation;
 	hintAction.textContent = actionText;
-	hintExplanation.textContent = explanation;
+	hintExplanation.innerHTML =
+		probabilities + '<p class="explanation-text">' + explanation + "</p>";
 
 	// Show dialog
 	hintOverlay.classList.add("active");

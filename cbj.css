@@ -1058,39 +1058,39 @@ h1 {
 }
 
 .hint-body {
-	padding: 25px;
+	padding: 15px;
 }
 
 .hint-situation,
 .hint-recommendation,
 .hint-explanation {
-	margin-bottom: 20px;
+	margin-bottom: 12px;
 }
 
 .hint-situation h3,
 .hint-recommendation h3,
 .hint-explanation h3 {
 	color: #f39c12;
-	font-size: 1.1em;
-	margin-bottom: 10px;
+	font-size: 0.9em;
+	margin-bottom: 6px;
 	text-transform: uppercase;
-	letter-spacing: 1px;
+	letter-spacing: 0.5px;
 }
 
 .hint-situation p,
 .hint-explanation p {
 	color: #d0d0d0;
-	font-size: 1em;
-	line-height: 1.6;
+	font-size: 0.9em;
+	line-height: 1.4;
 	margin: 0;
 }
 
 .hint-action {
 	background: rgba(243, 156, 18, 0.2);
 	border-left: 4px solid #f39c12;
-	padding: 15px;
+	padding: 10px;
 	color: #ffd700;
-	font-size: 1.3em;
+	font-size: 1.1em;
 	font-weight: bold;
 	text-transform: uppercase;
 	text-align: center;
@@ -1100,7 +1100,7 @@ h1 {
 }
 
 .hint-footer {
-	padding: 0 25px 25px 25px;
+	padding: 0 15px 15px 15px;
 	display: flex;
 	justify-content: center;
 }
@@ -1108,8 +1108,8 @@ h1 {
 .btn-hint-ok {
 	background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
 	color: white;
-	padding: 12px 40px;
-	font-size: 1.1em;
+	padding: 10px 30px;
+	font-size: 1em;
 	font-weight: bold;
 	border: none;
 	border-radius: 8px;
@@ -1131,6 +1131,84 @@ h1 {
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
+/* Probability Grid */
+.probability-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+	gap: 10px;
+	margin: 12px 0;
+	padding: 12px;
+	background: rgba(0, 0, 0, 0.2);
+	border-radius: 8px;
+}
+
+.prob-item {
+	background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+	border: 2px solid #555;
+	border-radius: 6px;
+	padding: 10px;
+	text-align: center;
+	transition: all 0.3s ease;
+}
+
+.prob-item.recommended {
+	border-color: #ffd700;
+	background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+	box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+	transform: scale(1.03);
+}
+
+.prob-action {
+	font-size: 0.95em;
+	font-weight: bold;
+	color: #ffd700;
+	margin-bottom: 6px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.prob-item.recommended .prob-action {
+	color: #fff;
+}
+
+.prob-stats {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	font-size: 0.8em;
+}
+
+.prob-win {
+	color: #2ecc71;
+	font-weight: bold;
+}
+
+.prob-lose {
+	color: #e74c3c;
+	font-weight: bold;
+}
+
+.prob-push {
+	color: #f39c12;
+	font-weight: bold;
+}
+
+.prob-note {
+	margin-top: 4px;
+	font-size: 0.7em;
+	color: #bbb;
+	font-style: italic;
+}
+
+.explanation-text {
+	margin-top: 10px;
+	padding-top: 10px;
+	border-top: 2px solid #555;
+	color: #ddd;
+	line-height: 1.4;
+	font-size: 0.9em;
+}
+
 @media (max-width: 480px) {
 	.hint-dialog {
 		width: 95%;
@@ -1138,14 +1216,63 @@ h1 {
 	}
 
 	.hint-header h2 {
-		font-size: 1.2em;
+		font-size: 1.1em;
 	}
 
 	.hint-body {
-		padding: 20px;
+		padding: 12px;
 	}
 
 	.hint-action {
-		font-size: 1.1em;
+		font-size: 1em;
+		padding: 8px;
+	}
+
+	.probability-grid {
+		grid-template-columns: 1fr 1fr;
+		gap: 8px;
+		padding: 10px;
+		margin: 10px 0;
+	}
+
+	.prob-item {
+		padding: 8px;
+	}
+
+	.prob-action {
+		font-size: 0.85em;
+		margin-bottom: 4px;
+	}
+
+	.prob-stats {
+		font-size: 0.75em;
+		gap: 2px;
+	}
+
+	.hint-situation h3,
+	.hint-recommendation h3,
+	.hint-explanation h3 {
+		font-size: 0.85em;
+		margin-bottom: 4px;
+	}
+
+	.hint-situation p,
+	.hint-explanation p {
+		font-size: 0.85em;
+	}
+
+	.explanation-text {
+		font-size: 0.85em;
+		margin-top: 8px;
+		padding-top: 8px;
+	}
+
+	.btn-hint-ok {
+		padding: 8px 24px;
+		font-size: 0.9em;
+	}
+
+	.hint-footer {
+		padding: 0 12px 12px 12px;
 	}
 }

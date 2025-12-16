@@ -513,20 +513,57 @@ function doubleDown() {
 
 ### 6. Strategy Hint System
 
-**Purpose**: Provide real-time Basic Strategy guidance with detailed explanations
+**Purpose**: Provide real-time Basic Strategy guidance with dynamic win probability analysis
 
 **Features**:
 
 -   💡 Hint button available during player's turn
--   Modal dialog showing recommended action
+-   **Monte Carlo Simulation**: 10,000 simulations per action to calculate win/loss/push probabilities
+-   Modal dialog with probability grid for all available actions
 -   Context-aware explanations based on game situation
 -   Same logic as auto-play mode (optimal Basic Strategy)
+-   No card counting - uses infinite deck probabilities
 
 **User Interface**:
 
 -   **Your Situation**: Displays current hand type and dealer's upcard
 -   **Recommended Action**: Bold display of HIT/STAND/DOUBLE/SPLIT
+-   **Probability Grid**: Shows win/lose/push percentages for each available action
+    -   Recommended action highlighted with gold border and green background
+    -   Color-coded: Green (win), Red (lose), Yellow (push)
+    -   2-column layout on mobile for optimal space usage
 -   **Why?**: Detailed explanation of the mathematical reasoning
+
+**Probability Calculation**:
+
+```javascript
+function calculateWinProbability(playerHand, dealerUpcard, action) {
+    const simulations = 10000;
+    let wins = 0, losses = 0, pushes = 0;
+
+    // Simulate dealer outcomes based on upcard
+    const dealerFinalValues = simulateDealerOutcomes(dealerUpcard, simulations);
+
+    for (let i = 0; i < simulations; i++) {
+        // Simulate player action
+        let playerValue = simulatePlayerAction(playerHand, action);
+        let dealerValue = dealerFinalValues[i];
+
+        // Compare outcomes
+        if (playerValue > 21) losses++;
+        else if (dealerValue > 21) wins++;
+        else if (playerValue > dealerValue) wins++;
+        else if (playerValue < dealerValue) losses++;
+        else pushes++;
+    }
+
+    return {
+        winRate: (wins / simulations) * 100,
+        loseRate: (losses / simulations) * 100,
+        pushRate: (pushes / simulations) * 100
+    };
+}
+```
 
 **Algorithm**:
 
@@ -538,13 +575,31 @@ function showHint() {
     // Get optimal move using same Basic Strategy logic as auto-play
     const move = getBasicStrategyMove(currentHand, dealerUpcard);
 
+    // Calculate probabilities for each available action
+    const standProb = calculateWinProbability(currentHand, dealerUpcard, 'stand');
+    const hitProb = calculateWinProbability(currentHand, dealerUpcard, 'hit');
+    if (canDouble) {
+        const doubleProb = calculateWinProbability(currentHand, dealerUpcard, 'double');
+    }
+    if (canSplit) {
+        const splitProb = calculateWinProbability([currentHand[0]], dealerUpcard, 'hit');
+    }
+
     // Generate context-aware explanation
     const explanation = getBasicStrategyExplanation(currentHand, dealerUpcard, move);
 
-    // Display in modal dialog
-    showHintDialog(move, explanation);
+    // Display in modal dialog with probabilities
+    showHintDialog(move, probabilities, explanation);
 }
 ```
+
+**Simulation Details**:
+
+-   **Dealer Simulation**: Follows standard rules (hit until 17+, proper soft ace handling)
+-   **Card Distribution**: 10-value cards = 30.8% (4/13), Aces = 7.7% (1/13)
+-   **Infinite Deck**: No card counting, pure mathematical probabilities
+-   **Player Strategy**: Conservative simulation for hit scenarios
+-   **Split Calculation**: Per-hand average probability
 
 **Explanation Categories**:
 
@@ -561,7 +616,8 @@ function showHint() {
 -   Uses same `getBasicStrategyMove()` function as automation
 -   Provides educational value while maintaining optimal play
 -   Modal overlay with animations (fade in, slide in)
--   Responsive design for mobile devices
+-   Responsive design: Desktop grid layout, 2-column mobile view
+-   Optimized spacing to minimize scrolling on all devices
 
 ---
 
@@ -1015,12 +1071,13 @@ BLACKJACK_STRATEGY.md  - Basic Strategy reference guide
 ✅ **Cryptographic Security**: Uses crypto.getRandomValues() for provably fair shuffling  
 ✅ **Realistic Cut Card System**: Random placement at 52-78 cards (1-1.5 decks from end)  
 ✅ **Basic Strategy Integration**: Auto-play and hint system use optimal mathematical strategy  
+✅ **Monte Carlo Probability Analysis**: 10,000 simulations show win/loss/push odds for each action  
 ✅ **21 Advanced Statistics**: ROI, dealer bust rate, double down success, and more  
-✅ **Interactive Hint System**: Learn optimal play with detailed explanations  
+✅ **Interactive Hint System**: Real-time probability grid with context-aware explanations  
 ✅ **Smooth Animations**: Card dealing, flipping, and chip tossing effects  
-✅ **Responsive Design**: Full mobile support with touch-friendly controls  
+✅ **Responsive Design**: Full mobile support with optimized 2-column probability display  
 ✅ **No Dependencies**: Pure vanilla JavaScript, HTML5, and CSS3  
-✅ **Educational Value**: Perfect for learning blackjack Basic Strategy
+✅ **Educational Value**: Perfect for learning blackjack Basic Strategy with data-driven insights
 
 ---
 
