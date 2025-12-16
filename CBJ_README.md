@@ -849,7 +849,9 @@ function moveToNextHand() {
 
 -   Validates bankroll before each round
 -   Stops if insufficient funds
--   Can be manually interrupted
+-   Can be manually interrupted (Stop Auto button remains active)
+-   Disables all manual action buttons during auto-play (Hit, Stand, Double, Split, Hint, Deal, New Round)
+-   Prevents user interference and ensures clean Basic Strategy execution
 -   Shows completion message
 -   Re-enables manual controls on stop
 -   Handles split hands automatically - continues playing all split hands sequentially

@@ -730,6 +730,18 @@ function closeHint() {
 
 // Update buttons
 function updateButtons() {
+	// During auto-play, disable all action buttons
+	if (autoPlaying) {
+		hitBtn.disabled = true;
+		standBtn.disabled = true;
+		doubleBtn.disabled = true;
+		splitBtn.disabled = true;
+		hintBtn.disabled = true;
+		dealBtn.disabled = true;
+		newRoundBtn.disabled = true;
+		return;
+	}
+
 	if (!gameInProgress) {
 		hitBtn.disabled = true;
 		standBtn.disabled = true;
@@ -1299,6 +1311,8 @@ function startAutoPlay() {
 	dealBtn.disabled = true;
 	betInput.disabled = true;
 	autoRoundsInput.disabled = true;
+	newRoundBtn.disabled = true;
+	updateButtons(); // Disable all game action buttons
 	showMessage(
 		`Auto-playing with Basic Strategy (${autoPlayMaxRounds} rounds)`,
 		"info"
@@ -1318,7 +1332,9 @@ function stopAutoPlay() {
 	dealBtn.disabled = false;
 	betInput.disabled = false;
 	autoRoundsInput.disabled = false;
+	newRoundBtn.disabled = false;
 	showMessage("Auto-play stopped", "info");
+	updateButtons(); // Re-enable game buttons based on current state
 }
 
 function autoPlayStartNewRound() {
