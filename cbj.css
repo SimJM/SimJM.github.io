@@ -592,6 +592,34 @@ h1 {
 	animation: pulse 2s infinite;
 }
 
+.btn-super-auto {
+	background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+	color: white;
+	font-weight: bold;
+	border: 2px solid #ffd700;
+}
+
+.btn-super-auto:hover {
+	background: linear-gradient(135deg, #ff8787 0%, #ff6b6b 100%);
+	box-shadow: 0 0 15px rgba(255, 107, 107, 0.5);
+}
+
+.btn-super-auto.active {
+	background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+	animation: pulse-fast 1s infinite;
+	border-color: #ff0000;
+}
+
+@keyframes pulse-fast {
+	0%,
+	100% {
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+	}
+	50% {
+		box-shadow: 0 4px 20px rgba(255, 0, 0, 0.8);
+	}
+}
+
 .btn-hint {
 	background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
 	color: white;

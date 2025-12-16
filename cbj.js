@@ -28,6 +28,11 @@ let autoPlayRounds = 0;
 let autoPlayMaxRounds = 10;
 let autoPlayDelay = 400;
 
+// Super Auto state
+let superAutoPlaying = false;
+let superAutoRounds = 0;
+let superAutoMaxRounds = 10;
+
 // Statistics
 let stats = {
 	handsPlayed: 0,
@@ -85,6 +90,7 @@ const splitBtn = document.getElementById("splitBtn");
 const hintBtn = document.getElementById("hintBtn");
 const newRoundBtn = document.getElementById("newRoundBtn");
 const autoPlayBtn = document.getElementById("autoPlayBtn");
+const superAutoBtn = document.getElementById("superAutoBtn");
 
 // Stats elements
 const handsPlayedEl = document.getElementById("handsPlayed");
@@ -1647,6 +1653,392 @@ function autoPlayCurrentHand() {
 	}, autoPlayDelay);
 }
 
+// Super Auto functions - instant play without animations
+function toggleSuperAuto() {
+	if (superAutoPlaying) {
+		stopSuperAuto();
+	} else {
+		startSuperAuto();
+	}
+}
+
+function startSuperAuto() {
+	superAutoPlaying = true;
+	superAutoRounds = 0;
+	superAutoMaxRounds = parseInt(autoRoundsInput.value) || 10;
+	superAutoBtn.textContent = "STOP SUPER AUTO";
+	superAutoBtn.classList.add("active");
+	dealBtn.disabled = true;
+	betInput.disabled = true;
+	autoRoundsInput.disabled = true;
+	autoPlayBtn.disabled = true;
+	newRoundBtn.disabled = true;
+	updateButtons();
+	showMessage(`Super Auto-playing (${superAutoMaxRounds} rounds)...`, "info");
+
+	// Run all rounds instantly
+	runSuperAutoRounds();
+}
+
+function stopSuperAuto() {
+	superAutoPlaying = false;
+	superAutoBtn.textContent = "SUPER AUTO";
+	superAutoBtn.classList.remove("active");
+	dealBtn.disabled = false;
+	betInput.disabled = false;
+	autoRoundsInput.disabled = false;
+	autoPlayBtn.disabled = false;
+	newRoundBtn.disabled = false;
+	updateDisplay();
+	updateButtons();
+	showMessage("Super Auto stopped", "info");
+}
+
+function runSuperAutoRounds() {
+	let roundsCompleted = 0;
+
+	while (roundsCompleted < superAutoMaxRounds && bankroll > 0) {
+		const betAmount = parseInt(betInput.value);
+
+		if (betAmount > bankroll) {
+			break;
+		}
+
+		// Instant deal without animations
+		instantDeal();
+
+		// Play hands using basic strategy
+		while (currentHandIndex < playerHands.length) {
+			instantPlayHand();
+		}
+
+		// Dealer plays
+		instantDealerPlay();
+
+		// Resolve hands
+		instantResolveHands();
+
+		// Check for shuffle
+		if (cutCardReached) {
+			shoe = createShoe();
+			shuffle(shoe);
+			setRandomCutCardPosition();
+			cutCardReached = false;
+		}
+
+		// Reset for next round
+		playerHands = [[]];
+		playerBets = [];
+		doubledDown = [];
+		dealerHand = [];
+		currentHandIndex = 0;
+		currentBet = 0;
+		gameInProgress = false;
+		dealerHoleCard = null;
+
+		roundsCompleted++;
+		superAutoRounds++;
+	}
+
+	// Update display with final results
+	stopSuperAuto();
+
+	if (bankroll <= 0) {
+		showMessage(
+			`Super Auto completed ${roundsCompleted} rounds - Out of money!`,
+			"lose"
+		);
+		newRoundBtn.textContent = "RESET GAME";
+		newRoundBtn.style.display = "inline-block";
+	} else {
+		showMessage(`Super Auto completed ${roundsCompleted} rounds`, "info");
+		newRoundBtn.style.display = "inline-block";
+	}
+}
+
+function instantDeal() {
+	const betAmount = parseInt(betInput.value);
+	currentBet = betAmount;
+	bankroll -= betAmount;
+	stats.totalWagered += betAmount;
+
+	playerHands = [[]];
+	playerBets = [betAmount];
+	doubledDown = [false];
+	dealerHand = [];
+	currentHandIndex = 0;
+	gameInProgress = true;
+	canDouble = true;
+	canSplit = false;
+
+	// Deal cards instantly
+	playerHands[0].push(dealCard());
+	dealerHand.push(dealCard());
+	playerHands[0].push(dealCard());
+	dealerHand.push(dealCard());
+	dealerHoleCard = dealerHand[1];
+
+	// Check for splits
+	if (
+		playerHands[0][0].value === playerHands[0][1].value &&
+		bankroll >= betAmount
+	) {
+		canSplit = true;
+	}
+
+	// Handle blackjacks instantly
+	const playerBlackjack = checkBlackjack(playerHands[0]);
+	const dealerBlackjack = checkBlackjack(dealerHand);
+
+	if (playerBlackjack || dealerBlackjack) {
+		stats.handsPlayed++;
+
+		if (playerBlackjack && dealerBlackjack) {
+			bankroll += currentBet;
+			stats.pushes++;
+			stats.handHistory.push("P");
+			stats.streak = 0;
+			stats.streakType = null;
+		} else if (playerBlackjack) {
+			const winnings = Math.floor(currentBet * 2.5);
+			const profit = winnings - currentBet;
+			bankroll += winnings;
+			stats.netWinLoss += profit;
+			if (profit > stats.largestWin) stats.largestWin = profit;
+			stats.blackjacks++;
+			stats.wins++;
+			stats.handHistory.push("W");
+			if (stats.streakType === "win") {
+				stats.streak++;
+				if (stats.streak > stats.longestWinStreak) {
+					stats.longestWinStreak = stats.streak;
+				}
+			} else {
+				stats.streak = 1;
+				stats.streakType = "win";
+			}
+		} else {
+			// Dealer blackjack
+			stats.netWinLoss -= currentBet;
+			stats.losses++;
+			stats.handHistory.push("L");
+			if (stats.streakType === "loss") {
+				stats.streak++;
+				if (stats.streak > stats.longestLossStreak) {
+					stats.longestLossStreak = stats.streak;
+				}
+			} else {
+				stats.streak = 1;
+				stats.streakType = "loss";
+			}
+		}
+
+		gameInProgress = false;
+		currentHandIndex = playerHands.length;
+	}
+}
+
+function instantPlayHand() {
+	if (currentHandIndex >= playerHands.length || !gameInProgress) return;
+
+	const currentHand = playerHands[currentHandIndex];
+	let playerValue = calculateHandValue(currentHand);
+
+	// Player busted or has 21
+	if (playerValue > 21) {
+		stats.busts++;
+		currentHandIndex++;
+		return;
+	}
+
+	if (playerValue === 21) {
+		currentHandIndex++;
+		return;
+	}
+
+	// Use basic strategy
+	while (playerValue < 21) {
+		const dealerUpcard = getDealerUpcard();
+		const move = getBasicStrategyMove(currentHand, dealerUpcard);
+
+		if (move === "stand") {
+			break;
+		} else if (move === "hit") {
+			const card = dealCard();
+			currentHand.push(card);
+			playerValue = calculateHandValue(currentHand);
+		} else if (
+			move === "double" &&
+			currentHand.length === 2 &&
+			bankroll >= playerBets[currentHandIndex]
+		) {
+			// Double down
+			bankroll -= playerBets[currentHandIndex];
+			stats.totalWagered += playerBets[currentHandIndex];
+			currentBet += playerBets[currentHandIndex];
+			playerBets[currentHandIndex] *= 2;
+			doubledDown[currentHandIndex] = true;
+			stats.doubleDownAttempts++;
+			canDouble = false;
+
+			const card = dealCard();
+			currentHand.push(card);
+			playerValue = calculateHandValue(currentHand);
+			break;
+		} else if (
+			move === "split" &&
+			canSplit &&
+			currentHand.length === 2 &&
+			bankroll >= playerBets[currentHandIndex]
+		) {
+			// Split
+			const splitCard = currentHand.pop();
+			playerHands.push([splitCard]);
+			playerBets.push(playerBets[currentHandIndex]);
+			doubledDown.push(false);
+			bankroll -= playerBets[currentHandIndex];
+			stats.totalWagered += playerBets[currentHandIndex];
+			currentBet += playerBets[currentHandIndex];
+
+			// Deal new cards
+			currentHand.push(dealCard());
+			playerHands[playerHands.length - 1].push(dealCard());
+
+			canSplit = false;
+			playerValue = calculateHandValue(currentHand);
+		} else {
+			// Can't perform preferred action, hit instead
+			const card = dealCard();
+			currentHand.push(card);
+			playerValue = calculateHandValue(currentHand);
+		}
+	}
+
+	if (playerValue > 21) {
+		stats.busts++;
+	}
+
+	currentHandIndex++;
+}
+
+function instantDealerPlay() {
+	if (!gameInProgress) return;
+
+	// Check if all player hands busted
+	const allBusted = playerHands.every(
+		(hand) => calculateHandValue(hand) > 21
+	);
+
+	if (allBusted) {
+		return;
+	}
+
+	// Dealer draws to 17
+	let dealerValue = calculateHandValue(dealerHand);
+	while (dealerValue < 17) {
+		dealerHand.push(dealCard());
+		dealerValue = calculateHandValue(dealerHand);
+	}
+
+	if (dealerValue > 21) {
+		stats.dealerBusts++;
+	}
+}
+
+function instantResolveHands() {
+	// Skip if game already ended (e.g., blackjacks were handled in instantDeal)
+	if (!gameInProgress && currentHandIndex >= playerHands.length) {
+		return;
+	}
+
+	const dealerValue = calculateHandValue(dealerHand);
+	const dealerBust = dealerValue > 21;
+
+	let totalWinnings = 0;
+	let hasWin = false;
+	let hasLoss = false;
+	let allPush = true;
+
+	playerHands.forEach((hand, index) => {
+		const playerValue = calculateHandValue(hand);
+		const bet = playerBets[index];
+		const wasDoubled = doubledDown[index];
+
+		if (playerValue > 21) {
+			// Player busted
+			hasLoss = true;
+			allPush = false;
+		} else if (dealerBust) {
+			totalWinnings += bet * 2;
+			hasWin = true;
+			allPush = false;
+			if (wasDoubled) stats.doubleDownWins++;
+		} else if (playerValue > dealerValue) {
+			totalWinnings += bet * 2;
+			hasWin = true;
+			allPush = false;
+			if (wasDoubled) stats.doubleDownWins++;
+		} else if (playerValue === dealerValue) {
+			totalWinnings += bet;
+		} else {
+			hasLoss = true;
+			allPush = false;
+		}
+	});
+
+	bankroll += totalWinnings;
+
+	const profit = totalWinnings - currentBet;
+	stats.netWinLoss += profit;
+	if (profit > stats.largestWin) stats.largestWin = profit;
+
+	// Update statistics
+	stats.handsPlayed++;
+	if (allPush) {
+		stats.pushes++;
+		stats.handHistory.push("P");
+		stats.streak = 0;
+		stats.streakType = null;
+	} else if (hasWin && !hasLoss) {
+		stats.wins++;
+		stats.handHistory.push("W");
+		if (stats.streakType === "win") {
+			stats.streak++;
+			if (stats.streak > stats.longestWinStreak) {
+				stats.longestWinStreak = stats.streak;
+			}
+		} else {
+			stats.streak = 1;
+			stats.streakType = "win";
+		}
+	} else if (hasLoss && !hasWin) {
+		stats.losses++;
+		stats.handHistory.push("L");
+		if (stats.streakType === "loss") {
+			stats.streak++;
+			if (stats.streak > stats.longestLossStreak) {
+				stats.longestLossStreak = stats.streak;
+			}
+		} else {
+			stats.streak = 1;
+			stats.streakType = "loss";
+		}
+	} else {
+		// Mixed results
+		if (totalWinnings - currentBet > 0) {
+			stats.wins++;
+			stats.handHistory.push("W");
+		} else {
+			stats.losses++;
+			stats.handHistory.push("L");
+		}
+		stats.streak = 0;
+		stats.streakType = null;
+	}
+
+	gameInProgress = false;
+}
+
 // Event listeners
 dealBtn.addEventListener("click", deal);
 hitBtn.addEventListener("click", hit);
@@ -1658,6 +2050,7 @@ newRoundBtn.addEventListener("click", newRound);
 nextCardsToggle.addEventListener("click", toggleNextCards);
 statsToggle.addEventListener("click", toggleStatsPanel);
 autoPlayBtn.addEventListener("click", toggleAutoPlay);
+superAutoBtn.addEventListener("click", toggleSuperAuto);
 
 // Hint dialog listeners
 hintClose.addEventListener("click", closeHint);

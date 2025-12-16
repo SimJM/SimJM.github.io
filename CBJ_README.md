@@ -2,7 +2,7 @@
 
 ## Overview
 
-A fully-featured, casino-realistic Blackjack game built with vanilla JavaScript, HTML5, and CSS3. Features authentic casino rules, card animations, comprehensive statistics tracking, Basic Strategy automation, and a realistic cut card shuffle system.
+A fully-featured, casino-realistic Blackjack game built with vanilla JavaScript, HTML5, and CSS3. Features authentic casino rules, card animations, comprehensive statistics tracking, Basic Strategy automation with dual-mode auto-play (animated and instant simulation), and a realistic cut card shuffle system.
 
 ---
 
@@ -747,14 +747,28 @@ last30.forEach((result) => {
 
 ### Purpose
 
-Automatically play multiple rounds using optimal Basic Strategy decisions
+Automatically play multiple rounds using optimal Basic Strategy decisions, available in two modes: **Auto Play** (with animations) and **Super Auto** (instant simulation)
 
 ### Configuration
 
 -   **Rounds**: User selectable 1-100
 -   **Bet**: Uses current bet input amount
--   **Speed**: 400ms delay between actions, 1000ms when shuffle occurs
 -   **Strategy**: Full Basic Strategy implementation
+
+### Two Modes
+
+#### 1. Auto Play (Animated)
+
+-   **Speed**: 400ms delay between actions, 1000ms when shuffle occurs
+-   **Display**: Full card animations and visual feedback
+-   **Use Case**: Watching strategy execution in real-time
+
+#### 2. Super Auto (Instant)
+
+-   **Speed**: No delays - runs all rounds instantly
+-   **Display**: Statistics update in real-time, no card animations
+-   **Use Case**: Quick simulation of hundreds/thousands of rounds for statistical analysis
+-   **Button Style**: Distinctive red gradient with faster pulse animation
 
 ### Control Flow
 
@@ -904,14 +918,40 @@ function moveToNextHand() {
 ### Safety Features
 
 -   Validates bankroll before each round
--   Stops if insufficient funds
--   Can be manually interrupted (Stop Auto button remains active)
+-   Stops if insufficient funds (both modes)
+-   Can be manually interrupted (Stop buttons remain active)
 -   Disables all manual action buttons during auto-play (Hit, Stand, Double, Split, Hint, Deal, New Round)
 -   Prevents user interference and ensures clean Basic Strategy execution
--   Shows completion message
+-   Shows completion message with round count
 -   Re-enables manual controls on stop
 -   Handles split hands automatically - continues playing all split hands sequentially
 -   Seamlessly transitions between hands during auto-play
+-   **Super Auto**: Prevents double-counting of hands played in blackjack scenarios
+
+### Implementation Details
+
+#### Super Auto Technical Approach
+
+**Instant Gameplay Functions**:
+
+-   `instantDeal()` - Deals cards without setTimeout delays
+-   `instantPlayHand()` - Executes Basic Strategy decisions instantly
+-   `instantDealerPlay()` - Dealer draws to 17 without animation
+-   `instantResolveHands()` - Resolves all hands and updates statistics immediately
+
+**Key Optimizations**:
+
+-   Bypasses all animation delays (no setTimeout calls)
+-   Direct function calls instead of async callbacks
+-   Single while loop processes all rounds synchronously
+-   Statistics updated only once at completion for maximum speed
+-   Proper handling of blackjack scenarios to prevent duplicate stat increments
+
+**Performance**:
+
+-   Can simulate 100+ rounds in milliseconds
+-   Useful for long-term strategy analysis and testing
+-   Provides instant statistical feedback
 
 ---
 
@@ -924,7 +964,8 @@ function moveToNextHand() {
 -   **Felt Green**: `#0a5f0a` (table surface)
 -   **Wood Trim**: `#8B4513`, `#654321` (table border)
 -   **Gold Accents**: `#ffd700` (buttons, highlights)
--   **Purple Theme**: `#9b59b6` (auto-play area)
+-   **Purple Theme**: `#9b59b6` (auto-play button)
+-   **Red Theme**: `#ff6b6b`, `#ee5a6f` (super auto button - distinctive gradient)
 -   **Dark Background**: `linear-gradient(135deg, #1a1a2e, #16213e)`
 
 **Oval Table Design**:
@@ -1071,10 +1112,12 @@ BLACKJACK_STRATEGY.md  - Basic Strategy reference guide
 ✅ **Cryptographic Security**: Uses crypto.getRandomValues() for provably fair shuffling  
 ✅ **Realistic Cut Card System**: Random placement at 52-78 cards (1-1.5 decks from end)  
 ✅ **Basic Strategy Integration**: Auto-play and hint system use optimal mathematical strategy  
+✅ **Dual-Mode Auto-Play**: Animated play (400ms delays) or Super Auto (instant simulation)  
 ✅ **Monte Carlo Probability Analysis**: 10,000 simulations show win/loss/push odds for each action  
 ✅ **21 Advanced Statistics**: ROI, dealer bust rate, double down success, and more  
 ✅ **Interactive Hint System**: Real-time probability grid with context-aware explanations  
 ✅ **Smooth Animations**: Card dealing, flipping, and chip tossing effects  
+✅ **High-Speed Simulation**: Super Auto runs 100+ rounds instantly for statistical analysis  
 ✅ **Responsive Design**: Full mobile support with optimized 2-column probability display  
 ✅ **No Dependencies**: Pure vanilla JavaScript, HTML5, and CSS3  
 ✅ **Educational Value**: Perfect for learning blackjack Basic Strategy with data-driven insights
@@ -1101,7 +1144,7 @@ BLACKJACK_STRATEGY.md  - Basic Strategy reference guide
 ## Credits
 
 **Developer**: SimJM  
-**Version**: 1.1  
+**Version**: 1.2  
 **Last Updated**: December 2025  
 **License**: MIT
 
