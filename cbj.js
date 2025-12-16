@@ -3,6 +3,7 @@ let shoe = [];
 let dealerHand = [];
 let playerHands = [[]];
 let playerBets = [];
+let doubledDown = []; // Track which hands were doubled down
 let currentHandIndex = 0;
 let bankroll = 1000;
 let currentBet = 0;
@@ -10,12 +11,14 @@ let gameInProgress = false;
 let canDouble = true;
 let canSplit = false;
 let dealerHoleCard = null;
+let cutCardReached = false; // Track if cut card has been reached
+let cutCardPosition = 0; // Shuffle when cut card is reached (randomized 52-78 cards, ~1-1.5 decks)
 
 // Auto-play state
 let autoPlaying = false;
 let autoPlayRounds = 0;
 let autoPlayMaxRounds = 10;
-let autoPlayDelay = 1000;
+let autoPlayDelay = 400;
 
 // Statistics
 let stats = {
@@ -32,7 +35,10 @@ let stats = {
 	largestWin: 0,
 	blackjacks: 0,
 	busts: 0,
-	handHistory: [], // Last 10 hands: 'W', 'L', 'P'
+	handHistory: [], // Last 30 hands: 'W', 'L', 'P'
+	dealerBusts: 0,
+	doubleDownAttempts: 0,
+	doubleDownWins: 0,
 };
 
 // Card suits and values
@@ -88,6 +94,10 @@ const largestWinEl = document.getElementById("largestWin");
 const blackjacksEl = document.getElementById("blackjacks");
 const bustsEl = document.getElementById("busts");
 const handHistoryEl = document.getElementById("handHistory");
+const roiEl = document.getElementById("roi");
+const dealerBustRateEl = document.getElementById("dealerBustRate");
+const avgBetSizeEl = document.getElementById("avgBetSize");
+const ddSuccessRateEl = document.getElementById("ddSuccessRate");
 const statsToggle = document.getElementById("statsToggle");
 const statsPanelWrapper = document.getElementById("statsPanelWrapper");
 const statsToggleIcon = document.getElementById("statsToggleIcon");
@@ -99,6 +109,20 @@ const nextCardsList = document.getElementById("nextCardsList");
 const toggleIcon = document.getElementById("toggleIcon");
 
 // Create a 6-deck shoe (312 cards)
+// Set random cut card position (1-1.5 decks from end, like real casinos)
+function setRandomCutCardPosition() {
+	// Random position between 52 cards (1 deck) and 78 cards (1.5 decks)
+	cutCardPosition = Math.floor(Math.random() * (78 - 52 + 1)) + 52;
+	console.log(`Cut card placed at ${cutCardPosition} cards remaining`);
+}
+
+// Set random cut card position (1-1.5 decks from end, like real casinos)
+function setRandomCutCardPosition() {
+	// Random position between 52 cards (1 deck) and 78 cards (1.5 decks)
+	cutCardPosition = Math.floor(Math.random() * (78 - 52 + 1)) + 52;
+	console.log(`Cut card placed at ${cutCardPosition} cards remaining`);
+}
+
 function createShoe() {
 	const newShoe = [];
 	for (let deck = 0; deck < 6; deck++) {
@@ -302,7 +326,16 @@ function dealCard() {
 	if (shoe.length === 0) {
 		shoe = createShoe();
 		shuffle(shoe);
+		setRandomCutCardPosition();
+		cutCardReached = false;
 	}
+
+	// Check if we've reached the cut card position
+	if (shoe.length <= cutCardPosition && !cutCardReached) {
+		cutCardReached = true;
+		console.log(`Cut card reached at ${shoe.length} cards remaining`);
+	}
+
 	const card = shoe.pop();
 	updateNextCardsPreview();
 	return card;
@@ -420,12 +453,45 @@ function updateDisplay() {
 	blackjacksEl.textContent = stats.blackjacks;
 	bustsEl.textContent = stats.busts;
 
+	// Calculate and display new stats
+	const roi =
+		stats.totalWagered > 0
+			? ((stats.netWinLoss / stats.totalWagered) * 100).toFixed(2)
+			: 0;
+	roiEl.textContent = `${roi}%`;
+	roiEl.className = `stat-value ${roi > 0 ? "win" : roi < 0 ? "lose" : ""}`;
+
+	const dealerBustRate =
+		stats.handsPlayed > 0
+			? ((stats.dealerBusts / stats.handsPlayed) * 100).toFixed(1)
+			: 0;
+	dealerBustRateEl.textContent = `${dealerBustRate}%`;
+
+	const avgBetSize =
+		stats.handsPlayed > 0
+			? (stats.totalWagered / stats.handsPlayed).toFixed(2)
+			: 0;
+	avgBetSizeEl.textContent = `$${avgBetSize}`;
+
+	const ddSuccessRate =
+		stats.doubleDownAttempts > 0
+			? ((stats.doubleDownWins / stats.doubleDownAttempts) * 100).toFixed(
+					1
+			  )
+			: 0;
+	ddSuccessRateEl.textContent = `${ddSuccessRate}%`;
+	ddSuccessRateEl.className = `stat-value ${
+		ddSuccessRate >= 50 ? "win" : ddSuccessRate > 0 ? "lose" : ""
+	}`;
+
 	// Update hand history
 	handHistoryEl.innerHTML = "";
 	const last30 = stats.handHistory.slice(-30);
 	last30.forEach((result) => {
 		const badge = document.createElement("div");
-		badge.className = `history-badge ${result.toLowerCase()}`;
+		const resultClass =
+			result === "W" ? "win" : result === "L" ? "lose" : "push";
+		badge.className = `history-badge ${resultClass}`;
 		badge.textContent = result;
 		handHistoryEl.appendChild(badge);
 	});
@@ -564,6 +630,7 @@ function deal() {
 	stats.totalWagered += betAmount;
 	playerHands = [[]];
 	playerBets = [betAmount];
+	doubledDown = []; // Reset double down tracking
 	dealerHand = [];
 	currentHandIndex = 0;
 	gameInProgress = true;
@@ -769,6 +836,13 @@ function moveToNextHand() {
 		updateDisplay();
 		updateButtons();
 		showMessage(`Playing hand ${currentHandIndex + 1}`, "info");
+
+		// Continue auto-play for next hand
+		if (autoPlaying) {
+			setTimeout(() => {
+				autoPlayCurrentHand();
+			}, autoPlayDelay);
+		}
 	}
 }
 
@@ -778,6 +852,10 @@ function doubleDown() {
 		showMessage("Insufficient funds to double down", "lose");
 		return;
 	}
+
+	// Track double down attempt
+	stats.doubleDownAttempts++;
+	doubledDown[currentHandIndex] = true;
 
 	bankroll -= playerBets[currentHandIndex];
 	playerBets[currentHandIndex] *= 2;
@@ -845,6 +923,11 @@ function resolveRound() {
 	const dealerValue = calculateHandValue(dealerHand);
 	const dealerBust = dealerValue > 21;
 
+	// Track dealer busts
+	if (dealerBust) {
+		stats.dealerBusts++;
+	}
+
 	let totalWinnings = 0;
 	let resultMessages = [];
 	let hasWin = false;
@@ -855,6 +938,7 @@ function resolveRound() {
 		const playerValue = calculateHandValue(hand);
 		const playerBust = playerValue > 21;
 		const bet = playerBets[index];
+		const wasDoubled = doubledDown[index] || false;
 
 		if (playerBust) {
 			resultMessages.push(`Hand ${index + 1}: Bust`);
@@ -865,11 +949,13 @@ function resolveRound() {
 			resultMessages.push(`Hand ${index + 1}: Win!`);
 			hasWin = true;
 			allPush = false;
+			if (wasDoubled) stats.doubleDownWins++;
 		} else if (playerValue > dealerValue) {
 			totalWinnings += bet * 2;
 			resultMessages.push(`Hand ${index + 1}: Win!`);
 			hasWin = true;
 			allPush = false;
+			if (wasDoubled) stats.doubleDownWins++;
 		} else if (playerValue === dealerValue) {
 			totalWinnings += bet;
 			resultMessages.push(`Hand ${index + 1}: Push`);
@@ -982,12 +1068,33 @@ function endRound() {
 		newRoundBtn.textContent = "RESET GAME";
 	}
 
+	// Check if cut card was reached and shuffle needed
+	if (cutCardReached) {
+		setTimeout(() => {
+			showMessage("🎴 Shuffling shoe... Cut card reached", "info");
+			setTimeout(() => {
+				shoe = createShoe();
+				shuffle(shoe);
+				setRandomCutCardPosition(); // Set new random position
+				cutCardReached = false;
+				updateDisplay();
+				if (!autoPlaying) {
+					showMessage(
+						"Shoe shuffled. Place your bet to continue",
+						"info"
+					);
+				}
+			}, 1500);
+		}, 500);
+	}
+
 	// Auto-play continues immediately without showing NEW ROUND button
 	if (autoPlaying && bankroll > 0) {
 		newRoundBtn.style.display = "none";
+		const delay = cutCardReached ? 1000 : 600;
 		setTimeout(() => {
 			autoPlayStartNewRound();
-		}, 1500);
+		}, delay);
 	}
 }
 
@@ -1208,5 +1315,7 @@ autoPlayBtn.addEventListener("click", toggleAutoPlay);
 // Initialize shoe and display
 shoe = createShoe();
 shuffle(shoe);
+setRandomCutCardPosition(); // Set initial random cut card position
+cutCardReached = false;
 updateDisplay();
 updateNextCardsPreview();
