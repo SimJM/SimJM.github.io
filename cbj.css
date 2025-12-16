@@ -57,15 +57,55 @@ h1 {
 	letter-spacing: 2px;
 }
 
+/* Statistics Container */
+.stats-container {
+	margin-bottom: 20px;
+}
+
+.stats-toggle {
+	width: 100%;
+	background: rgba(0, 0, 0, 0.4);
+	border: 2px solid #ffd700;
+	border-radius: 8px;
+	padding: 12px;
+	color: #ffd700;
+	font-size: 1em;
+	font-weight: bold;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-align: center;
+}
+
+.stats-toggle:hover {
+	background: rgba(255, 215, 0, 0.2);
+	box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+#statsToggleIcon {
+	display: inline-block;
+	transition: transform 0.3s ease;
+	margin-right: 5px;
+}
+
+.stats-panel-wrapper {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.4s ease;
+}
+
+.stats-panel-wrapper.expanded {
+	max-height: 1000px;
+}
+
 .stats-panel {
 	display: grid;
-	grid-template-columns: repeat(6, 1fr);
+	grid-template-columns: repeat(5, 1fr);
 	gap: 10px;
-	margin-bottom: 20px;
-	background: rgba(0, 0, 0, 0.4);
 	padding: 15px;
-	border-radius: 10px;
+	background: rgba(0, 0, 0, 0.3);
+	border-radius: 0 0 8px 8px;
 	border: 2px solid #ffd700;
+	border-top: none;
 }
 
 .stat-group {
@@ -73,6 +113,10 @@ h1 {
 	padding: 10px;
 	background: rgba(0, 0, 0, 0.3);
 	border-radius: 8px;
+}
+
+.stat-group.full-width {
+	grid-column: 1 / -1;
 }
 
 .stat-label {
@@ -90,6 +134,10 @@ h1 {
 	text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
+.stat-value.small {
+	font-size: 0.9em;
+}
+
 .stat-value.win {
 	color: #2ecc71;
 	text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
@@ -98,6 +146,48 @@ h1 {
 .stat-value.lose {
 	color: #e74c3c;
 	text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+}
+
+.hand-history {
+	display: flex;
+	justify-content: center;
+	gap: 5px;
+	flex-wrap: wrap;
+	margin-top: 5px;
+}
+
+.history-badge {
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: bold;
+	font-size: 0.9em;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+	border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.history-badge.win {
+	background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+	color: white;
+	border-color: #2ecc71;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.history-badge.lose {
+	background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+	color: white;
+	border-color: #e74c3c;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.history-badge.push {
+	background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+	color: white;
+	border-color: #3498db;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 @media (max-width: 768px) {
@@ -328,12 +418,17 @@ h1 {
 }
 
 @keyframes flipCard {
-	0%,
-	100% {
+	0% {
 		transform: rotateY(0deg);
 	}
-	50% {
+	49% {
 		transform: rotateY(90deg);
+	}
+	51% {
+		transform: rotateY(90deg);
+	}
+	100% {
+		transform: rotateY(0deg);
 	}
 }
 
@@ -374,6 +469,49 @@ h1 {
 	width: 120px;
 	background: rgba(255, 255, 255, 0.9);
 	font-weight: bold;
+	text-align: center;
+}
+
+.betting-area input:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.auto-area {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 15px;
+	margin: 20px 0;
+	background: rgba(138, 43, 226, 0.15);
+	padding: 15px 20px;
+	border-radius: 10px;
+	border: 2px solid #9b59b6;
+	position: relative;
+	z-index: 1;
+}
+
+.auto-area label {
+	color: #9b59b6;
+	font-weight: bold;
+	font-size: 1.1em;
+	text-shadow: 0 0 10px rgba(155, 89, 182, 0.3);
+}
+
+.auto-area input {
+	padding: 10px 15px;
+	font-size: 1.1em;
+	border: 2px solid #9b59b6;
+	border-radius: 5px;
+	width: 100px;
+	background: rgba(255, 255, 255, 0.9);
+	font-weight: bold;
+	text-align: center;
+}
+
+.auto-area input:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
 }
 
 .controls {
@@ -439,6 +577,30 @@ h1 {
 
 .btn-new-round:hover {
 	background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+}
+
+.btn-auto {
+	background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+	color: white;
+}
+
+.btn-auto:hover {
+	background: linear-gradient(135deg, #a569bd 0%, #9b59b6 100%);
+}
+
+.btn-auto.active {
+	background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+	animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+	0%,
+	100% {
+		box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+	}
+	50% {
+		box-shadow: 0 4px 20px rgba(231, 76, 60, 0.6);
+	}
 }
 
 /* Mobile Responsive Styles */
@@ -557,6 +719,23 @@ h1 {
 	.betting-area input {
 		width: 100%;
 		max-width: 200px;
+		padding: 12px;
+		font-size: 1em;
+	}
+
+	.auto-area {
+		flex-direction: column;
+		gap: 10px;
+		padding: 12px 15px;
+	}
+
+	.auto-area label {
+		font-size: 1em;
+	}
+
+	.auto-area input {
+		width: 100%;
+		max-width: 150px;
 		padding: 12px;
 		font-size: 1em;
 	}
