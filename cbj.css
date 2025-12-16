@@ -366,3 +366,215 @@ h1 {
 .btn-new-round:hover {
 	background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+	body {
+		padding: 10px;
+	}
+
+	.game-container {
+		padding: 20px;
+		border-radius: 40% / 25%;
+		box-shadow: 0 0 0 10px #8b4513, 0 0 0 15px #654321,
+			0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 80px rgba(0, 0, 0, 0.3);
+	}
+
+	h1 {
+		font-size: 1.5em;
+		margin-bottom: 15px;
+		letter-spacing: 1px;
+	}
+
+	.stat-label {
+		font-size: 0.65em;
+	}
+
+	.stat-value {
+		font-size: 1.2em;
+	}
+
+	.stat-group {
+		padding: 8px 5px;
+	}
+
+	.info-panel {
+		flex-direction: column;
+		gap: 10px;
+		padding: 12px;
+	}
+
+	.info-item {
+		padding: 8px 0;
+	}
+
+	.info-label {
+		font-size: 0.8em;
+	}
+
+	.info-value {
+		font-size: 1.3em;
+	}
+
+	.message {
+		font-size: 1em;
+		padding: 12px;
+		margin: 15px 0;
+	}
+
+	.dealer-area,
+	.player-area {
+		margin: 20px 0;
+	}
+
+	.area-title {
+		font-size: 1em;
+		margin-bottom: 10px;
+	}
+
+	.hand {
+		padding: 15px;
+	}
+
+	.card {
+		width: 50px;
+		height: 72px;
+		font-size: 1.3em;
+	}
+
+	.card.hidden {
+		font-size: 2em;
+	}
+
+	.cards {
+		gap: 8px;
+		min-height: 80px;
+	}
+
+	.hand-total {
+		font-size: 0.95em;
+		margin-top: 12px;
+	}
+
+	.betting-area {
+		flex-direction: column;
+		gap: 12px;
+		padding: 15px;
+	}
+
+	.betting-area label {
+		font-size: 1em;
+	}
+
+	.betting-area input {
+		width: 100%;
+		max-width: 200px;
+		padding: 12px;
+		font-size: 1em;
+	}
+
+	.controls {
+		gap: 10px;
+	}
+
+	.btn {
+		padding: 10px 20px;
+		font-size: 0.95em;
+		flex: 1 1 calc(50% - 10px);
+		min-width: 120px;
+	}
+}
+
+@media (max-width: 480px) {
+	.game-container {
+		padding: 15px;
+	}
+
+	h1 {
+		font-size: 1.3em;
+	}
+
+	.stat-label {
+		font-size: 0.6em;
+	}
+
+	.stat-value {
+		font-size: 1em;
+	}
+
+	.stat-group {
+		padding: 6px 3px;
+	}
+
+	.card {
+		width: 45px;
+		height: 65px;
+		font-size: 1.2em;
+	}
+
+	.card.hidden {
+		font-size: 1.8em;
+	}
+
+	.cards {
+		gap: 6px;
+	}
+
+	.btn {
+		padding: 10px 15px;
+		font-size: 0.9em;
+		min-width: 100px;
+	}
+
+	.message {
+		font-size: 0.9em;
+		padding: 10px;
+	}
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+	.game-container {
+		max-width: 800px;
+		padding: 35px;
+	}
+
+	h1 {
+		font-size: 1.8em;
+	}
+
+	.card {
+		width: 65px;
+		height: 93px;
+	}
+}
+
+@media (orientation: landscape) and (max-height: 600px) {
+	.game-container {
+		padding: 15px;
+	}
+
+	.stats-panel {
+		padding: 10px;
+		gap: 8px;
+		margin-bottom: 10px;
+	}
+
+	.info-panel {
+		margin-bottom: 10px;
+		padding: 10px;
+	}
+
+	.dealer-area,
+	.player-area {
+		margin: 15px 0;
+	}
+
+	.message {
+		margin: 10px 0;
+		padding: 10px;
+	}
+
+	h1 {
+		margin-bottom: 10px;
+	}
+}
