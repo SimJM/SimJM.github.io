@@ -112,6 +112,80 @@ h1 {
 	}
 }
 
+/* Next 10 Cards Preview */
+.next-cards-container {
+	margin-bottom: 20px;
+}
+
+.next-cards-toggle {
+	width: 100%;
+	background: rgba(0, 0, 0, 0.4);
+	border: 2px solid #ffd700;
+	border-radius: 8px;
+	padding: 12px;
+	color: #ffd700;
+	font-size: 0.9em;
+	font-weight: bold;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-align: center;
+}
+
+.next-cards-toggle:hover {
+	background: rgba(255, 215, 0, 0.2);
+	box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+#toggleIcon {
+	display: inline-block;
+	transition: transform 0.3s ease;
+	margin-right: 5px;
+}
+
+.next-cards-preview {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.3s ease;
+	background: rgba(0, 0, 0, 0.3);
+	border-radius: 0 0 8px 8px;
+	border: 2px solid #ffd700;
+	border-top: none;
+}
+
+.next-cards-preview.expanded {
+	max-height: 500px;
+}
+
+.next-cards-list {
+	padding: 15px;
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	gap: 10px;
+}
+
+.next-card-item {
+	background: rgba(255, 255, 255, 0.95);
+	border-radius: 6px;
+	padding: 8px;
+	text-align: center;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+	border: 1px solid #ddd;
+}
+
+.next-card-number {
+	display: block;
+	font-size: 0.7em;
+	color: #666;
+	margin-bottom: 4px;
+	font-weight: bold;
+}
+
+.next-card-display {
+	display: block;
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
 .info-panel {
 	display: flex;
 	justify-content: space-around;
@@ -398,6 +472,20 @@ h1 {
 		padding: 8px 5px;
 	}
 
+	.next-cards-list {
+		grid-template-columns: repeat(3, 1fr);
+		gap: 8px;
+		padding: 12px;
+	}
+
+	.next-card-item {
+		padding: 6px;
+	}
+
+	.next-card-display {
+		font-size: 1em;
+	}
+
 	.info-panel {
 		flex-direction: column;
 		gap: 10px;
@@ -504,6 +592,24 @@ h1 {
 
 	.stat-group {
 		padding: 6px 3px;
+	}
+
+	.next-cards-list {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 6px;
+		padding: 10px;
+	}
+
+	.next-card-item {
+		padding: 5px;
+	}
+
+	.next-card-number {
+		font-size: 0.6em;
+	}
+
+	.next-card-display {
+		font-size: 0.9em;
 	}
 
 	.card {

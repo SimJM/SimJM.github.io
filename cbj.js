@@ -63,6 +63,12 @@ const pushesEl = document.getElementById("pushes");
 const streakEl = document.getElementById("streak");
 const shoeCardsEl = document.getElementById("shoeCards");
 
+// Next cards preview elements
+const nextCardsToggle = document.getElementById("nextCardsToggle");
+const nextCardsPreview = document.getElementById("nextCardsPreview");
+const nextCardsList = document.getElementById("nextCardsList");
+const toggleIcon = document.getElementById("toggleIcon");
+
 // Create a 6-deck shoe (312 cards)
 function createShoe() {
 	const newShoe = [];
@@ -84,13 +90,42 @@ function shuffle(array) {
 	}
 }
 
+// Update next 10 cards preview
+function updateNextCardsPreview() {
+	if (!nextCardsList) return;
+
+	const next10 = shoe.slice(-10).reverse();
+	nextCardsList.innerHTML = next10
+		.map((card, index) => {
+			const color =
+				card.suit === "♥️" || card.suit === "♦️" ? "red" : "black";
+			return `
+				<div class="next-card-item">
+					<span class="next-card-number">${index + 1}</span>
+					<span class="next-card-display" style="color: ${color}">
+						${card.value}${card.suit}
+					</span>
+				</div>
+			`;
+		})
+		.join("");
+}
+
+// Toggle next cards preview
+function toggleNextCards() {
+	const isExpanded = nextCardsPreview.classList.toggle("expanded");
+	toggleIcon.textContent = isExpanded ? "▲" : "▼";
+}
+
 // Deal a card from the shoe
 function dealCard() {
 	if (shoe.length === 0) {
 		shoe = createShoe();
 		shuffle(shoe);
 	}
-	return shoe.pop();
+	const card = shoe.pop();
+	updateNextCardsPreview();
+	return card;
 }
 
 // Calculate hand value
@@ -711,8 +746,10 @@ standBtn.addEventListener("click", stand);
 doubleBtn.addEventListener("click", doubleDown);
 splitBtn.addEventListener("click", split);
 newRoundBtn.addEventListener("click", newRound);
+nextCardsToggle.addEventListener("click", toggleNextCards);
 
 // Initialize shoe and display
 shoe = createShoe();
 shuffle(shoe);
 updateDisplay();
+updateNextCardsPreview();
