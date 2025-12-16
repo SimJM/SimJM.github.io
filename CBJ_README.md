@@ -47,16 +47,54 @@ A fully-featured, casino-realistic Blackjack game built with vanilla JavaScript,
 
 ## Core Algorithms
 
-### 1. Fisher-Yates Shuffle Algorithm
+### 1. Cryptographically Secure Random Number Generation
 
-**Purpose**: Randomize the shoe fairly and efficiently
+**Purpose**: Provide unpredictable, fair randomness for casino gameplay
+
+**Why crypto.getRandomValues() over Math.random()**:
+
+-   **Math.random() Issues**:
+
+    -   Not cryptographically secure
+    -   Predictable with sufficient observations
+    -   Pseudorandom with deterministic seed
+    -   Unsuitable for gambling/casino applications
+    -   Can be exploited if pattern is discovered
+
+-   **crypto.getRandomValues() Benefits**:
+    -   Cryptographically secure random number generator (CSPRNG)
+    -   Uses OS-level entropy sources
+    -   Unpredictable and cannot be reverse-engineered
+    -   Industry standard for security-sensitive applications
+    -   Ensures genuine fairness in card shuffling
+
+**Implementation**:
+
+```javascript
+function secureRandom() {
+    const array = new Uint32Array(1);
+    crypto.getRandomValues(array);
+    return array[0] / (0xffffffff + 1);
+}
+```
+
+**How it works**:
+
+-   Creates a Uint32Array with one element
+-   Fills it with cryptographically secure random bits
+-   Normalizes to [0, 1) range (compatible with Math.random())
+-   Used for all randomness: shuffling and cut card placement
+
+### 2. Fisher-Yates Shuffle Algorithm
+
+**Purpose**: Randomize the shoe fairly and efficiently using cryptographic randomness
 
 **Implementation**:
 
 ```javascript
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
+        const j = Math.floor(secureRandom() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
 }
@@ -65,12 +103,13 @@ function shuffle(array) {
 **How it works**:
 
 -   Iterate backwards through the array
--   For each position `i`, select a random position `j` from 0 to `i`
+-   For each position `i`, select a random position `j` from 0 to `i` using **secureRandom()**
 -   Swap elements at positions `i` and `j`
 -   Time Complexity: O(n)
 -   Guarantees uniform distribution (each permutation equally likely)
+-   Enhanced with cryptographic randomness for casino-grade fairness
 
-### 2. Hand Value Calculation Algorithm
+### 3. Hand Value Calculation Algorithm
 
 **Purpose**: Calculate the optimal value of a blackjack hand
 
@@ -109,7 +148,7 @@ function calculateHandValue(hand) {
 3. If total exceeds 21 and Aces exist, convert Aces from 11 to 1 (subtract 10) until under 22 or no Aces remain
 4. Returns the highest value ≤21, or lowest value if busted
 
-### 3. Soft Hand Detection Algorithm
+### 4. Soft Hand Detection Algorithm
 
 **Purpose**: Determine if a hand contains an Ace counted as 11
 
@@ -141,7 +180,7 @@ function isSoftHand(hand) {
 -   A hand is "soft" if it contains an Ace AND the total is ≤21
 -   Soft hands can't bust on the next hit (Ace converts to 1 if needed)
 
-### 4. Basic Strategy Decision Algorithm
+### 5. Basic Strategy Decision Algorithm
 
 **Purpose**: Make mathematically optimal decisions based on player hand and dealer upcard
 
@@ -204,7 +243,7 @@ IF hard hand:
 -   Considers dealer upcard, player total, soft/hard distinction
 -   Accounts for available actions (split, double) and bankroll
 
-### 5. Cut Card Placement Algorithm
+### 6. Cut Card Placement Algorithm
 
 **Purpose**: Simulate realistic casino shuffle timing
 
@@ -325,7 +364,7 @@ function setRandomCutCardPosition() {
 
 ```javascript
 shoe = createShoe();      // Create 6 decks (312 cards)
-shuffle(shoe);            // Randomize using Fisher-Yates
+shuffle(shoe);            // Randomize using Fisher-Yates with crypto.getRandomValues()
 setRandomCutCardPosition(); // Place cut card randomly
 ```
 

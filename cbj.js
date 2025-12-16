@@ -1,3 +1,11 @@
+// Cryptographically secure random number generator
+// Replaces Math.random() for fair, unpredictable randomness in casino games
+function secureRandom() {
+	const array = new Uint32Array(1);
+	crypto.getRandomValues(array);
+	return array[0] / (0xffffffff + 1);
+}
+
 // Game state
 let shoe = [];
 let dealerHand = [];
@@ -108,18 +116,11 @@ const nextCardsPreview = document.getElementById("nextCardsPreview");
 const nextCardsList = document.getElementById("nextCardsList");
 const toggleIcon = document.getElementById("toggleIcon");
 
-// Create a 6-deck shoe (312 cards)
 // Set random cut card position (1-1.5 decks from end, like real casinos)
+// Uses cryptographically secure random for fair, unpredictable placement
 function setRandomCutCardPosition() {
 	// Random position between 52 cards (1 deck) and 78 cards (1.5 decks)
-	cutCardPosition = Math.floor(Math.random() * (78 - 52 + 1)) + 52;
-	console.log(`Cut card placed at ${cutCardPosition} cards remaining`);
-}
-
-// Set random cut card position (1-1.5 decks from end, like real casinos)
-function setRandomCutCardPosition() {
-	// Random position between 52 cards (1 deck) and 78 cards (1.5 decks)
-	cutCardPosition = Math.floor(Math.random() * (78 - 52 + 1)) + 52;
+	cutCardPosition = Math.floor(secureRandom() * (78 - 52 + 1)) + 52;
 	console.log(`Cut card placed at ${cutCardPosition} cards remaining`);
 }
 
@@ -135,10 +136,10 @@ function createShoe() {
 	return newShoe;
 }
 
-// Shuffle the shoe using Fisher-Yates algorithm
+// Shuffle the shoe using Fisher-Yates algorithm with cryptographically secure randomness
 function shuffle(array) {
 	for (let i = array.length - 1; i > 0; i--) {
-		const j = Math.floor(Math.random() * (i + 1));
+		const j = Math.floor(secureRandom() * (i + 1));
 		[array[i], array[j]] = [array[j], array[i]];
 	}
 }
