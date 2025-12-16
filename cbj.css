@@ -9,7 +9,8 @@ body {
 	background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
 	min-height: 100vh;
 	display: flex;
-	justify-content: center;
+	flex-direction: column;
+	justify-content: flex-start;
 	align-items: center;
 	padding: 20px;
 }
@@ -23,6 +24,7 @@ body {
 	box-shadow: 0 0 0 15px #8b4513, 0 0 0 20px #654321,
 		0 20px 60px rgba(0, 0, 0, 0.5), inset 0 0 100px rgba(0, 0, 0, 0.3);
 	position: relative;
+	margin: 20px 0;
 }
 
 .game-container::before {
@@ -859,4 +861,102 @@ h1 {
 	h1 {
 		margin-bottom: 10px;
 	}
+}
+
+/* Disclaimer Footer */
+.disclaimer-footer {
+	background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 100%);
+	border-top: 3px solid #ffd700;
+	padding: 0;
+	box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
+	width: 100%;
+	max-width: 900px;
+	margin-top: auto;
+	margin-bottom: 20px;
+	border-radius: 10px;
+}
+
+.disclaimer-toggle {
+	width: 100%;
+	background: linear-gradient(to bottom, #2a2a3e 0%, #1a1a2e 100%);
+	color: #ffd700;
+	border: none;
+	padding: 15px 20px;
+	font-size: 16px;
+	font-weight: bold;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	transition: all 0.3s ease;
+	text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.disclaimer-toggle:hover {
+	background: linear-gradient(to bottom, #3a3a4e 0%, #2a2a3e 100%);
+	text-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+}
+
+.disclaimer-toggle #disclaimerIcon {
+	transition: transform 0.3s ease;
+	font-size: 14px;
+}
+
+.disclaimer-toggle.active #disclaimerIcon {
+	transform: rotate(180deg);
+}
+
+.disclaimer-content {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.5s ease;
+	background: #0f0f1e;
+	color: #e0e0e0;
+}
+
+.disclaimer-content.expanded {
+	max-height: 1000px;
+	padding: 20px;
+}
+
+.disclaimer-section {
+	margin-bottom: 20px;
+	padding: 15px;
+	background: rgba(255, 255, 255, 0.05);
+	border-left: 4px solid #ffd700;
+	border-radius: 5px;
+}
+
+.disclaimer-section:last-child {
+	margin-bottom: 0;
+}
+
+.disclaimer-section h3 {
+	color: #ffd700;
+	font-size: 16px;
+	margin-bottom: 10px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+.disclaimer-section p {
+	line-height: 1.6;
+	font-size: 14px;
+	color: #d0d0d0;
+}
+
+.disclaimer-section a {
+	color: #4db8ff;
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+.disclaimer-section a:hover {
+	color: #ffd700;
+	text-decoration: underline;
+}
+
+.disclaimer-section strong {
+	color: #ffd700;
+	font-weight: bold;
 }

@@ -1312,6 +1312,15 @@ nextCardsToggle.addEventListener("click", toggleNextCards);
 statsToggle.addEventListener("click", toggleStatsPanel);
 autoPlayBtn.addEventListener("click", toggleAutoPlay);
 
+// Disclaimer toggle
+const disclaimerToggle = document.getElementById("disclaimerToggle");
+const disclaimerContent = document.getElementById("disclaimerContent");
+
+disclaimerToggle.addEventListener("click", () => {
+	disclaimerContent.classList.toggle("expanded");
+	disclaimerToggle.classList.toggle("active");
+});
+
 // Initialize shoe and display
 shoe = createShoe();
 shuffle(shoe);
