@@ -592,6 +592,15 @@ h1 {
 	animation: pulse 2s infinite;
 }
 
+.btn-hint {
+	background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+	color: white;
+}
+
+.btn-hint:not(:disabled):hover {
+	background: linear-gradient(135deg, #f4a62a 0%, #f39c12 100%);
+}
+
 @keyframes pulse {
 	0%,
 	100% {
@@ -959,4 +968,184 @@ h1 {
 .disclaimer-section strong {
 	color: #ffd700;
 	font-weight: bold;
+}
+
+/* Hint Dialog Modal */
+.hint-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.85);
+	display: none;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+	animation: fadeIn 0.3s ease;
+}
+
+.hint-overlay.active {
+	display: flex;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.hint-dialog {
+	background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 100%);
+	border: 3px solid #f39c12;
+	border-radius: 15px;
+	max-width: 500px;
+	width: 90%;
+	max-height: 80vh;
+	overflow-y: auto;
+	box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8);
+	animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+	from {
+		transform: translateY(-50px);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+.hint-header {
+	background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+	padding: 20px;
+	border-radius: 12px 12px 0 0;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.hint-header h2 {
+	color: white;
+	margin: 0;
+	font-size: 1.5em;
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hint-close {
+	background: rgba(255, 255, 255, 0.2);
+	border: none;
+	color: white;
+	font-size: 1.5em;
+	width: 35px;
+	height: 35px;
+	border-radius: 50%;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.hint-close:hover {
+	background: rgba(255, 255, 255, 0.3);
+	transform: rotate(90deg);
+}
+
+.hint-body {
+	padding: 25px;
+}
+
+.hint-situation,
+.hint-recommendation,
+.hint-explanation {
+	margin-bottom: 20px;
+}
+
+.hint-situation h3,
+.hint-recommendation h3,
+.hint-explanation h3 {
+	color: #f39c12;
+	font-size: 1.1em;
+	margin-bottom: 10px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+
+.hint-situation p,
+.hint-explanation p {
+	color: #d0d0d0;
+	font-size: 1em;
+	line-height: 1.6;
+	margin: 0;
+}
+
+.hint-action {
+	background: rgba(243, 156, 18, 0.2);
+	border-left: 4px solid #f39c12;
+	padding: 15px;
+	color: #ffd700;
+	font-size: 1.3em;
+	font-weight: bold;
+	text-transform: uppercase;
+	text-align: center;
+	margin: 0;
+	border-radius: 5px;
+	text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.hint-footer {
+	padding: 0 25px 25px 25px;
+	display: flex;
+	justify-content: center;
+}
+
+.btn-hint-ok {
+	background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+	color: white;
+	padding: 12px 40px;
+	font-size: 1.1em;
+	font-weight: bold;
+	border: none;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.btn-hint-ok:hover {
+	background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+	transform: translateY(-2px);
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.btn-hint-ok:active {
+	transform: translateY(0);
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 480px) {
+	.hint-dialog {
+		width: 95%;
+		max-height: 90vh;
+	}
+
+	.hint-header h2 {
+		font-size: 1.2em;
+	}
+
+	.hint-body {
+		padding: 20px;
+	}
+
+	.hint-action {
+		font-size: 1.1em;
+	}
 }

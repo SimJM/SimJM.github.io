@@ -82,6 +82,7 @@ const hitBtn = document.getElementById("hitBtn");
 const standBtn = document.getElementById("standBtn");
 const doubleBtn = document.getElementById("doubleBtn");
 const splitBtn = document.getElementById("splitBtn");
+const hintBtn = document.getElementById("hintBtn");
 const newRoundBtn = document.getElementById("newRoundBtn");
 const autoPlayBtn = document.getElementById("autoPlayBtn");
 
@@ -115,6 +116,14 @@ const nextCardsToggle = document.getElementById("nextCardsToggle");
 const nextCardsPreview = document.getElementById("nextCardsPreview");
 const nextCardsList = document.getElementById("nextCardsList");
 const toggleIcon = document.getElementById("toggleIcon");
+
+// Hint dialog elements
+const hintOverlay = document.getElementById("hintOverlay");
+const hintClose = document.getElementById("hintClose");
+const hintOk = document.getElementById("hintOk");
+const hintSituation = document.getElementById("hintSituation");
+const hintAction = document.getElementById("hintAction");
+const hintExplanation = document.getElementById("hintExplanation");
 
 // Set random cut card position (1-1.5 decks from end, like real casinos)
 // Uses cryptographically secure random for fair, unpredictable placement
@@ -320,6 +329,97 @@ function getBasicStrategyMove(hand, dealerUpcard) {
 	}
 
 	return "hit";
+}
+
+// Get explanation for Basic Strategy decision
+function getBasicStrategyExplanation(hand, dealerUpcard, move) {
+	const playerValue = calculateHandValue(hand);
+	const isSoft = isSoftHand(hand);
+	const isPair = hand.length === 2 && hand[0].value === hand[1].value;
+	const dealerCard = dealerUpcard === 11 ? "Ace" : dealerUpcard;
+
+	// Pair explanations
+	if (isPair && move === "split") {
+		const pairValue = hand[0].value;
+		if (pairValue === "A") {
+			return "Always split Aces! Two chances at blackjack (21) is better than one hand starting at 12. This is a fundamental rule of Basic Strategy.";
+		}
+		if (pairValue === "8") {
+			return "Always split 8s! Starting with 16 is the worst hand in blackjack. Two hands of 8 give you much better chances to improve.";
+		}
+		if (["2", "3", "6", "7"].includes(pairValue)) {
+			return `Split ${pairValue}s against dealer's weak card (${dealerCard}). The dealer has a 40%+ bust rate when showing 2-6, so maximize your advantage with two hands.`;
+		}
+		if (pairValue === "9") {
+			if (dealerUpcard === 7) {
+				return "Stand with pair of 9s against dealer 7. You have 18, which likely beats the dealer's probable 17. Splitting risks two weaker hands.";
+			}
+			return `Split 9s against dealer ${dealerCard}. Two chances at strong hands (19+) is better than standing on 18 against this dealer card.`;
+		}
+	}
+
+	// Double down explanations
+	if (move === "double") {
+		if (playerValue === 11) {
+			return `Double on 11! This is one of the best doubling situations. You have high odds of getting a 10-value card for 21, and even a low card keeps you competitive.`;
+		}
+		if (playerValue === 10) {
+			return `Double on 10 against dealer ${dealerCard}. Strong chance of making 20, and the dealer's card suggests they may bust or end up weaker.`;
+		}
+		if (playerValue === 9) {
+			return `Double on 9 against dealer's weak ${dealerCard}. The dealer has high bust potential (40%+), so maximize your bet while you have the advantage.`;
+		}
+		if (isSoft && playerValue === 18) {
+			return `Double soft 18 against dealer's weak ${dealerCard}. You can't bust, and there's great upside to improve to 19-21 while the dealer is likely to bust.`;
+		}
+		if (isSoft && playerValue >= 15 && playerValue <= 17) {
+			return `Double this soft hand against dealer ${dealerCard}. You can't bust, the dealer is weak (40%+ bust rate), so double your bet to maximize profit.`;
+		}
+	}
+
+	// Soft hand explanations
+	if (isSoft) {
+		if (playerValue >= 19) {
+			return `Stand on soft ${playerValue}. This is a strong hand. Hitting risks worsening your position, and you're already in excellent shape.`;
+		}
+		if (playerValue === 18) {
+			if (dealerUpcard >= 2 && dealerUpcard <= 8) {
+				return `Stand on soft 18 against dealer ${dealerCard}. This beats most dealer outcomes when they show 2-8. Hitting or doubling (without sufficient bankroll) risks a worse result.`;
+			}
+			return `Hit soft 18 against dealer's strong ${dealerCard}. The dealer likely has 19-21, so you need to improve. Since the Ace can count as 1, you can't bust.`;
+		}
+		return `Hit soft ${playerValue}. You can't bust (Ace counts as 1 if needed), so always try to improve soft 17 or less. No risk, potential reward.`;
+	}
+
+	// Hard hand explanations
+	if (move === "stand") {
+		if (playerValue >= 17) {
+			return `Always stand on ${playerValue}. The risk of busting is too high. Let the dealer play out their hand - they must hit until 17.`;
+		}
+		if (playerValue >= 13 && playerValue <= 16) {
+			return `Stand on ${playerValue} against dealer's weak ${dealerCard}. The dealer has 40%+ chance to bust when showing 2-6. Don't risk busting - let them play.`;
+		}
+		if (playerValue === 12) {
+			return `Stand on 12 against dealer ${dealerCard}. The dealer's cards (4-6) have the highest bust rates. Your risk of busting (if you hit) is significant, so let the dealer bust instead.`;
+		}
+		if (isPair && hand[0].value === "9" && dealerUpcard === 7) {
+			return "Stand on pair of 9s (18 total) against dealer 7. You likely have the better hand (dealer probably has 17). Don't risk splitting into weaker positions.";
+		}
+	}
+
+	if (move === "hit") {
+		if (playerValue >= 13 && playerValue <= 16) {
+			return `Hit on ${playerValue} against dealer's strong ${dealerCard}. Dealer showing 7-Ace likely has 17+. You must improve to have a chance, even with bust risk.`;
+		}
+		if (playerValue === 12) {
+			return `Hit on 12 against dealer ${dealerCard}. While there's some bust risk, dealer's strong card means you need to improve. Standing on 12 against 7-Ace loses most of the time.`;
+		}
+		if (playerValue <= 11) {
+			return `Always hit on ${playerValue} or less. You can't bust, so there's no risk. Keep hitting until you reach at least 12.`;
+		}
+	}
+
+	return "This is the mathematically optimal play based on computer simulations of millions of hands. Basic Strategy minimizes the house edge to ~0.5%.";
 }
 
 // Deal a card from the shoe
@@ -576,6 +676,58 @@ function showMessage(text, type = "info") {
 	messageEl.className = `message ${type}`;
 }
 
+// Show hint dialog
+function showHint() {
+	if (!gameInProgress) return;
+
+	const currentHand = playerHands[currentHandIndex];
+	const playerValue = calculateHandValue(currentHand);
+	const isSoft = isSoftHand(currentHand);
+	const isPair =
+		currentHand.length === 2 &&
+		currentHand[0].value === currentHand[1].value;
+	const dealerUpcard = getDealerUpcard();
+	const dealerCard = dealerUpcard === 11 ? "Ace" : dealerUpcard;
+
+	// Get recommended move
+	const move = getBasicStrategyMove(currentHand, dealerUpcard);
+
+	// Build situation description
+	let handType = "";
+	if (isPair) {
+		handType = `Pair of ${currentHand[0].value}s (${playerValue} total)`;
+	} else if (isSoft) {
+		handType = `Soft ${playerValue}`;
+	} else {
+		handType = `Hard ${playerValue}`;
+	}
+
+	const situation = `You have: ${handType}<br>Dealer shows: ${dealerCard}`;
+
+	// Get action text
+	const actionText = move.toUpperCase();
+
+	// Get explanation
+	const explanation = getBasicStrategyExplanation(
+		currentHand,
+		dealerUpcard,
+		move
+	);
+
+	// Update dialog content
+	hintSituation.innerHTML = situation;
+	hintAction.textContent = actionText;
+	hintExplanation.textContent = explanation;
+
+	// Show dialog
+	hintOverlay.classList.add("active");
+}
+
+// Close hint dialog
+function closeHint() {
+	hintOverlay.classList.remove("active");
+}
+
 // Update buttons
 function updateButtons() {
 	if (!gameInProgress) {
@@ -583,12 +735,14 @@ function updateButtons() {
 		standBtn.disabled = true;
 		doubleBtn.disabled = true;
 		splitBtn.disabled = true;
+		hintBtn.disabled = true;
 		return;
 	}
 
 	const currentHand = playerHands[currentHandIndex];
 	hitBtn.disabled = false;
 	standBtn.disabled = false;
+	hintBtn.disabled = false;
 
 	// Double down only available on first two cards
 	doubleBtn.disabled = !(
@@ -1308,10 +1462,18 @@ hitBtn.addEventListener("click", hit);
 standBtn.addEventListener("click", stand);
 doubleBtn.addEventListener("click", doubleDown);
 splitBtn.addEventListener("click", split);
+hintBtn.addEventListener("click", showHint);
 newRoundBtn.addEventListener("click", newRound);
 nextCardsToggle.addEventListener("click", toggleNextCards);
 statsToggle.addEventListener("click", toggleStatsPanel);
 autoPlayBtn.addEventListener("click", toggleAutoPlay);
+
+// Hint dialog listeners
+hintClose.addEventListener("click", closeHint);
+hintOk.addEventListener("click", closeHint);
+hintOverlay.addEventListener("click", (e) => {
+	if (e.target === hintOverlay) closeHint();
+});
 
 // Disclaimer toggle
 const disclaimerToggle = document.getElementById("disclaimerToggle");

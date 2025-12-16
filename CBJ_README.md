@@ -511,6 +511,58 @@ function doubleDown() {
 }
 ```
 
+### 6. Strategy Hint System
+
+**Purpose**: Provide real-time Basic Strategy guidance with detailed explanations
+
+**Features**:
+
+-   💡 Hint button available during player's turn
+-   Modal dialog showing recommended action
+-   Context-aware explanations based on game situation
+-   Same logic as auto-play mode (optimal Basic Strategy)
+
+**User Interface**:
+
+-   **Your Situation**: Displays current hand type and dealer's upcard
+-   **Recommended Action**: Bold display of HIT/STAND/DOUBLE/SPLIT
+-   **Why?**: Detailed explanation of the mathematical reasoning
+
+**Algorithm**:
+
+```javascript
+function showHint() {
+    const currentHand = playerHands[currentHandIndex];
+    const dealerUpcard = getDealerUpcard();
+
+    // Get optimal move using same Basic Strategy logic as auto-play
+    const move = getBasicStrategyMove(currentHand, dealerUpcard);
+
+    // Generate context-aware explanation
+    const explanation = getBasicStrategyExplanation(currentHand, dealerUpcard, move);
+
+    // Display in modal dialog
+    showHintDialog(move, explanation);
+}
+```
+
+**Explanation Categories**:
+
+-   **Pair Splitting**: Why to always split Aces/8s, conditional splits for 2s/3s/6s/7s/9s
+-   **Double Down**: Optimal situations for 9/10/11 and soft hands against weak dealer cards
+-   **Soft Hands**: Can't bust scenarios, when to hit vs stand with Aces
+-   **Hard Hands**: Dealer weakness (2-6 = 40%+ bust rate) vs strength (7-Ace)
+-   **Bust Avoidance**: Mathematical reasoning for standing on 12-16 vs weak dealer
+
+**Implementation Details**:
+
+-   Enabled only during active gameplay
+-   Disabled during auto-play mode
+-   Uses same `getBasicStrategyMove()` function as automation
+-   Provides educational value while maintaining optimal play
+-   Modal overlay with animations (fade in, slide in)
+-   Responsive design for mobile devices
+
 ---
 
 ## Statistics Tracking
@@ -911,6 +963,8 @@ function toggleNextCards() {
 -   Message system for game events
 -   Keyboard-accessible controls
 -   Color-coded statistics (green=positive, red=negative)
+-   Interactive hint system for learning Basic Strategy
+-   Modal dialogs with escape/click-outside to close
 
 ---
 
@@ -918,9 +972,10 @@ function toggleNextCards() {
 
 **Frontend**:
 
--   **HTML5**: Semantic structure
--   **CSS3**: Animations, gradients, flexbox, grid
+-   **HTML5**: Semantic structure, modal dialogs
+-   **CSS3**: Animations, gradients, flexbox, grid, keyframe animations
 -   **Vanilla JavaScript ES6+**: No external dependencies
+-   **Web Crypto API**: Cryptographically secure random number generation
 
 **Browser Compatibility**:
 
@@ -928,24 +983,42 @@ function toggleNextCards() {
 -   Requires ES6 support
 -   CSS Grid and Flexbox support
 -   CSS animations and transforms
+-   Web Crypto API support (crypto.getRandomValues)
 
 **Performance**:
 
 -   Zero network requests after initial load
--   Lightweight (~50KB total)
+-   Lightweight (~55KB total)
 -   Smooth 60fps animations
 -   Efficient DOM updates
+-   Cryptographically secure randomness
 
 ---
 
 ## File Structure
 
 ```
-cbj.html        - Game structure and UI elements
-cbj.css         - Styling, animations, responsive design
-cbj.js          - Game logic, algorithms, event handlers
-CBJ_README.md   - This documentation file
+cbj.html               - Game structure, UI elements, and hint modal
+cbj.css                - Styling, animations, responsive design
+cbj.js                 - Game logic, algorithms, event handlers
+CBJ_README.md          - This documentation file
+BLACKJACK_STRATEGY.md  - Basic Strategy reference guide
 ```
+
+---
+
+## Key Features Summary
+
+✅ **Authentic Casino Rules**: 6-deck shoe, 3:2 blackjack payout, dealer stands on 17  
+✅ **Cryptographic Security**: Uses crypto.getRandomValues() for provably fair shuffling  
+✅ **Realistic Cut Card System**: Random placement at 52-78 cards (1-1.5 decks from end)  
+✅ **Basic Strategy Integration**: Auto-play and hint system use optimal mathematical strategy  
+✅ **21 Advanced Statistics**: ROI, dealer bust rate, double down success, and more  
+✅ **Interactive Hint System**: Learn optimal play with detailed explanations  
+✅ **Smooth Animations**: Card dealing, flipping, and chip tossing effects  
+✅ **Responsive Design**: Full mobile support with touch-friendly controls  
+✅ **No Dependencies**: Pure vanilla JavaScript, HTML5, and CSS3  
+✅ **Educational Value**: Perfect for learning blackjack Basic Strategy
 
 ---
 
@@ -961,13 +1034,15 @@ CBJ_README.md   - This documentation file
 8. **Save/Load**: Session persistence with localStorage
 9. **Statistics Export**: CSV download of session data
 10. **Theme Customization**: Different table colors and card designs
+11. **Strategy Quiz Mode**: Test knowledge with randomized scenarios
+12. **Multilingual Support**: Translate UI and hints to multiple languages
 
 ---
 
 ## Credits
 
 **Developer**: SimJM  
-**Version**: 1.0  
+**Version**: 1.1  
 **Last Updated**: December 2025  
 **License**: MIT
 

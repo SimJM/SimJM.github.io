@@ -175,10 +175,40 @@
 				<button id="standBtn" class="btn" disabled>STAND</button>
 				<button id="doubleBtn" class="btn" disabled>DOUBLE</button>
 				<button id="splitBtn" class="btn" disabled>SPLIT</button>
+				<button id="hintBtn" class="btn btn-hint" disabled>
+					💡 HINT
+				</button>
 				<button id="autoPlayBtn" class="btn btn-auto">AUTO PLAY</button>
 				<button id="newRoundBtn" class="btn btn-new-round">
 					NEW ROUND
 				</button>
+			</div>
+		</div>
+
+		<!-- Hint Dialog Modal -->
+		<div class="hint-overlay" id="hintOverlay">
+			<div class="hint-dialog">
+				<div class="hint-header">
+					<h2>💡 Basic Strategy Hint</h2>
+					<button class="hint-close" id="hintClose">✕</button>
+				</div>
+				<div class="hint-body">
+					<div class="hint-situation">
+						<h3>Your Situation</h3>
+						<p id="hintSituation"></p>
+					</div>
+					<div class="hint-recommendation">
+						<h3>Recommended Action</h3>
+						<p class="hint-action" id="hintAction"></p>
+					</div>
+					<div class="hint-explanation">
+						<h3>Why?</h3>
+						<p id="hintExplanation"></p>
+					</div>
+				</div>
+				<div class="hint-footer">
+					<button class="btn btn-hint-ok" id="hintOk">GOT IT</button>
+				</div>
 			</div>
 		</div>
 
