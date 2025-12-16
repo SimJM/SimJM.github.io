@@ -33,6 +33,9 @@ let superAutoPlaying = false;
 let superAutoRounds = 0;
 let superAutoMaxRounds = 10;
 
+// Bankroll history for charting
+let bankrollHistory = [];
+
 // Statistics
 let stats = {
 	handsPlayed: 0,
@@ -91,6 +94,14 @@ const hintBtn = document.getElementById("hintBtn");
 const newRoundBtn = document.getElementById("newRoundBtn");
 const autoPlayBtn = document.getElementById("autoPlayBtn");
 const superAutoBtn = document.getElementById("superAutoBtn");
+
+// Chart elements
+const chartToggle = document.getElementById("chartToggle");
+const chartWrapper = document.getElementById("chartWrapper");
+const chartToggleIcon = document.getElementById("chartToggleIcon");
+const bankrollChart = document.getElementById("bankrollChart");
+const chartDataPoints = document.getElementById("chartDataPoints");
+const clearChartBtn = document.getElementById("clearChartBtn");
 
 // Stats elements
 const handsPlayedEl = document.getElementById("handsPlayed");
@@ -1121,6 +1132,10 @@ function checkBlackjacks() {
 					stats.streakType = "loss";
 				}
 			}
+
+			// Track bankroll for chart
+			addBankrollDataPoint();
+
 			endRound();
 		}, 1000);
 	} else {
@@ -1363,6 +1378,9 @@ function resolveRound() {
 		stats.streak = 0;
 		stats.streakType = null;
 	}
+
+	// Track bankroll for chart
+	addBankrollDataPoint();
 
 	let message = resultMessages.join(" | ");
 	if (dealerBust) {
@@ -1738,6 +1756,9 @@ function runSuperAutoRounds() {
 
 		roundsCompleted++;
 		superAutoRounds++;
+
+		// Track bankroll for chart after every round
+		addBankrollDataPoint();
 	}
 
 	// Update display with final results
@@ -2039,6 +2060,317 @@ function instantResolveHands() {
 	gameInProgress = false;
 }
 
+// ============================================
+// BANKROLL CHART SYSTEM
+// ============================================
+
+// Chart state
+let chartExpanded = false;
+let chartCtx = null;
+let chartInitialized = false;
+
+// Toggle chart visibility
+function toggleChart() {
+	chartExpanded = !chartExpanded;
+	chartWrapper.classList.toggle("expanded");
+	chartToggle.classList.toggle("active");
+	chartToggleIcon.textContent = chartExpanded ? "▲" : "▼";
+
+	if (chartExpanded && !chartInitialized) {
+		initChart();
+	}
+
+	if (chartExpanded) {
+		drawChart();
+	}
+}
+
+// Initialize chart canvas
+function initChart() {
+	const canvas = bankrollChart;
+	const container = canvas.parentElement;
+
+	// Set canvas size to match container
+	const resizeCanvas = () => {
+		const dpr = window.devicePixelRatio || 1;
+		const rect = container.getBoundingClientRect();
+		canvas.width = rect.width * dpr;
+		canvas.height = rect.height * dpr;
+		canvas.style.width = rect.width + "px";
+		canvas.style.height = rect.height + "px";
+		chartCtx = canvas.getContext("2d");
+		chartCtx.scale(dpr, dpr);
+		if (chartExpanded) drawChart();
+	};
+
+	resizeCanvas();
+	window.addEventListener("resize", resizeCanvas);
+	chartInitialized = true;
+
+	// Initialize with starting bankroll
+	if (bankrollHistory.length === 0) {
+		bankrollHistory.push({hands: 0, bankroll: 1000});
+	}
+}
+
+// Add data point to bankroll history
+function addBankrollDataPoint() {
+	bankrollHistory.push({
+		hands: stats.handsPlayed,
+		bankroll: bankroll,
+	});
+
+	updateChartInfo();
+
+	if (chartExpanded) {
+		// Only redraw periodically for performance
+		if (
+			bankrollHistory.length % 10 === 0 ||
+			bankrollHistory.length < 1000
+		) {
+			drawChart();
+		}
+	}
+}
+
+// Update chart info display
+function updateChartInfo() {
+	const count = bankrollHistory.length;
+	if (count > 1000000) {
+		chartDataPoints.textContent = `${(count / 1000000).toFixed(
+			2
+		)}M data points`;
+	} else if (count > 1000) {
+		chartDataPoints.textContent = `${(count / 1000).toFixed(
+			1
+		)}K data points`;
+	} else {
+		chartDataPoints.textContent = `${count} data points`;
+	}
+}
+
+// Clear chart data
+function clearChartData() {
+	bankrollHistory = [{hands: stats.handsPlayed, bankroll: bankroll}];
+	updateChartInfo();
+	if (chartExpanded) {
+		drawChart();
+	}
+}
+
+// Downsample data using Largest-Triangle-Three-Buckets algorithm
+// This reduces 10M points to ~2000 while preserving visual trends
+function downsampleData(data, threshold) {
+	if (data.length <= threshold) {
+		return data;
+	}
+
+	const sampled = [];
+	const bucketSize = (data.length - 2) / (threshold - 2);
+
+	sampled.push(data[0]); // Always keep first point
+
+	for (let i = 0; i < threshold - 2; i++) {
+		const avgRangeStart = Math.floor((i + 1) * bucketSize) + 1;
+		const avgRangeEnd = Math.floor((i + 2) * bucketSize) + 1;
+		const avgRangeLength = avgRangeEnd - avgRangeStart;
+
+		let avgX = 0,
+			avgY = 0;
+		for (let j = avgRangeStart; j < avgRangeEnd; j++) {
+			avgX += data[j].hands;
+			avgY += data[j].bankroll;
+		}
+		avgX /= avgRangeLength;
+		avgY /= avgRangeLength;
+
+		const rangeStart = Math.floor(i * bucketSize) + 1;
+		const rangeEnd = Math.floor((i + 1) * bucketSize) + 1;
+
+		const pointA = sampled[sampled.length - 1];
+		let maxArea = -1;
+		let maxAreaPoint = null;
+
+		for (let j = rangeStart; j < rangeEnd; j++) {
+			const area = Math.abs(
+				(pointA.hands - avgX) * (data[j].bankroll - pointA.bankroll) -
+					(pointA.hands - data[j].hands) * (avgY - pointA.bankroll)
+			);
+			if (area > maxArea) {
+				maxArea = area;
+				maxAreaPoint = data[j];
+			}
+		}
+
+		sampled.push(maxAreaPoint);
+	}
+
+	sampled.push(data[data.length - 1]); // Always keep last point
+	return sampled;
+}
+
+// Draw the chart
+function drawChart() {
+	if (!chartCtx || bankrollHistory.length < 2) return;
+
+	const canvas = bankrollChart;
+	const width = canvas.clientWidth;
+	const height = canvas.clientHeight;
+	const ctx = chartCtx;
+
+	// Clear canvas
+	ctx.clearRect(0, 0, width, height);
+
+	// Downsample data if needed (max 2000 points for smooth rendering)
+	const data = downsampleData(bankrollHistory, 2000);
+
+	// Calculate bounds
+	const minHands = 0;
+	const maxHands = data[data.length - 1].hands;
+	const minBankroll = Math.min(...data.map((d) => d.bankroll), 0);
+	const maxBankroll = Math.max(...data.map((d) => d.bankroll));
+
+	// Add padding
+	const padding = {top: 20, right: 20, bottom: 40, left: 60};
+	const chartWidth = width - padding.left - padding.right;
+	const chartHeight = height - padding.top - padding.bottom;
+
+	// Scale functions
+	const scaleX = (hands) => padding.left + (hands / maxHands) * chartWidth;
+	const scaleY = (bankroll) => {
+		const range = maxBankroll - minBankroll;
+		return (
+			padding.top +
+			chartHeight -
+			((bankroll - minBankroll) / range) * chartHeight
+		);
+	};
+
+	// Draw grid
+	ctx.strokeStyle = "rgba(255, 215, 0, 0.1)";
+	ctx.lineWidth = 1;
+
+	// Horizontal grid lines (5 lines)
+	for (let i = 0; i <= 5; i++) {
+		const y = padding.top + (chartHeight / 5) * i;
+		ctx.beginPath();
+		ctx.moveTo(padding.left, y);
+		ctx.lineTo(width - padding.right, y);
+		ctx.stroke();
+
+		// Y-axis labels
+		const value = maxBankroll - ((maxBankroll - minBankroll) / 5) * i;
+		ctx.fillStyle = "#ffd700";
+		ctx.font = "11px Arial";
+		ctx.textAlign = "right";
+		ctx.fillText(`$${Math.round(value)}`, padding.left - 5, y + 4);
+	}
+
+	// Vertical grid lines (5 lines)
+	for (let i = 0; i <= 5; i++) {
+		const x = padding.left + (chartWidth / 5) * i;
+		ctx.beginPath();
+		ctx.moveTo(x, padding.top);
+		ctx.lineTo(x, height - padding.bottom);
+		ctx.stroke();
+
+		// X-axis labels
+		const value = (maxHands / 5) * i;
+		ctx.fillStyle = "#ffd700";
+		ctx.font = "11px Arial";
+		ctx.textAlign = "center";
+		let label;
+		if (value > 1000000) {
+			label = `${(value / 1000000).toFixed(1)}M`;
+		} else if (value > 1000) {
+			label = `${(value / 1000).toFixed(0)}K`;
+		} else {
+			label = Math.round(value).toString();
+		}
+		ctx.fillText(label, x, height - padding.bottom + 20);
+	}
+
+	// Draw zero line if visible
+	if (minBankroll < 0 && maxBankroll > 0) {
+		const zeroY = scaleY(0);
+		ctx.strokeStyle = "rgba(255, 0, 0, 0.5)";
+		ctx.lineWidth = 2;
+		ctx.beginPath();
+		ctx.moveTo(padding.left, zeroY);
+		ctx.lineTo(width - padding.right, zeroY);
+		ctx.stroke();
+	}
+
+	// Draw line chart
+	ctx.strokeStyle = "#00ff00";
+	ctx.lineWidth = 2;
+	ctx.beginPath();
+
+	for (let i = 0; i < data.length; i++) {
+		const x = scaleX(data[i].hands);
+		const y = scaleY(data[i].bankroll);
+
+		if (i === 0) {
+			ctx.moveTo(x, y);
+		} else {
+			ctx.lineTo(x, y);
+		}
+	}
+	ctx.stroke();
+
+	// Draw area under curve with gradient
+	const gradient = ctx.createLinearGradient(
+		0,
+		padding.top,
+		0,
+		height - padding.bottom
+	);
+	gradient.addColorStop(0, "rgba(0, 255, 0, 0.3)");
+	gradient.addColorStop(1, "rgba(0, 255, 0, 0.05)");
+	ctx.fillStyle = gradient;
+
+	ctx.beginPath();
+	ctx.moveTo(scaleX(data[0].hands), height - padding.bottom);
+	for (let i = 0; i < data.length; i++) {
+		const x = scaleX(data[i].hands);
+		const y = scaleY(data[i].bankroll);
+		ctx.lineTo(x, y);
+	}
+	ctx.lineTo(scaleX(data[data.length - 1].hands), height - padding.bottom);
+	ctx.closePath();
+	ctx.fill();
+
+	// Axis labels
+	ctx.fillStyle = "#ffd700";
+	ctx.font = "bold 12px Arial";
+	ctx.textAlign = "center";
+	ctx.fillText("Hands Played", width / 2, height - 5);
+
+	ctx.save();
+	ctx.translate(15, height / 2);
+	ctx.rotate(-Math.PI / 2);
+	ctx.fillText("Bankroll ($)", 0, 0);
+	ctx.restore();
+
+	// Current value indicator
+	if (data.length > 0) {
+		const lastPoint = data[data.length - 1];
+		const x = scaleX(lastPoint.hands);
+		const y = scaleY(lastPoint.bankroll);
+
+		ctx.fillStyle = "#00ff00";
+		ctx.beginPath();
+		ctx.arc(x, y, 4, 0, Math.PI * 2);
+		ctx.fill();
+
+		ctx.strokeStyle = "#ffd700";
+		ctx.lineWidth = 2;
+		ctx.beginPath();
+		ctx.arc(x, y, 6, 0, Math.PI * 2);
+		ctx.stroke();
+	}
+}
+
 // Event listeners
 dealBtn.addEventListener("click", deal);
 hitBtn.addEventListener("click", hit);
@@ -2051,6 +2383,8 @@ nextCardsToggle.addEventListener("click", toggleNextCards);
 statsToggle.addEventListener("click", toggleStatsPanel);
 autoPlayBtn.addEventListener("click", toggleAutoPlay);
 superAutoBtn.addEventListener("click", toggleSuperAuto);
+chartToggle.addEventListener("click", toggleChart);
+clearChartBtn.addEventListener("click", clearChartData);
 
 // Hint dialog listeners
 hintClose.addEventListener("click", closeHint);
@@ -2075,3 +2409,7 @@ setRandomCutCardPosition(); // Set initial random cut card position
 cutCardReached = false;
 updateDisplay();
 updateNextCardsPreview();
+
+// Initialize bankroll history with starting point
+bankrollHistory.push({hands: 0, bankroll: 1000});
+updateChartInfo();
