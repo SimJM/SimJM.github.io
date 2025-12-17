@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Casino Baccarat - Punto Banco</title>
+		<link rel="stylesheet" href="bcr.css" />
+	</head>
+	<body>
+		<div class="game-container">
+			<h1>🎰 BACCARAT 🎰</h1>
+			<p class="subtitle">Punto Banco - 8 Deck Shoe</p>
+
+			<!-- Game Info -->
+			<div class="info-panel">
+				<div class="info-item">
+					<div class="info-label">BANKROLL</div>
+					<div class="info-value" id="bankroll">$1000</div>
+				</div>
+				<div class="info-item">
+					<div class="info-label">CURRENT BET</div>
+					<div class="info-value" id="currentBet">$0</div>
+				</div>
+				<div class="info-item">
+					<div class="info-label">CARDS IN SHOE</div>
+					<div class="info-value" id="shoeCards">416</div>
+				</div>
+			</div>
+
+			<!-- Message -->
+			<div class="message info" id="message">
+				Place your bet and choose Player, Banker, or Tie
+			</div>
+
+			<!-- Gaming Table -->
+			<div class="table-area">
+				<!-- Banker Hand -->
+				<div class="hand-area banker-area">
+					<div class="area-title">BANKER</div>
+					<div class="hand" id="bankerHand">
+						<div class="cards" id="bankerCards"></div>
+						<div class="hand-total" id="bankerTotal"></div>
+					</div>
+				</div>
+
+				<!-- Player Hand -->
+				<div class="hand-area player-area">
+					<div class="area-title">PLAYER</div>
+					<div class="hand" id="playerHand">
+						<div class="cards" id="playerCards"></div>
+						<div class="hand-total" id="playerTotal"></div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Betting Area -->
+			<div class="betting-area" id="bettingArea">
+				<div class="bet-amount-section">
+					<label for="betInput">BET AMOUNT:</label>
+					<input
+						type="number"
+						id="betInput"
+						min="1"
+						max="1000"
+						value="10"
+						step="5" />
+				</div>
+				<div class="bet-type-section">
+					<label class="bet-option">
+						<input
+							type="radio"
+							name="betType"
+							value="player"
+							checked />
+						<span class="bet-label player-bet">PLAYER (1:1)</span>
+					</label>
+					<label class="bet-option">
+						<input type="radio" name="betType" value="banker" />
+						<span class="bet-label banker-bet"
+							>BANKER (1:1 - 5%)</span
+						>
+					</label>
+					<label class="bet-option">
+						<input type="radio" name="betType" value="tie" />
+						<span class="bet-label tie-bet">TIE (8:1)</span>
+					</label>
+				</div>
+			</div>
+
+			<!-- Auto Play Area -->
+			<div class="auto-area">
+				<label for="autoRoundsInput">AUTO ROUNDS:</label>
+				<input
+					type="number"
+					id="autoRoundsInput"
+					min="1"
+					max="1000"
+					value="10"
+					step="1" />
+			</div>
+
+			<!-- Controls -->
+			<div class="controls">
+				<button id="dealBtn" class="btn btn-deal">DEAL</button>
+				<button id="autoPlayBtn" class="btn btn-auto">AUTO PLAY</button>
+				<button id="superAutoBtn" class="btn btn-super-auto">
+					SUPER AUTO
+				</button>
+				<button
+					id="newRoundBtn"
+					class="btn btn-new-round"
+					style="display: none;">
+					NEW ROUND
+				</button>
+			</div>
+
+			<!-- Statistics -->
+			<div class="stats-container">
+				<button class="stats-toggle" id="statsToggle">
+					<span id="statsToggleIcon">▼</span> STATISTICS
+				</button>
+				<div class="stats-panel" id="statsPanel">
+					<div class="stat-group">
+						<div class="stat-label">HANDS PLAYED</div>
+						<div class="stat-value" id="handsPlayed">0</div>
+					</div>
+					<div class="stat-group">
+						<div class="stat-label">PLAYER WINS</div>
+						<div class="stat-value win" id="playerWins">0</div>
+					</div>
+					<div class="stat-group">
+						<div class="stat-label">BANKER WINS</div>
+						<div class="stat-value win" id="bankerWins">0</div>
+					</div>
+					<div class="stat-group">
+						<div class="stat-label">TIES</div>
+						<div class="stat-value" id="ties">0</div>
+					</div>
+					<div class="stat-group">
+						<div class="stat-label">TOTAL WAGERED</div>
+						<div class="stat-value" id="totalWagered">$0</div>
+					</div>
+					<div class="stat-group">
+						<div class="stat-label">NET WIN/LOSS</div>
+						<div class="stat-value" id="netWinLoss">$0</div>
+					</div>
+					<div class="stat-group">
+						<div class="stat-label">COMMISSIONS PAID</div>
+						<div class="stat-value" id="totalCommissions">$0</div>
+					</div>
+					<div class="stat-group">
+						<div class="stat-label">WIN RATE</div>
+						<div class="stat-value" id="winRate">0%</div>
+					</div>
+					<div class="stat-group full-width">
+						<div class="stat-label">LAST 20 HANDS</div>
+						<div class="hand-history" id="handHistory"></div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Round History -->
+			<div class="history-container">
+				<button class="history-toggle" id="historyToggle">
+					<span id="historyToggleIcon">▼</span> LAST 30 ROUNDS
+				</button>
+				<div class="history-panel" id="historyPanel">
+					<div class="history-list" id="historyList">
+						<div class="no-history">No rounds played yet</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="bcr.js"></script>
+	</body>
+</html>
