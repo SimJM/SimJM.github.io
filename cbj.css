@@ -652,7 +652,50 @@ h1 {
 	background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
 }
 
-.btn:not(.btn-deal):not(.btn-new-round) {
+/* Hit button - Teal/Cyan */
+#hitBtn {
+	background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+	color: white;
+}
+
+#hitBtn:not(:disabled):hover {
+	background: linear-gradient(135deg, #1fc8db 0%, #17a2b8 100%);
+}
+
+/* Stand button - Red/Burgundy */
+#standBtn {
+	background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+	color: white;
+}
+
+#standBtn:not(:disabled):hover {
+	background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+}
+
+/* Double button - Gold/Amber */
+#doubleBtn {
+	background: linear-gradient(135deg, #f39c12 0%, #d68910 100%);
+	color: white;
+}
+
+#doubleBtn:not(:disabled):hover {
+	background: linear-gradient(135deg, #f4a62a 0%, #f39c12 100%);
+}
+
+/* Split button - Purple/Violet */
+#splitBtn {
+	background: linear-gradient(135deg, #8e44ad 0%, #7d3c98 100%);
+	color: white;
+}
+
+#splitBtn:not(:disabled):hover {
+	background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+}
+
+/* Generic button styling for any remaining buttons */
+.btn:not(.btn-deal):not(.btn-new-round):not(.btn-hint):not(.btn-auto):not(
+		.btn-super-auto
+	):not(#hitBtn):not(#standBtn):not(#doubleBtn):not(#splitBtn) {
 	background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
 	color: white;
 }
@@ -776,15 +819,15 @@ h1 {
 	.next-card-display {
 		font-size: 1em;
 	}
-	
+
 	.chart-canvas-container {
 		height: 300px;
 	}
-	
+
 	.chart-wrapper.expanded {
 		max-height: 500px;
 	}
-	
+
 	.chart-info {
 		flex-direction: column;
 		gap: 10px;
