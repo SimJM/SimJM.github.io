@@ -201,6 +201,54 @@ h1 {
 	}
 }
 
+/* Hand History Container */
+.hand-history-container {
+	margin-bottom: 20px;
+}
+
+.hand-history-toggle {
+	width: 100%;
+	background: rgba(0, 0, 0, 0.4);
+	border: 2px solid #ffd700;
+	border-radius: 8px;
+	padding: 12px;
+	color: #ffd700;
+	font-size: 0.9em;
+	font-weight: bold;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	text-align: center;
+}
+
+.hand-history-toggle:hover {
+	background: rgba(255, 215, 0, 0.2);
+	box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+#handHistoryToggleIcon {
+	display: inline-block;
+	transition: transform 0.3s ease;
+	margin-right: 5px;
+}
+
+.hand-history-panel {
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.3s ease;
+	background: rgba(0, 0, 0, 0.3);
+	border-radius: 0 0 8px 8px;
+	border: 2px solid #ffd700;
+	border-top: none;
+}
+
+.hand-history-panel.expanded {
+	max-height: 800px;
+}
+
+.hand-history-content {
+	padding: 15px;
+}
+
 /* Next 10 Cards Preview */
 .next-cards-container {
 	margin-bottom: 20px;

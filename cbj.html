@@ -109,10 +109,6 @@
 							</div>
 						</div>
 						<div class="stat-group full-width">
-							<div class="stat-label">LAST 50 HANDS</div>
-							<div class="hand-history" id="handHistory"></div>
-						</div>
-						<div class="stat-group full-width">
 							<div class="stat-label">
 								DEALER OUTCOMES (LAST 50)
 							</div>
@@ -157,6 +153,32 @@
 				</button>
 				<div class="next-cards-preview" id="nextCardsPreview">
 					<div class="next-cards-list" id="nextCardsList"></div>
+				</div>
+			</div>
+
+			<div class="hand-history-container">
+				<button class="hand-history-toggle" id="handHistoryToggle">
+					<span id="handHistoryToggleIcon">▼</span> HAND HISTORY
+				</button>
+				<div class="hand-history-panel" id="handHistoryPanel">
+					<div class="hand-history-content">
+						<div class="stat-group full-width">
+							<div class="stat-label">LAST 50 HANDS</div>
+							<div class="hand-history" id="handHistory"></div>
+						</div>
+						<div class="stat-group full-width">
+							<div class="stat-label">LAST 50 PLAYER HANDS</div>
+							<div
+								class="hand-history"
+								id="playerHandHistory"></div>
+						</div>
+						<div class="stat-group full-width">
+							<div class="stat-label">LAST 50 DEALER HANDS</div>
+							<div
+								class="hand-history"
+								id="dealerHandHistory"></div>
+						</div>
+					</div>
 				</div>
 			</div>
 

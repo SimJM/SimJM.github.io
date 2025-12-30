@@ -52,6 +52,8 @@ let stats = {
 	blackjacks: 0,
 	busts: 0,
 	handHistory: [], // Last 50 hands: 'W', 'L', 'P'
+	playerHandHistory: [], // Last 50 player hands: 'BJ', '21', '20', etc.
+	dealerHandHistory: [], // Last 50 dealer hands: 'W', 'L', 'P'
 	dealerBusts: 0,
 	doubleDownAttempts: 0,
 	doubleDownWins: 0,
@@ -123,6 +125,8 @@ const largestWinEl = document.getElementById("largestWin");
 const blackjacksEl = document.getElementById("blackjacks");
 const bustsEl = document.getElementById("busts");
 const handHistoryEl = document.getElementById("handHistory");
+const playerHandHistoryEl = document.getElementById("playerHandHistory");
+const dealerHandHistoryEl = document.getElementById("dealerHandHistory");
 const roiEl = document.getElementById("roi");
 const dealerBustRateEl = document.getElementById("dealerBustRate");
 const avgBetSizeEl = document.getElementById("avgBetSize");
@@ -144,6 +148,11 @@ const nextCardsToggle = document.getElementById("nextCardsToggle");
 const nextCardsPreview = document.getElementById("nextCardsPreview");
 const nextCardsList = document.getElementById("nextCardsList");
 const toggleIcon = document.getElementById("toggleIcon");
+
+// Hand history elements
+const handHistoryToggle = document.getElementById("handHistoryToggle");
+const handHistoryPanel = document.getElementById("handHistoryPanel");
+const handHistoryToggleIcon = document.getElementById("handHistoryToggleIcon");
 
 // Hint dialog elements
 const hintOverlay = document.getElementById("hintOverlay");
@@ -206,6 +215,12 @@ function updateNextCardsPreview() {
 function toggleNextCards() {
 	const isExpanded = nextCardsPreview.classList.toggle("expanded");
 	toggleIcon.textContent = isExpanded ? "▲" : "▼";
+}
+
+// Toggle hand history panel
+function toggleHandHistory() {
+	const isExpanded = handHistoryPanel.classList.toggle("expanded");
+	handHistoryToggleIcon.textContent = isExpanded ? "▲" : "▼";
 }
 
 // Toggle stats panel
@@ -667,9 +682,9 @@ function updateDisplay() {
 	dealer17El.textContent = outcomeCount["17"];
 	dealerBustCountEl.textContent = outcomeCount.Bust;
 
-	// Update hand history
+	// Update hand history (reversed to show latest first)
 	handHistoryEl.innerHTML = "";
-	const last50Hands = stats.handHistory.slice(-50);
+	const last50Hands = stats.handHistory.slice(-50).reverse();
 	last50Hands.forEach((result) => {
 		const badge = document.createElement("div");
 		const resultClass =
@@ -677,6 +692,38 @@ function updateDisplay() {
 		badge.className = `history-badge ${resultClass}`;
 		badge.textContent = result;
 		handHistoryEl.appendChild(badge);
+	});
+
+	// Update player hand history (reversed to show latest first)
+	playerHandHistoryEl.innerHTML = "";
+	const last50PlayerHands = stats.playerHandHistory.slice(-50).reverse();
+	last50PlayerHands.forEach((outcome) => {
+		const badge = document.createElement("div");
+		let resultClass = "";
+		if (outcome === "BJ") {
+			resultClass = "win"; // Green for player blackjack
+		} else if (!isNaN(outcome) && parseInt(outcome) > 21) {
+			resultClass = "lose"; // Red for player bust
+		}
+		badge.className = `history-badge ${resultClass}`;
+		badge.textContent = outcome;
+		playerHandHistoryEl.appendChild(badge);
+	});
+
+	// Update dealer hand history (reversed to show latest first)
+	dealerHandHistoryEl.innerHTML = "";
+	const last50DealerHands = stats.dealerHandHistory.slice(-50).reverse();
+	last50DealerHands.forEach((outcome) => {
+		const badge = document.createElement("div");
+		let resultClass = "";
+		if (outcome === "BJ") {
+			resultClass = "lose"; // Red for dealer blackjack
+		} else if (!isNaN(outcome) && parseInt(outcome) > 21) {
+			resultClass = "win"; // Green for dealer bust
+		}
+		badge.className = `history-badge ${resultClass}`;
+		badge.textContent = outcome;
+		dealerHandHistoryEl.appendChild(badge);
 	});
 
 	if (stats.streak === 0) {
@@ -1161,6 +1208,7 @@ function checkBlackjacks() {
 				showMessage("Both Blackjack! Push", "info");
 				stats.pushes++;
 				stats.handHistory.push("P");
+				stats.playerHandHistory.push(playerOutcome);
 				stats.streak = 0;
 				stats.streakType = null;
 			} else if (playerBlackjack) {
@@ -1173,6 +1221,7 @@ function checkBlackjacks() {
 				showMessage("Blackjack! You win 3:2", "win");
 				stats.wins++;
 				stats.handHistory.push("W");
+				stats.playerHandHistory.push(playerOutcome);
 				if (stats.streakType === "win") {
 					stats.streak++;
 					if (stats.streak > stats.longestWinStreak) {
@@ -1187,6 +1236,7 @@ function checkBlackjacks() {
 				showMessage("Dealer Blackjack! You lose", "lose");
 				stats.losses++;
 				stats.handHistory.push("L");
+				stats.playerHandHistory.push(playerOutcome);
 				if (stats.streakType === "loss") {
 					stats.streak++;
 					if (stats.streak > stats.longestLossStreak) {
@@ -1333,6 +1383,19 @@ function dealerPlay() {
 	dealerHoleCard = null;
 	revealDealerHoleCard();
 
+	// Check if all player hands busted
+	const allBusted = playerHands.every(
+		(hand) => calculateHandValue(hand) > 21
+	);
+
+	if (allBusted) {
+		// All players busted, dealer wins with just 2 cards
+		setTimeout(() => {
+			resolveRound();
+		}, 1200);
+		return;
+	}
+
 	setTimeout(() => {
 		function dealerHit() {
 			const dealerValue = calculateHandValue(dealerHand);
@@ -1356,12 +1419,16 @@ function resolveRound() {
 
 	// Track dealer outcome
 	const dealerBlackjack = checkBlackjack(dealerHand);
+	let dealerOutcome;
 	if (dealerBlackjack) {
+		dealerOutcome = "BJ";
 		stats.dealerOutcomes.push("BJ");
 	} else if (dealerBust) {
+		dealerOutcome = dealerValue.toString();
 		stats.dealerOutcomes.push("Bust");
 		stats.dealerBusts++;
 	} else {
+		dealerOutcome = dealerValue.toString();
 		stats.dealerOutcomes.push(dealerValue.toString());
 	}
 
@@ -1379,6 +1446,16 @@ function resolveRound() {
 	let hasLoss = false;
 	let allPush = true;
 	let splitHandWins = 0;
+
+	// Track player outcome (use first hand for display)
+	const firstHandValue = calculateHandValue(playerHands[0]);
+	const firstHandBlackjack = checkBlackjack(playerHands[0]);
+	let playerOutcome;
+	if (firstHandBlackjack) {
+		playerOutcome = "BJ";
+	} else {
+		playerOutcome = firstHandValue.toString();
+	}
 
 	playerHands.forEach((hand, index) => {
 		const playerValue = calculateHandValue(hand);
@@ -1430,11 +1507,15 @@ function resolveRound() {
 	if (allPush) {
 		stats.pushes++;
 		stats.handHistory.push("P");
+		stats.playerHandHistory.push(playerOutcome);
+		stats.dealerHandHistory.push(dealerOutcome);
 		stats.streak = 0;
 		stats.streakType = null;
 	} else if (hasWin && !hasLoss) {
 		stats.wins++;
 		stats.handHistory.push("W");
+		stats.playerHandHistory.push(playerOutcome);
+		stats.dealerHandHistory.push(dealerOutcome);
 		if (stats.streakType === "win") {
 			stats.streak++;
 			if (stats.streak > stats.longestWinStreak) {
@@ -1447,6 +1528,8 @@ function resolveRound() {
 	} else if (hasLoss && !hasWin) {
 		stats.losses++;
 		stats.handHistory.push("L");
+		stats.playerHandHistory.push(playerOutcome);
+		stats.dealerHandHistory.push(dealerOutcome);
 		if (stats.streakType === "loss") {
 			stats.streak++;
 			if (stats.streak > stats.longestLossStreak) {
@@ -1461,11 +1544,15 @@ function resolveRound() {
 		if (totalWinnings - currentBet > 0) {
 			stats.wins++;
 			stats.handHistory.push("W");
+			stats.playerHandHistory.push(playerOutcome);
 		} else {
 			stats.losses++;
+			stats.dealerHandHistory.push(dealerOutcome);
 			stats.handHistory.push("L");
+			stats.playerHandHistory.push(playerOutcome);
 		}
 		stats.streak = 0;
+		stats.dealerHandHistory.push(dealerOutcome);
 		stats.streakType = null;
 	}
 
@@ -1724,9 +1811,15 @@ function autoPlayCurrentHand() {
 				stand();
 				break;
 			case "double":
-				if (!doubleBtn.disabled) {
+				// Check actual double conditions, not button state (button disabled during auto-play)
+				if (
+					currentHand.length === 2 &&
+					canDouble &&
+					bankroll >= playerBets[currentHandIndex]
+				) {
 					doubleDown();
 				} else {
+					// Can't double, hit instead
 					hit();
 					setTimeout(() => {
 						if (autoPlaying && gameInProgress)
@@ -1735,18 +1828,22 @@ function autoPlayCurrentHand() {
 				}
 				break;
 			case "split":
-				if (!splitBtn.disabled) {
+				// Check actual split conditions, not button state (button disabled during auto-play)
+				if (
+					currentHand.length === 2 &&
+					playerHands.length === 1 &&
+					bankroll >= currentBet &&
+					currentHand[0].value === currentHand[1].value
+				) {
 					split();
 					setTimeout(() => {
 						if (autoPlaying && gameInProgress)
 							autoPlayCurrentHand();
 					}, autoPlayDelay);
 				} else {
-					const altMove = getBasicStrategyMove(
-						currentHand,
-						dealerUpcard
-					);
-					if (altMove === "stand") {
+					// Can't split, treat as hard total and hit/stand
+					const hardValue = calculateHandValue(currentHand);
+					if (hardValue >= 17) {
 						stand();
 					} else {
 						hit();
@@ -1905,11 +2002,23 @@ function instantDeal() {
 		stats.handsPlayed++;
 
 		// Track dealer outcome
+		let dealerOutcome;
 		if (dealerBlackjack) {
+			dealerOutcome = "BJ";
 			stats.dealerOutcomes.push("BJ");
 		} else if (playerBlackjack) {
 			const dValue = calculateHandValue(dealerHand);
+			dealerOutcome = dValue.toString();
 			stats.dealerOutcomes.push(dValue.toString());
+		}
+
+		// Track player outcome
+		let playerOutcome;
+		if (playerBlackjack) {
+			playerOutcome = "BJ";
+		} else if (dealerBlackjack) {
+			const pValue = calculateHandValue(playerHands[0]);
+			playerOutcome = pValue.toString();
 		}
 
 		// Keep only last 50 outcomes
@@ -1920,6 +2029,8 @@ function instantDeal() {
 			bankroll += currentBet;
 			stats.pushes++;
 			stats.handHistory.push("P");
+			stats.playerHandHistory.push(playerOutcome);
+			stats.dealerHandHistory.push(dealerOutcome);
 			stats.streak = 0;
 			stats.streakType = null;
 		} else if (playerBlackjack) {
@@ -1931,6 +2042,8 @@ function instantDeal() {
 			stats.blackjacks++;
 			stats.wins++;
 			stats.handHistory.push("W");
+			stats.playerHandHistory.push(playerOutcome);
+			stats.dealerHandHistory.push(dealerOutcome);
 			if (stats.streakType === "win") {
 				stats.streak++;
 				if (stats.streak > stats.longestWinStreak) {
@@ -1945,6 +2058,8 @@ function instantDeal() {
 			stats.netWinLoss -= currentBet;
 			stats.losses++;
 			stats.handHistory.push("L");
+			stats.playerHandHistory.push(playerOutcome);
+			stats.dealerHandHistory.push(dealerOutcome);
 			if (stats.streakType === "loss") {
 				stats.streak++;
 				if (stats.streak > stats.longestLossStreak) {
@@ -2081,9 +2196,12 @@ function instantResolveHands() {
 
 	// Track dealer outcome
 	const dealerBlackjack = checkBlackjack(dealerHand);
+	let dealerOutcome;
 	if (dealerBlackjack) {
+		dealerOutcome = "BJ";
 		stats.dealerOutcomes.push("BJ");
 	} else if (dealerBust) {
+		dealerOutcome = dealerValue.toString();
 		stats.dealerOutcomes.push("Bust");
 	} else {
 		stats.dealerOutcomes.push(dealerValue.toString());
@@ -2102,6 +2220,16 @@ function instantResolveHands() {
 	let hasLoss = false;
 	let allPush = true;
 	let splitHandWins = 0;
+
+	// Track player outcome (use first hand for display)
+	const firstHandValue = calculateHandValue(playerHands[0]);
+	const firstHandBlackjack = checkBlackjack(playerHands[0]);
+	let playerOutcome;
+	if (firstHandBlackjack) {
+		playerOutcome = "BJ";
+	} else {
+		playerOutcome = firstHandValue.toString();
+	}
 
 	playerHands.forEach((hand, index) => {
 		const playerValue = calculateHandValue(hand);
@@ -2147,11 +2275,13 @@ function instantResolveHands() {
 	if (allPush) {
 		stats.pushes++;
 		stats.handHistory.push("P");
+		stats.playerHandHistory.push(playerOutcome);
 		stats.streak = 0;
 		stats.streakType = null;
 	} else if (hasWin && !hasLoss) {
 		stats.wins++;
 		stats.handHistory.push("W");
+		stats.playerHandHistory.push(playerOutcome);
 		if (stats.streakType === "win") {
 			stats.streak++;
 			if (stats.streak > stats.longestWinStreak) {
@@ -2164,6 +2294,7 @@ function instantResolveHands() {
 	} else if (hasLoss && !hasWin) {
 		stats.losses++;
 		stats.handHistory.push("L");
+		stats.playerHandHistory.push(playerOutcome);
 		if (stats.streakType === "loss") {
 			stats.streak++;
 			if (stats.streak > stats.longestLossStreak) {
@@ -2178,9 +2309,11 @@ function instantResolveHands() {
 		if (totalWinnings - currentBet > 0) {
 			stats.wins++;
 			stats.handHistory.push("W");
+			stats.playerHandHistory.push(playerOutcome);
 		} else {
 			stats.losses++;
 			stats.handHistory.push("L");
+			stats.playerHandHistory.push(playerOutcome);
 		}
 		stats.streak = 0;
 		stats.streakType = null;
@@ -2509,6 +2642,7 @@ splitBtn.addEventListener("click", split);
 hintBtn.addEventListener("click", showHint);
 newRoundBtn.addEventListener("click", newRound);
 nextCardsToggle.addEventListener("click", toggleNextCards);
+handHistoryToggle.addEventListener("click", toggleHandHistory);
 statsToggle.addEventListener("click", toggleStatsPanel);
 autoPlayBtn.addEventListener("click", toggleAutoPlay);
 superAutoBtn.addEventListener("click", toggleSuperAuto);

@@ -22,8 +22,10 @@ This is the universally recognized **Basic Strategy** - the mathematically prove
 ### **Pairs (Splitting)**
 
 -   **Always Split**: Aces and 8s
--   **Never Split**: 10s, 5s, and 4s
--   **Split if dealer shows 2-6**: 2s, 3s, 6s, 7s, 9s
+-   **Never Split**: 10s and 5s
+-   **Split if dealer shows 2-7**: 2s, 3s, 7s
+-   **Split if dealer shows 2-6**: 6s
+-   **Split if dealer shows 5-6**: 4s (only when dealer is weakest)
 -   **9s special**: Split if dealer shows 2-9 (except 7), STAND if dealer shows 7, 10, or Ace
 
 ### **Doubling Down**
