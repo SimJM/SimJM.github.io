@@ -2209,6 +2209,7 @@ function instantResolveHands() {
 		dealerOutcome = dealerValue.toString();
 		stats.dealerOutcomes.push("Bust");
 	} else {
+		dealerOutcome = dealerValue.toString();
 		stats.dealerOutcomes.push(dealerValue.toString());
 	}
 
