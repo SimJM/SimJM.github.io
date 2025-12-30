@@ -228,6 +228,75 @@
 					value="10"
 					step="5" />
 				<button id="dealBtn" class="btn btn-deal">DEAL</button>
+				<button id="customDealToggle" class="btn btn-custom">
+					⚙️ CUSTOM
+				</button>
+			</div>
+
+			<div class="custom-deal-panel" id="customDealPanel">
+				<div class="custom-deal-header">
+					<h3>🎯 Custom Deal</h3>
+					<button id="customDealClose" class="close-btn">✕</button>
+				</div>
+				<div class="custom-deal-content">
+					<div class="custom-section">
+						<label>Player Card 1:</label>
+						<select id="playerCard1Value">
+							<option value="A">A</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+							<option value="7">7</option>
+							<option value="8">8</option>
+							<option value="9">9</option>
+							<option value="10" selected>10</option>
+							<option value="J">J</option>
+							<option value="Q">Q</option>
+							<option value="K">K</option>
+						</select>
+					</div>
+					<div class="custom-section">
+						<label>Player Card 2:</label>
+						<select id="playerCard2Value">
+							<option value="A">A</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6">6</option>
+							<option value="7">7</option>
+							<option value="8">8</option>
+							<option value="9">9</option>
+							<option value="10" selected>10</option>
+							<option value="J">J</option>
+							<option value="Q">Q</option>
+							<option value="K">K</option>
+						</select>
+					</div>
+					<div class="custom-section">
+						<label>Dealer Card (visible):</label>
+						<select id="dealerCard1Value">
+							<option value="A">A</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="6" selected>6</option>
+							<option value="7">7</option>
+							<option value="8">8</option>
+							<option value="9">9</option>
+							<option value="10">10</option>
+							<option value="J">J</option>
+							<option value="Q">Q</option>
+							<option value="K">K</option>
+						</select>
+					</div>
+					<button id="customDealBtn" class="btn btn-deal">
+						DEAL CUSTOM HAND
+					</button>
+				</div>
 			</div>
 
 			<div class="auto-area">

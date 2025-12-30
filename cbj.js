@@ -100,6 +100,15 @@ const newRoundBtn = document.getElementById("newRoundBtn");
 const autoPlayBtn = document.getElementById("autoPlayBtn");
 const superAutoBtn = document.getElementById("superAutoBtn");
 
+// Custom deal elements
+const customDealToggle = document.getElementById("customDealToggle");
+const customDealPanel = document.getElementById("customDealPanel");
+const customDealClose = document.getElementById("customDealClose");
+const customDealBtn = document.getElementById("customDealBtn");
+const playerCard1Value = document.getElementById("playerCard1Value");
+const playerCard2Value = document.getElementById("playerCard2Value");
+const dealerCard1Value = document.getElementById("dealerCard1Value");
+
 // Chart elements
 const chartToggle = document.getElementById("chartToggle");
 const chartWrapper = document.getElementById("chartWrapper");
@@ -1088,6 +1097,141 @@ function updateButtons() {
 }
 
 // Deal initial cards
+// Toggle custom deal panel
+function toggleCustomDealPanel() {
+	customDealPanel.classList.toggle("active");
+}
+
+// Deal custom hand with specified cards
+function dealCustomHand() {
+	const betAmount = parseInt(betInput.value);
+	if (isNaN(betAmount) || betAmount <= 0) {
+		showMessage("Please enter a valid bet amount", "lose");
+		return;
+	}
+
+	if (betAmount > bankroll) {
+		showMessage("Insufficient funds!", "lose");
+		return;
+	}
+
+	// Close custom deal panel
+	customDealPanel.classList.remove("active");
+
+	// Reset game state
+	currentBet = betAmount;
+	bankroll -= betAmount;
+	stats.totalWagered += betAmount;
+	playerHands = [[]];
+	playerBets = [betAmount];
+	doubledDown = [];
+	dealerHand = [];
+	currentHandIndex = 0;
+	gameInProgress = true;
+	canDouble = true;
+	canSplit = false;
+
+	// Hide betting area and deal button
+	bettingArea.style.display = "none";
+	dealBtn.disabled = true;
+
+	// Update display to show current bet immediately
+	updateDisplay();
+
+	// Helper function to get random suit
+	const getRandomSuit = () => {
+		const suits = ["♠️", "♥️", "♦️", "♣️"];
+		return suits[Math.floor(secureRandom() * suits.length)];
+	};
+
+	// Create custom cards with random suits
+	const playerCard1 = {
+		value: playerCard1Value.value,
+		suit: getRandomSuit(),
+	};
+	const playerCard2 = {
+		value: playerCard2Value.value,
+		suit: getRandomSuit(),
+	};
+	const dealerCard1 = {
+		value: dealerCard1Value.value,
+		suit: getRandomSuit(),
+	};
+
+	// Deal custom cards with animation
+	animateCustomDeal(playerCard1, playerCard2, dealerCard1);
+}
+
+// Animate custom card dealing
+function animateCustomDeal(playerCard1, playerCard2, dealerCard1) {
+	return new Promise((resolve) => {
+		playerHandsEl.innerHTML = "";
+		dealerCardsEl.innerHTML = "";
+
+		// Create player hand container
+		const handEl = document.createElement("div");
+		handEl.className = "hand";
+		const cardsEl = document.createElement("div");
+		cardsEl.className = "cards";
+		const totalEl = document.createElement("div");
+		totalEl.className = "hand-total";
+		handEl.appendChild(cardsEl);
+		handEl.appendChild(totalEl);
+		playerHandsEl.appendChild(handEl);
+
+		let delay = 0;
+
+		// First card to player (custom)
+		setTimeout(() => {
+			playerHands[0].push(playerCard1);
+			const cardEl = document.createElement("div");
+			cardEl.className = `card ${getCardColor(playerCard1.suit)}`;
+			cardEl.textContent = `${playerCard1.value}${playerCard1.suit}`;
+			cardsEl.appendChild(cardEl);
+		}, delay);
+		delay += 400;
+
+		// First card to dealer (custom, face up)
+		setTimeout(() => {
+			dealerHand.push(dealerCard1);
+			const cardEl = document.createElement("div");
+			cardEl.className = `card ${getCardColor(dealerCard1.suit)}`;
+			cardEl.textContent = `${dealerCard1.value}${dealerCard1.suit}`;
+			dealerCardsEl.appendChild(cardEl);
+			dealerTotalEl.textContent = `Total: ${calculateHandValue([
+				dealerCard1,
+			])}`;
+		}, delay);
+		delay += 400;
+
+		// Second card to player (custom)
+		setTimeout(() => {
+			playerHands[0].push(playerCard2);
+			const cardEl = document.createElement("div");
+			cardEl.className = `card ${getCardColor(playerCard2.suit)}`;
+			cardEl.textContent = `${playerCard2.value}${playerCard2.suit}`;
+			cardsEl.appendChild(cardEl);
+			totalEl.textContent = `Total: ${calculateHandValue(
+				playerHands[0]
+			)} | Bet: $${playerBets[0]}`;
+		}, delay);
+		delay += 400;
+
+		// Second card to dealer (from shoe, face down)
+		setTimeout(() => {
+			const card = dealCard();
+			dealerHand.push(card);
+			dealerHoleCard = card;
+			const cardEl = document.createElement("div");
+			cardEl.className = "card hidden";
+			cardEl.textContent = "🂠";
+			dealerCardsEl.appendChild(cardEl);
+			checkBlackjacks();
+			resolve();
+		}, delay);
+	});
+}
+
 function deal() {
 	const betAmount = parseInt(betInput.value);
 	if (isNaN(betAmount) || betAmount <= 0) {
@@ -2670,6 +2814,9 @@ autoPlayBtn.addEventListener("click", toggleAutoPlay);
 superAutoBtn.addEventListener("click", toggleSuperAuto);
 chartToggle.addEventListener("click", toggleChart);
 clearChartBtn.addEventListener("click", clearChartData);
+customDealToggle.addEventListener("click", toggleCustomDealPanel);
+customDealClose.addEventListener("click", toggleCustomDealPanel);
+customDealBtn.addEventListener("click", dealCustomHand);
 
 // Hint dialog listeners
 hintClose.addEventListener("click", closeHint);

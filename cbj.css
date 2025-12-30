@@ -593,6 +593,7 @@ h1 {
 	border: 2px solid #ffd700;
 	position: relative;
 	z-index: 1;
+	flex-wrap: wrap;
 }
 
 .betting-area label {
@@ -698,6 +699,141 @@ h1 {
 
 .btn-deal:not(:disabled):hover {
 	background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+}
+
+.btn-custom {
+	background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+	color: white;
+	font-size: 14px;
+	padding: 10px 15px;
+}
+
+.btn-custom:hover {
+	background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);
+	box-shadow: 0 6px 20px rgba(155, 89, 182, 0.5);
+}
+
+.custom-deal-panel {
+	display: none;
+	background: rgba(26, 35, 46, 0.98);
+	border: 2px solid #9b59b6;
+	border-radius: 15px;
+	padding: 20px;
+	margin: 20px 0;
+	box-shadow: 0 8px 32px rgba(155, 89, 182, 0.4);
+	position: relative;
+	z-index: 1;
+}
+
+.custom-deal-panel.active {
+	display: block;
+	animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+	from {
+		opacity: 0;
+		transform: translateY(-20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.custom-deal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 20px;
+	padding-bottom: 15px;
+	border-bottom: 2px solid #9b59b6;
+}
+
+.custom-deal-header h3 {
+	color: #9b59b6;
+	margin: 0;
+	font-size: 20px;
+	text-shadow: 0 0 10px rgba(155, 89, 182, 0.4);
+}
+
+.close-btn {
+	background: none;
+	border: none;
+	color: #e74c3c;
+	font-size: 24px;
+	cursor: pointer;
+	padding: 0;
+	width: 30px;
+	height: 30px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+	background: rgba(231, 76, 60, 0.2);
+	transform: rotate(90deg);
+}
+
+.custom-deal-content {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+.custom-section {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 12px;
+	background: rgba(155, 89, 182, 0.1);
+	border-radius: 8px;
+	transition: all 0.3s ease;
+	flex-wrap: wrap;
+}
+
+.custom-section:hover {
+	background: rgba(155, 89, 182, 0.2);
+}
+
+.custom-section label {
+	color: #ecf0f1;
+	font-weight: 600;
+	min-width: 180px;
+	font-size: 14px;
+}
+
+.custom-section select {
+	background: #1a232e;
+	color: #ecf0f1;
+	border: 2px solid #9b59b6;
+	border-radius: 8px;
+	padding: 8px 12px;
+	font-size: 16px;
+	font-weight: bold;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.custom-section select:hover {
+	border-color: #af7ac5;
+	background: #243447;
+}
+
+.custom-section select:focus {
+	outline: none;
+	border-color: #af7ac5;
+	box-shadow: 0 0 10px rgba(155, 89, 182, 0.5);
+}
+
+#customDealBtn {
+	margin-top: 10px;
+	width: 100%;
+	font-size: 16px;
+	padding: 12px;
 }
 
 /* Hit button - Teal/Cyan */
