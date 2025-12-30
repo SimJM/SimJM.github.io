@@ -238,20 +238,14 @@ function getBasicStrategyMove(hand, dealerUpcard) {
 	const isPair = hand.length === 2 && hand[0].value === hand[1].value;
 
 	// Check for pair splitting
-	if (isPair && playerHands.length === 1 && bankroll >= currentBet) {
+	// Note: The calling code should check canSplit flag and bankroll availability
+	if (isPair) {
 		const pairValue = hand[0].value;
 		// Always split Aces and 8s
 		if (pairValue === "A" || pairValue === "8") return "split";
-		// Never split 10s, 5s, 4s
-		if (
-			["K", "Q", "J", "10"].includes(pairValue) ||
-			pairValue === "5" ||
-			pairValue === "4"
-		) {
-			// Continue to regular strategy
-		} else if (["2", "3", "6", "7"].includes(pairValue)) {
-			if (dealerUpcard >= 2 && dealerUpcard <= 6) return "split";
-		} else if (pairValue === "9") {
+
+		// Pair of 9s: Split vs 2-6, 8-9 (skip 7, stand vs 10/A)
+		if (pairValue === "9") {
 			if (
 				(dealerUpcard >= 2 && dealerUpcard <= 6) ||
 				dealerUpcard === 8 ||
@@ -267,6 +261,35 @@ function getBasicStrategyMove(hand, dealerUpcard) {
 				return "stand";
 			}
 		}
+
+		// Pair of 7s: Split vs 2-7
+		if (pairValue === "7") {
+			if (dealerUpcard >= 2 && dealerUpcard <= 7) return "split";
+		}
+
+		// Pair of 6s: Split vs 2-6
+		if (pairValue === "6") {
+			if (dealerUpcard >= 2 && dealerUpcard <= 6) return "split";
+		}
+
+		// Pair of 4s: Split vs 5-6 only
+		if (pairValue === "4") {
+			if (dealerUpcard >= 5 && dealerUpcard <= 6) return "split";
+		}
+
+		// Pair of 3s: Split vs 2-7
+		if (pairValue === "3") {
+			if (dealerUpcard >= 2 && dealerUpcard <= 7) return "split";
+		}
+
+		// Pair of 2s: Split vs 2-7
+		if (pairValue === "2") {
+			if (dealerUpcard >= 2 && dealerUpcard <= 7) return "split";
+		}
+
+		// Never split 10s or 5s - continue to regular strategy
+		// 10s: treat as 20 (stand)
+		// 5s: treat as 10 (double if possible, else hit)
 	}
 
 	// Soft hands
@@ -284,8 +307,8 @@ function getBasicStrategyMove(hand, dealerUpcard) {
 			if (dealerUpcard >= 2 && dealerUpcard <= 8) return "stand";
 			return "hit";
 		}
-		// Soft 17 or less
-		if (hand.length === 2 && playerValue >= 15 && playerValue <= 18) {
+		// Soft 16-17 (A,5 / A,6) - per documented strategy
+		if (hand.length === 2 && playerValue >= 16 && playerValue <= 17) {
 			if (
 				dealerUpcard >= 4 &&
 				dealerUpcard <= 6 &&
@@ -1910,6 +1933,7 @@ function instantPlayHand() {
 			move === "split" &&
 			canSplit &&
 			currentHand.length === 2 &&
+			currentHand[0].value === currentHand[1].value &&
 			bankroll >= playerBets[currentHandIndex]
 		) {
 			// Split
@@ -1926,6 +1950,7 @@ function instantPlayHand() {
 			playerHands[playerHands.length - 1].push(dealCard());
 
 			canSplit = false;
+			canDouble = true; // Allow doubling after split on first hand
 			playerValue = calculateHandValue(currentHand);
 		} else {
 			// Can't perform preferred action, hit instead

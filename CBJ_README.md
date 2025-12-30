@@ -948,6 +948,102 @@ function moveToNextHand() {
 -   Statistics updated only once at completion for maximum speed
 -   Proper handling of blackjack scenarios to prevent duplicate stat increments
 
+#### Split and Double Down Implementation in Auto-Play
+
+Both auto-play modes correctly execute splitting and doubling decisions based on Basic Strategy. The implementation ensures:
+
+**Strategy Decision Function** (`getBasicStrategyMove`):
+
+```javascript
+function getBasicStrategyMove(hand, dealerUpcard) {
+    const isPair = hand.length === 2 && hand[0].value === hand[1].value;
+
+    // Returns 'split', 'double', 'hit', or 'stand'
+    // The function determines the optimal move without checking constraints
+    // Constraint validation (bankroll, canSplit flag) is handled by calling code
+}
+```
+
+**Key Design Principles**:
+
+-   **Separation of Concerns**: Strategy function returns optimal move, execution code validates constraints
+-   **Constraint Validation**: Split/double decisions validated at execution time with:
+    -   `canSplit` flag (prevents multiple splits per round)
+    -   `canDouble` flag (ensures only on first two cards)
+    -   Bankroll availability check
+    -   Hand length verification (2 cards required)
+-   **Fallback Logic**: If optimal move can't be executed (insufficient funds, constraints), falls back to next best action
+
+**Auto Play Mode** (Animated):
+
+```javascript
+function autoPlayCurrentHand() {
+    const move = getBasicStrategyMove(currentHand, dealerUpcard);
+
+    switch(move) {
+        case 'split':
+            if (!splitBtn.disabled) {
+                split(); // Executes split with validation
+            } else {
+                // Fallback: recalculate alternative move
+                hit();
+            }
+            break;
+        case 'double':
+            if (!doubleBtn.disabled) {
+                doubleDown(); // Executes double with validation
+            } else {
+                hit(); // Fallback if can't double
+            }
+            break;
+    }
+}
+```
+
+**Super Auto Mode** (Instant):
+
+```javascript
+function instantPlayHand() {
+    while (playerValue < 21) {
+        const move = getBasicStrategyMove(currentHand, dealerUpcard);
+
+        if (move === 'split' &&
+            canSplit &&
+            currentHand.length === 2 &&
+            currentHand[0].value === currentHand[1].value &&
+            bankroll >= playerBets[currentHandIndex]) {
+            // Execute split instantly
+            // Creates second hand, deals new cards
+            // Sets canSplit = false to prevent re-splitting
+            // Resets canDouble = true for first split hand
+        }
+        else if (move === 'double' &&
+                 currentHand.length === 2 &&
+                 bankroll >= playerBets[currentHandIndex]) {
+            // Execute double down instantly
+            // Doubles bet, draws one card, breaks loop
+            stats.doubleDownAttempts++;
+        }
+    }
+}
+```
+
+**Correct Behavior Examples**:
+
+-   **Pair of 8s vs Dealer 10**: Strategy returns "split", auto-play executes if bankroll allows
+-   **11 vs Dealer 6**: Strategy returns "double", auto-play doubles down
+-   **Soft 18 (A,7) vs Dealer 5**: Strategy returns "double", auto-play doubles down
+-   **After Split**: `canSplit = false` prevents re-splitting, but `canDouble = true` allows doubling on split hands
+
+**Bug Fix (Dec 2024)**:
+
+Prior versions had an issue where `getBasicStrategyMove()` included constraint checking (`playerHands.length === 1`), which prevented correct split suggestions after the initial deal. Fixed by:
+
+1. Removing constraint checks from strategy function
+2. Moving all validation to execution layer
+3. Adding explicit pair validation in `instantPlayHand()`
+4. Ensuring `canDouble` resets properly after splits
+
 **Performance**:
 
 -   Can simulate 100+ rounds in milliseconds
