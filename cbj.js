@@ -130,6 +130,8 @@ const dealerHandHistoryEl = document.getElementById("dealerHandHistory");
 const roiEl = document.getElementById("roi");
 const dealerBustRateEl = document.getElementById("dealerBustRate");
 const avgBetSizeEl = document.getElementById("avgBetSize");
+const doublesCountEl = document.getElementById("doublesCount");
+const splitsCountEl = document.getElementById("splitsCount");
 const ddSuccessRateEl = document.getElementById("ddSuccessRate");
 const splitSuccessRateEl = document.getElementById("splitSuccessRate");
 const dealerBJEl = document.getElementById("dealerBJ");
@@ -639,6 +641,9 @@ function updateDisplay() {
 			? (stats.totalWagered / stats.handsPlayed).toFixed(2)
 			: 0;
 	avgBetSizeEl.textContent = `$${avgBetSize}`;
+
+	doublesCountEl.textContent = stats.doubleDownAttempts;
+	splitsCountEl.textContent = stats.splitAttempts;
 
 	const ddSuccessRate =
 		stats.doubleDownAttempts > 0
@@ -2276,12 +2281,14 @@ function instantResolveHands() {
 		stats.pushes++;
 		stats.handHistory.push("P");
 		stats.playerHandHistory.push(playerOutcome);
+		stats.dealerHandHistory.push(dealerOutcome);
 		stats.streak = 0;
 		stats.streakType = null;
 	} else if (hasWin && !hasLoss) {
 		stats.wins++;
 		stats.handHistory.push("W");
 		stats.playerHandHistory.push(playerOutcome);
+		stats.dealerHandHistory.push(dealerOutcome);
 		if (stats.streakType === "win") {
 			stats.streak++;
 			if (stats.streak > stats.longestWinStreak) {
@@ -2295,6 +2302,7 @@ function instantResolveHands() {
 		stats.losses++;
 		stats.handHistory.push("L");
 		stats.playerHandHistory.push(playerOutcome);
+		stats.dealerHandHistory.push(dealerOutcome);
 		if (stats.streakType === "loss") {
 			stats.streak++;
 			if (stats.streak > stats.longestLossStreak) {
@@ -2310,13 +2318,26 @@ function instantResolveHands() {
 			stats.wins++;
 			stats.handHistory.push("W");
 			stats.playerHandHistory.push(playerOutcome);
+			stats.dealerHandHistory.push(dealerOutcome);
 		} else {
 			stats.losses++;
 			stats.handHistory.push("L");
 			stats.playerHandHistory.push(playerOutcome);
+			stats.dealerHandHistory.push(dealerOutcome);
 		}
 		stats.streak = 0;
 		stats.streakType = null;
+	}
+
+	// Keep only last 50 outcomes for all histories
+	if (stats.handHistory.length > 50) {
+		stats.handHistory = stats.handHistory.slice(-50);
+	}
+	if (stats.playerHandHistory.length > 50) {
+		stats.playerHandHistory = stats.playerHandHistory.slice(-50);
+	}
+	if (stats.dealerHandHistory.length > 50) {
+		stats.dealerHandHistory = stats.dealerHandHistory.slice(-50);
 	}
 
 	gameInProgress = false;
