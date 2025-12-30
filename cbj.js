@@ -51,10 +51,13 @@ let stats = {
 	largestWin: 0,
 	blackjacks: 0,
 	busts: 0,
-	handHistory: [], // Last 30 hands: 'W', 'L', 'P'
+	handHistory: [], // Last 50 hands: 'W', 'L', 'P'
 	dealerBusts: 0,
 	doubleDownAttempts: 0,
 	doubleDownWins: 0,
+	splitAttempts: 0,
+	splitWins: 0,
+	dealerOutcomes: [], // Last 50 dealer outcomes: 'BJ', '21', '20', '19', '18', '17', 'Bust'
 };
 
 // Card suits and values
@@ -124,6 +127,14 @@ const roiEl = document.getElementById("roi");
 const dealerBustRateEl = document.getElementById("dealerBustRate");
 const avgBetSizeEl = document.getElementById("avgBetSize");
 const ddSuccessRateEl = document.getElementById("ddSuccessRate");
+const splitSuccessRateEl = document.getElementById("splitSuccessRate");
+const dealerBJEl = document.getElementById("dealerBJ");
+const dealer21El = document.getElementById("dealer21");
+const dealer20El = document.getElementById("dealer20");
+const dealer19El = document.getElementById("dealer19");
+const dealer18El = document.getElementById("dealer18");
+const dealer17El = document.getElementById("dealer17");
+const dealerBustCountEl = document.getElementById("dealerBustCount");
 const statsToggle = document.getElementById("statsToggle");
 const statsPanelWrapper = document.getElementById("statsPanelWrapper");
 const statsToggleIcon = document.getElementById("statsToggleIcon");
@@ -625,10 +636,41 @@ function updateDisplay() {
 		ddSuccessRate >= 50 ? "win" : ddSuccessRate > 0 ? "lose" : ""
 	}`;
 
+	const splitSuccessRate =
+		stats.splitAttempts > 0
+			? ((stats.splitWins / stats.splitAttempts) * 100).toFixed(1)
+			: 0;
+	splitSuccessRateEl.textContent = `${splitSuccessRate}%`;
+	splitSuccessRateEl.className = `stat-value ${
+		splitSuccessRate >= 50 ? "win" : splitSuccessRate > 0 ? "lose" : ""
+	}`;
+
+	// Update dealer outcomes (last 50)
+	const last50 = stats.dealerOutcomes.slice(-50);
+	const outcomeCount = {
+		BJ: 0,
+		21: 0,
+		20: 0,
+		19: 0,
+		18: 0,
+		17: 0,
+		Bust: 0,
+	};
+	last50.forEach((outcome) => {
+		outcomeCount[outcome]++;
+	});
+	dealerBJEl.textContent = outcomeCount.BJ;
+	dealer21El.textContent = outcomeCount["21"];
+	dealer20El.textContent = outcomeCount["20"];
+	dealer19El.textContent = outcomeCount["19"];
+	dealer18El.textContent = outcomeCount["18"];
+	dealer17El.textContent = outcomeCount["17"];
+	dealerBustCountEl.textContent = outcomeCount.Bust;
+
 	// Update hand history
 	handHistoryEl.innerHTML = "";
-	const last30 = stats.handHistory.slice(-30);
-	last30.forEach((result) => {
+	const last50Hands = stats.handHistory.slice(-50);
+	last50Hands.forEach((result) => {
 		const badge = document.createElement("div");
 		const resultClass =
 			result === "W" ? "win" : result === "L" ? "lose" : "push";
@@ -1267,6 +1309,9 @@ function split() {
 		return;
 	}
 
+	// Track split attempt
+	stats.splitAttempts++;
+
 	bankroll -= currentBet;
 	const currentHand = playerHands[0];
 	const splitCard = currentHand.pop();
@@ -1309,16 +1354,31 @@ function resolveRound() {
 	const dealerValue = calculateHandValue(dealerHand);
 	const dealerBust = dealerValue > 21;
 
-	// Track dealer busts
-	if (dealerBust) {
+	// Track dealer outcome
+	const dealerBlackjack = checkBlackjack(dealerHand);
+	if (dealerBlackjack) {
+		stats.dealerOutcomes.push("BJ");
+	} else if (dealerBust) {
+		stats.dealerOutcomes.push("Bust");
 		stats.dealerBusts++;
+	} else {
+		stats.dealerOutcomes.push(dealerValue.toString());
 	}
+
+	// Keep only last 50 outcomes
+	if (stats.dealerOutcomes.length > 50) {
+		stats.dealerOutcomes = stats.dealerOutcomes.slice(-50);
+	}
+
+	// Check if this was a split hand
+	const wasSplit = playerHands.length > 1;
 
 	let totalWinnings = 0;
 	let resultMessages = [];
 	let hasWin = false;
 	let hasLoss = false;
 	let allPush = true;
+	let splitHandWins = 0;
 
 	playerHands.forEach((hand, index) => {
 		const playerValue = calculateHandValue(hand);
@@ -1335,12 +1395,14 @@ function resolveRound() {
 			resultMessages.push(`Hand ${index + 1}: Win!`);
 			hasWin = true;
 			allPush = false;
+			if (wasSplit) splitHandWins++;
 			if (wasDoubled) stats.doubleDownWins++;
 		} else if (playerValue > dealerValue) {
 			totalWinnings += bet * 2;
 			resultMessages.push(`Hand ${index + 1}: Win!`);
 			hasWin = true;
 			allPush = false;
+			if (wasSplit) splitHandWins++;
 			if (wasDoubled) stats.doubleDownWins++;
 		} else if (playerValue === dealerValue) {
 			totalWinnings += bet;
@@ -1351,6 +1413,11 @@ function resolveRound() {
 			allPush = false;
 		}
 	});
+
+	// Track split wins (count as win if at least one hand wins)
+	if (wasSplit && splitHandWins > 0) {
+		stats.splitWins++;
+	}
 
 	bankroll += totalWinnings;
 
@@ -1837,6 +1904,18 @@ function instantDeal() {
 	if (playerBlackjack || dealerBlackjack) {
 		stats.handsPlayed++;
 
+		// Track dealer outcome
+		if (dealerBlackjack) {
+			stats.dealerOutcomes.push("BJ");
+		} else if (playerBlackjack) {
+			const dValue = calculateHandValue(dealerHand);
+			stats.dealerOutcomes.push(dValue.toString());
+		}
+
+		// Keep only last 50 outcomes
+		if (stats.dealerOutcomes.length > 50) {
+			stats.dealerOutcomes = stats.dealerOutcomes.slice(-50);
+		}
 		if (playerBlackjack && dealerBlackjack) {
 			bankroll += currentBet;
 			stats.pushes++;
@@ -2000,10 +2079,29 @@ function instantResolveHands() {
 	const dealerValue = calculateHandValue(dealerHand);
 	const dealerBust = dealerValue > 21;
 
+	// Track dealer outcome
+	const dealerBlackjack = checkBlackjack(dealerHand);
+	if (dealerBlackjack) {
+		stats.dealerOutcomes.push("BJ");
+	} else if (dealerBust) {
+		stats.dealerOutcomes.push("Bust");
+	} else {
+		stats.dealerOutcomes.push(dealerValue.toString());
+	}
+
+	// Keep only last 50 outcomes
+	if (stats.dealerOutcomes.length > 50) {
+		stats.dealerOutcomes = stats.dealerOutcomes.slice(-50);
+	}
+
+	// Check if this was a split hand
+	const wasSplit = playerHands.length > 1;
+
 	let totalWinnings = 0;
 	let hasWin = false;
 	let hasLoss = false;
 	let allPush = true;
+	let splitHandWins = 0;
 
 	playerHands.forEach((hand, index) => {
 		const playerValue = calculateHandValue(hand);
@@ -2019,11 +2117,13 @@ function instantResolveHands() {
 			hasWin = true;
 			allPush = false;
 			if (wasDoubled) stats.doubleDownWins++;
+			if (wasSplit) splitHandWins++;
 		} else if (playerValue > dealerValue) {
 			totalWinnings += bet * 2;
 			hasWin = true;
 			allPush = false;
 			if (wasDoubled) stats.doubleDownWins++;
+			if (wasSplit) splitHandWins++;
 		} else if (playerValue === dealerValue) {
 			totalWinnings += bet;
 		} else {
@@ -2032,6 +2132,10 @@ function instantResolveHands() {
 		}
 	});
 
+	// Track split wins (count as win if at least one hand wins)
+	if (wasSplit && splitHandWins > 0) {
+		stats.splitWins++;
+	}
 	bankroll += totalWinnings;
 
 	const profit = totalWinnings - currentBet;
