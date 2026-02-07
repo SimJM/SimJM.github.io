@@ -59,4 +59,22 @@ window.addEventListener("DOMContentLoaded", () => {
 		bookNowBtn.removeEventListener("click", handleNav);
 		bookNowBtn.addEventListener("click", handleNav);
 	}
+
+	// Valentine page navigation
+	const valentine1Btn = document.getElementById("valentine1Btn");
+	const valentine2Btn = document.getElementById("valentine2Btn");
+
+	if (valentine1Btn) {
+		valentine1Btn.addEventListener("click", (e) => {
+			e.preventDefault();
+			window.location.href = "BeMyValentine/index.html";
+		});
+	}
+
+	if (valentine2Btn) {
+		valentine2Btn.addEventListener("click", (e) => {
+			e.preventDefault();
+			window.location.href = "LoveMeValentine/index.html";
+		});
+	}
 });
