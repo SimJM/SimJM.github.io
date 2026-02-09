@@ -171,7 +171,7 @@ function createChallengeURL(puzzle) {
 	const encodedPuzzle = encodePuzzle(puzzle);
 	const baseUrl =
 		window.location.origin +
-		window.location.pathname.replace("tango-admin.html", "tango.html");
+		window.location.pathname.replace("/TangoAdmin/index.html", "/Tango/index.html");
 	return `${baseUrl}?puzzle=${encodedPuzzle}`;
 }
 
