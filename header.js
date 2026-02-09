@@ -68,15 +68,30 @@ window.headerManager = {
 		},
 	},
 
-	// Get current page filename
+	// Get current page filename or directory name
 	getCurrentPage() {
 		const path = window.location.pathname;
+		const segments = path.split("/").filter(Boolean);
+		
+		// If we're in a subdirectory with index.html
+		if (segments.length > 1 && segments[segments.length - 1] === "index.html") {
+			// Return the directory name + .html (e.g., "Portfolio" -> "portfolio.html")
+			return segments[segments.length - 2].toLowerCase() + ".html";
+		}
+		
+		// Otherwise, return the filename
 		return path.substring(path.lastIndexOf("/") + 1) || "index.html";
 	},
 
 	// Load and configure header
 	loadHeader() {
-		return fetch("header.html")
+		// Determine header path based on current location
+		const path = window.location.pathname;
+		const headerPath = path.includes("/") && !path.endsWith("/") && path.split("/").length > 2
+			? "../header.html"
+			: "header.html";
+			
+		return fetch(headerPath)
 			.then((response) => response.text())
 			.then((data) => {
 				document.getElementById("header-placeholder").innerHTML = data;
