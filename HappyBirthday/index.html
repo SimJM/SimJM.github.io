@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Happy Birthday! 🎂</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap"
+			rel="stylesheet" />
+		<link rel="stylesheet" href="styles.css" />
+	</head>
+	<body>
+		<!-- Floating animal decorations -->
+		<div class="floating-animals">
+			<span class="animal" style="top: 10%; left: 10%;">🌺</span>
+			<span class="animal" style="top: 20%; left: 80%;">🐶</span>
+			<span class="animal" style="top: 70%; left: 15%;">🐾</span>
+			<span class="animal" style="top: 80%; left: 85%;">💖</span>
+			<span class="animal" style="top: 40%; left: 5%;">🌸</span>
+			<span class="animal" style="top: 60%; left: 90%;">🌺</span>
+		</div>
+
+		<!-- State 1: Photo Container -->
+		<div class="photo-container" id="photoContainer">
+			<div class="photo-frame">
+				<div class="photo-placeholder">
+					<img
+						src="asset/photo.jpg"
+						alt="Us Together"
+						class="couple-photo" />
+					<div class="photo-decoration">
+						<span class="deco-paw">🐾</span>
+						<span class="deco-heart">💕</span>
+					</div>
+				</div>
+			</div>
+			<h1 class="birthday-heading">
+				Ready for Your Birthday Surprise? 🎉
+			</h1>
+			<div class="button-container">
+				<button class="yes-button" id="yesBtn">
+					Open My Present! 🎁
+				</button>
+				<button class="no-button" id="noBtn">Maybe Later...</button>
+			</div>
+			<p class="hint-text" id="hintText"></p>
+		</div>
+
+		<!-- State 2: Loader Container -->
+		<div class="loader-container" id="loaderContainer">
+			<div class="animal-loader">
+				<div class="bouncing-bunny">�</div>
+				<div class="bouncing-heart">💖</div>
+				<div class="bouncing-butterfly">🌺</div>
+			</div>
+			<p class="loading-text">Preparing your surprise...</p>
+		</div>
+
+		<!-- State 3: Gift Container -->
+		<div class="gift-container" id="giftContainer">
+			<div class="gift-box" id="giftBox">
+				<div class="gift-lid">
+					<div class="ribbon-bow">🎀</div>
+				</div>
+				<div class="gift-body">
+					<div class="gift-wrap">🎁</div>
+				</div>
+			</div>
+			<p class="gift-instruction">Click to unwrap! 🎁</p>
+		</div>
+
+		<!-- State 4: Card Container -->
+		<div class="card-container" id="cardContainer">
+			<div class="birthday-card">
+				<div class="card-header">
+					<h2>Happy Birthday, My Love! 🎂</h2>
+					<div class="card-decorations">
+						<span>🌺</span>
+						<span>💖</span>
+						<span>🐶</span>
+					</div>
+				</div>
+				<div class="card-body">
+					<div class="message-section">
+						<p class="sweet-message">
+							To my wonderful girlfriend and the love of my
+							life,<br /><br />
+							Every moment with you is a gift. Your smile
+							brightens my days, your laughter fills my heart with
+							joy, and your love makes everything better. I'm so
+							grateful to celebrate another year of your beautiful
+							existence.<br /><br />
+							You make ordinary days extraordinary, and I can't
+							wait to create more wonderful memories together.
+							Here's to you, to us, and to all the adventures that
+							await! 🌟
+						</p>
+					</div>
+					<div class="plans-section">
+						<h3>✨ Birthday Plans ✨</h3>
+						<p class="birthday-plans">
+							Pack your bags for an unforgettable staycation at
+							Marina Bay Sands! We'll be living it up in luxury
+							with stunning views, incredible dining, and quality
+							time together. And guess what? LKG will be joining
+							us for the celebrations too!<br /><br />
+							Get ready for pampering, delicious food, amazing
+							experiences, and creating beautiful memories in one
+							of the most iconic places in the city. This is going
+							to be spectacular! 🌟🎉
+						</p>
+					</div>
+					<div class="card-footer">
+						<p class="signature">
+							With all my love,<br />Your Person 💕
+						</p>
+						<button class="replay-button" id="replayBtn">
+							See Animations Again ✨
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Scattered animals container (for funky effect) -->
+		<div class="scattered-animals" id="scatteredAnimals"></div>
+
+		<script src="script.js"></script>
+	</body>
+</html>
