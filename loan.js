@@ -3,14 +3,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	const calculateBtn = document.getElementById("calculateLoanBtn");
 	const earlyRepaymentBtn = document.getElementById(
-		"calculateEarlyRepaymentBtn"
+		"calculateEarlyRepaymentBtn",
 	);
 	const resultDiv = document.getElementById("loanResult");
 	const earlyRepaymentSection = document.getElementById(
-		"earlyRepaymentSection"
+		"earlyRepaymentSection",
 	);
 	const earlyRepaymentResult = document.getElementById(
-		"earlyRepaymentResult"
+		"earlyRepaymentResult",
 	);
 	const priceInput = document.getElementById("loanPrice");
 	const downPaymentInput = document.getElementById("downPayment");
@@ -21,6 +21,16 @@ document.addEventListener("DOMContentLoaded", function () {
 	const extraPaymentInput = document.getElementById("extraPayment");
 	const lumpSumPaymentInput = document.getElementById("lumpSumPayment");
 	const monthsPaidInput = document.getElementById("monthsPaid");
+	const calculateMaxLoanBtn = document.getElementById("calculateMaxLoanBtn");
+	const grossMonthlyIncomeInput =
+		document.getElementById("grossMonthlyIncome");
+	const existingMonthlyDebtInput = document.getElementById(
+		"existingMonthlyDebt",
+	);
+	const maxLoanInterestRateInput = document.getElementById(
+		"maxLoanInterestRate",
+	);
+	const maxLoanTenureInput = document.getElementById("maxLoanTenure");
 
 	// Add number formatting for price and early repayment inputs
 	priceInput.addEventListener("input", function (e) {
@@ -42,6 +52,14 @@ document.addEventListener("DOMContentLoaded", function () {
 		formatPriceInput(e.target);
 	});
 
+	grossMonthlyIncomeInput.addEventListener("input", function (e) {
+		formatPriceInput(e.target);
+	});
+
+	existingMonthlyDebtInput.addEventListener("input", function (e) {
+		formatPriceInput(e.target);
+	});
+
 	// Add blur events
 	priceInput.addEventListener("blur", function (e) {
 		formatPriceInput(e.target);
@@ -56,6 +74,14 @@ document.addEventListener("DOMContentLoaded", function () {
 	});
 
 	lumpSumPaymentInput.addEventListener("blur", function (e) {
+		formatPriceInput(e.target);
+	});
+
+	grossMonthlyIncomeInput.addEventListener("blur", function (e) {
+		formatPriceInput(e.target);
+	});
+
+	existingMonthlyDebtInput.addEventListener("blur", function (e) {
 		formatPriceInput(e.target);
 	});
 
@@ -74,6 +100,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
 	monthsPaidInput.addEventListener("input", function (e) {
 		validateIntegerInput(e.target, 0, 1200);
+	});
+
+	maxLoanInterestRateInput.addEventListener("input", function (e) {
+		validatePercentageInput(e.target, 0, 1000);
+	});
+
+	maxLoanTenureInput.addEventListener("input", function (e) {
+		validateIntegerInput(e.target, 1, 100);
 	});
 
 	// Auto-calculate loan balance when months paid changes
@@ -102,6 +136,14 @@ document.addEventListener("DOMContentLoaded", function () {
 		this.style.background = "#28a745";
 	});
 
+	calculateMaxLoanBtn.addEventListener("mouseenter", function () {
+		this.style.background = "#e84419";
+	});
+
+	calculateMaxLoanBtn.addEventListener("mouseleave", function () {
+		this.style.background = "#f9532d";
+	});
+
 	// Add event listeners
 	calculateBtn.addEventListener("click", function () {
 		// Reset Early Repayment Calculator first
@@ -115,11 +157,16 @@ document.addEventListener("DOMContentLoaded", function () {
 	});
 
 	earlyRepaymentBtn.addEventListener("click", calculateEarlyRepayment);
+	calculateMaxLoanBtn.addEventListener("click", calculateMaxLoanByRatios);
 
 	// Allow Enter key to trigger calculation
 	document.addEventListener("keypress", function (e) {
 		if (e.key === "Enter") {
-			if (document.activeElement.closest("#earlyRepaymentSection")) {
+			if (document.activeElement.closest("#maxLoanSection")) {
+				calculateMaxLoanByRatios();
+			} else if (
+				document.activeElement.closest("#earlyRepaymentSection")
+			) {
 				calculateEarlyRepayment();
 			} else {
 				// Reset Early Repayment Calculator first
@@ -132,6 +179,14 @@ document.addEventListener("DOMContentLoaded", function () {
 				earlyRepaymentSection.style.display = "block";
 			}
 		}
+	});
+
+	maxLoanInterestRateInput.addEventListener("blur", function (e) {
+		validatePercentageInput(e.target, 0, 1000);
+	});
+
+	maxLoanTenureInput.addEventListener("blur", function (e) {
+		validateIntegerInput(e.target, 1, 100);
 	});
 });
 
@@ -301,13 +356,13 @@ function calculateLoan() {
 	// Get input values
 	const price = parsePriceInput(document.getElementById("loanPrice"));
 	const downPaymentPercent = parseFloat(
-		document.getElementById("downPayment").value
+		document.getElementById("downPayment").value,
 	);
 	const annualInterestRate = parseFloat(
-		document.getElementById("interestRate").value
+		document.getElementById("interestRate").value,
 	);
 	const loanPeriodYears = parseInt(
-		document.getElementById("loanPeriod").value
+		document.getElementById("loanPeriod").value,
 	);
 	const resultDiv = document.getElementById("loanResult");
 
@@ -317,7 +372,7 @@ function calculateLoan() {
 			price,
 			downPaymentPercent,
 			annualInterestRate,
-			loanPeriodYears
+			loanPeriodYears,
 		)
 	) {
 		showError("Please fill in all fields with valid values.");
@@ -330,7 +385,7 @@ function calculateLoan() {
 			price,
 			downPaymentPercent,
 			annualInterestRate,
-			loanPeriodYears
+			loanPeriodYears,
 		);
 
 		// Calculate BSD
@@ -342,9 +397,154 @@ function calculateLoan() {
 	} catch (error) {
 		console.error("Calculation error:", error);
 		showError(
-			"An error occurred during calculation. Please check your inputs."
+			"An error occurred during calculation. Please check your inputs.",
 		);
 	}
+}
+
+function calculateMaxLoanByRatios() {
+	const grossMonthlyIncome = parsePriceInput(
+		document.getElementById("grossMonthlyIncome"),
+	);
+	const existingMonthlyDebt = parsePriceInput(
+		document.getElementById("existingMonthlyDebt"),
+	);
+	const annualInterestRate = parseFloat(
+		document.getElementById("maxLoanInterestRate").value,
+	);
+	const loanTenureYears = parseInt(
+		document.getElementById("maxLoanTenure").value,
+	);
+
+	if (
+		isNaN(grossMonthlyIncome) ||
+		grossMonthlyIncome <= 0 ||
+		isNaN(existingMonthlyDebt) ||
+		existingMonthlyDebt < 0 ||
+		isNaN(annualInterestRate) ||
+		annualInterestRate < 0 ||
+		isNaN(loanTenureYears) ||
+		loanTenureYears <= 0
+	) {
+		showMaxLoanError(
+			"Please enter valid values for monthly income, debt, interest rate, and loan tenure.",
+		);
+		return;
+	}
+
+	const msrMonthlyLimit = grossMonthlyIncome * 0.3;
+	const tdsrMonthlyLimit = grossMonthlyIncome * 0.55 - existingMonthlyDebt;
+	const usableTdsrLimit = Math.max(0, tdsrMonthlyLimit);
+
+	const monthlyInterestRate = annualInterestRate / 100 / 12;
+	const totalPayments = loanTenureYears * 12;
+
+	function loanFromInstallment(installment) {
+		if (installment <= 0) return 0;
+		if (monthlyInterestRate > 0) {
+			const growthFactor = Math.pow(
+				1 + monthlyInterestRate,
+				totalPayments,
+			);
+			return (
+				(installment * (growthFactor - 1)) /
+				(monthlyInterestRate * growthFactor)
+			);
+		}
+		return installment * totalPayments;
+	}
+
+	const maxLoanMSR = loanFromInstallment(msrMonthlyLimit);
+	const maxLoanTDSR = loanFromInstallment(usableTdsrLimit);
+
+	displayMaxLoanResults({
+		grossMonthlyIncome,
+		existingMonthlyDebt,
+		annualInterestRate,
+		loanTenureYears,
+		msrMonthlyLimit,
+		tdsrMonthlyLimit: usableTdsrLimit,
+		maxLoanMSR,
+		maxLoanTDSR,
+	});
+}
+
+function displayMaxLoanResults(data) {
+	const resultDiv = document.getElementById("maxLoanResult");
+
+	const bindingLoan = Math.min(
+		data.maxLoanMSR,
+		data.maxLoanTDSR > 0 ? data.maxLoanTDSR : data.maxLoanMSR,
+	);
+	const bindingRule =
+		data.maxLoanMSR <=
+		(data.maxLoanTDSR > 0 ? data.maxLoanTDSR : data.maxLoanMSR)
+			? "MSR (30%)"
+			: "TDSR (55%)";
+
+	const html = `
+		<h2 style="color: #f9532d; margin-bottom: 25px; border-bottom: 2px solid #f9532d; padding-bottom: 10px;">
+			<i class="bx bx-line-chart"></i> Max Loan Estimation
+		</h2>
+
+		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+			<div style="background: #f0f8ff; padding: 20px; border-radius: 8px; border-left: 4px solid #2196f3; text-align: center;">
+				<h3 style="color: #333; margin-bottom: 6px; font-size: 1em;">Max Loan (MSR 30%)</h3>
+				<p style="font-size: 1.6em; font-weight: bold; color: #2196f3; margin: 0;">
+					$${formatNumber(data.maxLoanMSR)}
+				</p>
+				<p style="margin: 8px 0 0 0; color: #666; font-size: 0.85em;">
+					Cap: <strong>$${formatNumber(data.msrMonthlyLimit)}/mth</strong>
+				</p>
+			</div>
+
+			<div style="background: #f0f8ff; padding: 20px; border-radius: 8px; border-left: 4px solid #2196f3; text-align: center;">
+				<h3 style="color: #333; margin-bottom: 6px; font-size: 1em;">Max Loan (TDSR 55%)</h3>
+				<p style="font-size: 1.6em; font-weight: bold; color: #2196f3; margin: 0;">
+					${data.maxLoanTDSR > 0 ? "$" + formatNumber(data.maxLoanTDSR) : "—"}
+				</p>
+				<p style="margin: 8px 0 0 0; color: #666; font-size: 0.85em;">
+					Cap: <strong>${data.tdsrMonthlyLimit > 0 ? "$" + formatNumber(data.tdsrMonthlyLimit) + "/mth" : "Exceeded by existing debt"}</strong>
+				</p>
+			</div>
+		</div>
+
+		<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+			<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+				<h4 style="color: #333; margin-bottom: 8px;">Interest Rate</h4>
+				<p style="font-weight: bold; color: #666; margin: 0;">${data.annualInterestRate}% APR</p>
+			</div>
+
+			<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
+				<h4 style="color: #333; margin-bottom: 8px;">Loan Tenure</h4>
+				<p style="font-weight: bold; color: #666; margin: 0;">${data.loanTenureYears} years</p>
+			</div>
+		</div>
+
+		<div style="margin-top: 20px; padding: 15px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+			<p style="margin: 0; font-size: 0.9em; color: #856404;">
+				<i class="bx bx-info-circle"></i>
+				<strong>Binding Rule:</strong> ${bindingRule} — effective max loan is <strong>$${formatNumber(bindingLoan)}</strong>. This is an estimate and actual approved loan may vary by lender policy and stress-test assumptions.
+			</p>
+		</div>
+	`;
+
+	resultDiv.innerHTML = html;
+	resultDiv.style.display = "block";
+	resultDiv.scrollIntoView({behavior: "smooth", block: "nearest"});
+}
+
+function showMaxLoanError(message) {
+	const resultDiv = document.getElementById("maxLoanResult");
+
+	resultDiv.innerHTML = `
+		<div style="background: #f8d7da; color: #721c24; padding: 15px; border-radius: 8px; border-left: 4px solid #dc3545;">
+			<i class="bx bx-error"></i>
+			<strong>Error:</strong> ${message}
+		</div>
+	`;
+
+	resultDiv.style.display = "block";
 }
 
 function validateInputs(price, downPayment, interestRate, loanPeriod) {
@@ -367,7 +567,7 @@ function calculateLoanDetails(
 	price,
 	downPaymentPercent,
 	annualInterestRate,
-	loanPeriodYears
+	loanPeriodYears,
 ) {
 	// Calculate basic values
 	const downPaymentAmount = price * (downPaymentPercent / 100);
@@ -446,7 +646,7 @@ function displayResults(loan) {
 			<div style="background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center;">
 				<h4 style="color: #333; margin-bottom: 8px;">Loan Amount</h4>
 				<p style="font-weight: bold; color: #666; margin: 0;">$${formatNumber(
-					loan.loanAmount
+					loan.loanAmount,
 				)}</p>
 			</div>
 			
@@ -563,10 +763,10 @@ function calculateBSD(propertyPrice) {
 					tier.max === Infinity
 						? `Remaining $${formatWholeNumber(taxableInThisTier)}`
 						: `$${formatWholeNumber(
-								tier.min + 1
-						  )} - $${formatWholeNumber(
-								Math.min(propertyPrice, tier.max)
-						  )}`,
+								tier.min + 1,
+							)} - $${formatWholeNumber(
+								Math.min(propertyPrice, tier.max),
+							)}`,
 				amount: taxableInThisTier,
 				rate: tier.rate * 100,
 				bsd: bsdForThisTier,
@@ -595,11 +795,11 @@ function displayBSDResults(bsdData) {
 			<div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid #eee; align-items: center;">
 				<div style="font-size: 0.9em; color: #666;">${tier.range}</div>
 				<div style="text-align: right; font-size: 0.9em;">$${formatWholeNumber(
-					tier.amount
+					tier.amount,
 				)}</div>
 				<div style="text-align: center; font-size: 0.9em;">${tier.rate}%</div>
 				<div style="text-align: right; font-weight: bold;">$${formatWholeNumber(
-					tier.bsd
+					tier.bsd,
 				)}</div>
 			</div>
 		`;
@@ -651,7 +851,7 @@ function calculateEarlyRepayment() {
 
 	// Get early repayment inputs
 	const currentBalance = parsePriceInput(
-		document.getElementById("currentLoanBalance")
+		document.getElementById("currentLoanBalance"),
 	);
 	const monthsPaid =
 		parseInt(document.getElementById("monthsPaid").value) || 0;
@@ -660,7 +860,7 @@ function calculateEarlyRepayment() {
 	const lumpSumPayment =
 		parsePriceInput(document.getElementById("lumpSumPayment")) || 0;
 	const earlyRepaymentResult = document.getElementById(
-		"earlyRepaymentResult"
+		"earlyRepaymentResult",
 	);
 
 	// Get original loan details from main calculator
@@ -669,10 +869,10 @@ function calculateEarlyRepayment() {
 		parsePriceInput(document.getElementById("loanPrice")) *
 			(parseFloat(document.getElementById("downPayment").value) / 100);
 	const annualInterestRate = parseFloat(
-		document.getElementById("interestRate").value
+		document.getElementById("interestRate").value,
 	);
 	const originalLoanPeriodYears = parseInt(
-		document.getElementById("loanPeriod").value
+		document.getElementById("loanPeriod").value,
 	);
 
 	// Validate inputs
@@ -681,11 +881,11 @@ function calculateEarlyRepayment() {
 			currentBalance,
 			monthsPaid,
 			annualInterestRate,
-			originalLoanPeriodYears
+			originalLoanPeriodYears,
 		)
 	) {
 		showEarlyRepaymentError(
-			"Please ensure you have calculated the main loan first and entered a valid current balance and months paid."
+			"Please ensure you have calculated the main loan first and entered a valid current balance and months paid.",
 		);
 		return;
 	}
@@ -695,7 +895,7 @@ function calculateEarlyRepayment() {
 		const originalMonthlyPayment = calculateMonthlyPayment(
 			originalLoanAmount,
 			annualInterestRate,
-			originalLoanPeriodYears
+			originalLoanPeriodYears,
 		);
 
 		// Calculate payment breakdown (principal and interest paid so far)
@@ -703,7 +903,7 @@ function calculateEarlyRepayment() {
 			originalLoanAmount,
 			originalMonthlyPayment,
 			annualInterestRate,
-			monthsPaid
+			monthsPaid,
 		);
 
 		// Calculate remaining loan details
@@ -714,31 +914,31 @@ function calculateEarlyRepayment() {
 		const currentScenario = calculateRemainingPayments(
 			currentBalance,
 			originalMonthlyPayment,
-			monthlyInterestRate
+			monthlyInterestRate,
 		);
 		const extraPaymentScenario =
 			extraPayment > 0
 				? calculateRemainingPayments(
 						currentBalance,
 						originalMonthlyPayment + extraPayment,
-						monthlyInterestRate
-				  )
+						monthlyInterestRate,
+					)
 				: null;
 		const lumpSumScenario =
 			lumpSumPayment > 0
 				? calculateRemainingPayments(
 						Math.max(0, currentBalance - lumpSumPayment),
 						originalMonthlyPayment,
-						monthlyInterestRate
-				  )
+						monthlyInterestRate,
+					)
 				: null;
 		const bothScenario =
 			extraPayment > 0 && lumpSumPayment > 0
 				? calculateRemainingPayments(
 						Math.max(0, currentBalance - lumpSumPayment),
 						originalMonthlyPayment + extraPayment,
-						monthlyInterestRate
-				  )
+						monthlyInterestRate,
+					)
 				: null;
 
 		// Calculate effective interest rate
@@ -746,7 +946,7 @@ function calculateEarlyRepayment() {
 			originalLoanAmount,
 			paymentBreakdown.totalPaymentsMade,
 			paymentBreakdown.interestPaid,
-			monthsPaid
+			monthsPaid,
 		);
 
 		// Display results
@@ -769,7 +969,7 @@ function calculateEarlyRepayment() {
 	} catch (error) {
 		console.error("Early repayment calculation error:", error);
 		showEarlyRepaymentError(
-			"An error occurred during calculation. Please check your inputs."
+			"An error occurred during calculation. Please check your inputs.",
 		);
 	}
 }
@@ -778,7 +978,7 @@ function validateEarlyRepaymentInputs(
 	currentBalance,
 	monthsPaid,
 	interestRate,
-	loanPeriod
+	loanPeriod,
 ) {
 	if (isNaN(currentBalance) || currentBalance <= 0) {
 		return false;
@@ -798,7 +998,7 @@ function validateEarlyRepaymentInputs(
 function calculateMonthlyPayment(
 	loanAmount,
 	annualInterestRate,
-	loanPeriodYears
+	loanPeriodYears,
 ) {
 	const monthlyInterestRate = annualInterestRate / 100 / 12;
 	const totalPayments = loanPeriodYears * 12;
@@ -819,7 +1019,7 @@ function calculateInterestPaidSoFar(
 	loanAmount,
 	monthlyPayment,
 	annualInterestRate,
-	monthsPaid
+	monthsPaid,
 ) {
 	const monthlyInterestRate = annualInterestRate / 100 / 12;
 	let remainingBalance = loanAmount;
@@ -843,7 +1043,7 @@ function calculatePaymentBreakdown(
 	loanAmount,
 	monthlyPayment,
 	annualInterestRate,
-	monthsPaid
+	monthsPaid,
 ) {
 	const monthlyInterestRate = annualInterestRate / 100 / 12;
 	let remainingBalance = loanAmount;
@@ -872,7 +1072,7 @@ function calculatePaymentBreakdown(
 function calculateRemainingPayments(
 	balance,
 	monthlyPayment,
-	monthlyInterestRate
+	monthlyInterestRate,
 ) {
 	if (balance <= 0) {
 		return {
@@ -891,7 +1091,7 @@ function calculateRemainingPayments(
 		const interestPayment = remainingBalance * monthlyInterestRate;
 		const principalPayment = Math.min(
 			monthlyPayment - interestPayment,
-			remainingBalance
+			remainingBalance,
 		);
 
 		if (principalPayment <= 0) {
@@ -920,7 +1120,7 @@ function calculateEffectiveInterestRate(
 	originalLoanAmount,
 	totalPaymentsMade,
 	totalInterestPaid,
-	monthsPaid
+	monthsPaid,
 ) {
 	if (monthsPaid <= 0 || totalPaymentsMade <= 0) {
 		return 0;
@@ -1005,7 +1205,7 @@ function displayEarlyRepaymentResults(data) {
 			<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
 				<h4 style="color: #333; margin-bottom: 10px;">
 					<i class="bx bx-time"></i> Continue Current Payments ($${formatNumber(
-						data.originalMonthlyPayment
+						data.originalMonthlyPayment,
 					)}/month)
 				</h4>
 				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
@@ -1018,14 +1218,14 @@ function displayEarlyRepaymentResults(data) {
 					<div style="text-align: center;">
 						<p style="margin: 0; font-size: 0.9em; color: #666;">Remaining Interest</p>
 						<p style="margin: 0; font-weight: bold; color: #dc3545;">$${formatNumber(
-							data.currentScenario.totalInterest
+							data.currentScenario.totalInterest,
 						)}</p>
 					</div>
 					<div style="text-align: center;">
 						<p style="margin: 0; font-size: 0.9em; color: #666;">Total Interest (Lifetime)</p>
 						<p style="margin: 0; font-weight: bold; color: #dc3545;">$${formatNumber(
 							data.interestPaidSoFar +
-								data.currentScenario.totalInterest
+								data.currentScenario.totalInterest,
 						)}</p>
 					</div>
 				</div>
@@ -1037,7 +1237,7 @@ function displayEarlyRepaymentResults(data) {
 			<div style="background: #e8f5e8; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #28a745;">
 				<h4 style="color: #333; margin-bottom: 10px;">
 					<i class="bx bx-plus-circle"></i> With Extra Payment (+$${formatNumber(
-						data.extraPayment
+						data.extraPayment,
 					)}/month)
 				</h4>
 				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
@@ -1056,12 +1256,12 @@ function displayEarlyRepaymentResults(data) {
 					<div style="text-align: center;">
 						<p style="margin: 0; font-size: 0.9em; color: #666;">Remaining Interest</p>
 						<p style="margin: 0; font-weight: bold; color: #28a745;">$${formatNumber(
-							data.extraPaymentScenario.totalInterest
+							data.extraPaymentScenario.totalInterest,
 						)}</p>
 						<p style="margin: 0; font-size: 0.8em; color: #28a745;">
 							($${formatNumber(
 								data.currentScenario.totalInterest -
-									data.extraPaymentScenario.totalInterest
+									data.extraPaymentScenario.totalInterest,
 							)} saved)
 						</p>
 					</div>
@@ -1069,7 +1269,7 @@ function displayEarlyRepaymentResults(data) {
 						<p style="margin: 0; font-size: 0.9em; color: #666;">Total Interest (Lifetime)</p>
 						<p style="margin: 0; font-weight: bold; color: #28a745;">$${formatNumber(
 							data.interestPaidSoFar +
-								data.extraPaymentScenario.totalInterest
+								data.extraPaymentScenario.totalInterest,
 						)}</p>
 					</div>
 				</div>
@@ -1084,7 +1284,7 @@ function displayEarlyRepaymentResults(data) {
 			<div style="background: #e8f4fd; padding: 20px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #007bff;">
 				<h4 style="color: #333; margin-bottom: 10px;">
 					<i class="bx bx-dollar-circle"></i> With Lump Sum Payment ($${formatNumber(
-						data.lumpSumPayment
+						data.lumpSumPayment,
 					)})
 				</h4>
 				<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
@@ -1103,12 +1303,12 @@ function displayEarlyRepaymentResults(data) {
 					<div style="text-align: center;">
 						<p style="margin: 0; font-size: 0.9em; color: #666;">Remaining Interest</p>
 						<p style="margin: 0; font-weight: bold; color: #007bff;">$${formatNumber(
-							data.lumpSumScenario.totalInterest
+							data.lumpSumScenario.totalInterest,
 						)}</p>
 						<p style="margin: 0; font-size: 0.8em; color: #007bff;">
 							($${formatNumber(
 								data.currentScenario.totalInterest -
-									data.lumpSumScenario.totalInterest
+									data.lumpSumScenario.totalInterest,
 							)} saved)
 						</p>
 					</div>
@@ -1116,7 +1316,7 @@ function displayEarlyRepaymentResults(data) {
 						<p style="margin: 0; font-size: 0.9em; color: #666;">Total Interest (Lifetime)</p>
 						<p style="margin: 0; font-weight: bold; color: #007bff;">$${formatNumber(
 							data.interestPaidSoFar +
-								data.lumpSumScenario.totalInterest
+								data.lumpSumScenario.totalInterest,
 						)}</p>
 					</div>
 				</div>
@@ -1148,12 +1348,12 @@ function displayEarlyRepaymentResults(data) {
 					<div style="text-align: center;">
 						<p style="margin: 0; font-size: 0.9em; color: #666;">Remaining Interest</p>
 						<p style="margin: 0; font-weight: bold; color: #856404;">$${formatNumber(
-							data.bothScenario.totalInterest
+							data.bothScenario.totalInterest,
 						)}</p>
 						<p style="margin: 0; font-size: 0.8em; color: #856404;">
 							($${formatNumber(
 								data.currentScenario.totalInterest -
-									data.bothScenario.totalInterest
+									data.bothScenario.totalInterest,
 							)} saved)
 						</p>
 					</div>
@@ -1161,7 +1361,7 @@ function displayEarlyRepaymentResults(data) {
 						<p style="margin: 0; font-size: 0.9em; color: #666;">Total Interest (Lifetime)</p>
 						<p style="margin: 0; font-weight: bold; color: #856404;">$${formatNumber(
 							data.interestPaidSoFar +
-								data.bothScenario.totalInterest
+								data.bothScenario.totalInterest,
 						)}</p>
 					</div>
 				</div>
@@ -1209,13 +1409,13 @@ function autoCalculateLoanBalance() {
 	// Check if we have enough data to calculate
 	const price = parsePriceInput(document.getElementById("loanPrice"));
 	const downPaymentPercent = parseFloat(
-		document.getElementById("downPayment").value
+		document.getElementById("downPayment").value,
 	);
 	const annualInterestRate = parseFloat(
-		document.getElementById("interestRate").value
+		document.getElementById("interestRate").value,
 	);
 	const loanPeriodYears = parseInt(
-		document.getElementById("loanPeriod").value
+		document.getElementById("loanPeriod").value,
 	);
 	const monthsPaid = parseInt(document.getElementById("monthsPaid").value);
 
@@ -1237,7 +1437,7 @@ function autoCalculateLoanBalance() {
 				price,
 				downPaymentPercent,
 				annualInterestRate,
-				loanPeriodYears
+				loanPeriodYears,
 			);
 
 			// Calculate remaining balance and payment breakdown after months paid
@@ -1245,7 +1445,7 @@ function autoCalculateLoanBalance() {
 				loanDetails.loanAmount,
 				loanDetails.monthlyPayment,
 				annualInterestRate,
-				monthsPaid
+				monthsPaid,
 			);
 
 			// Auto-fill the current loan balance field

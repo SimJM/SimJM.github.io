@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
@@ -248,6 +248,50 @@
 			body.dark-mode #bsdResult [style*="border-bottom: 2px solid #ddd"] {
 			    border-bottom: 2px solid #555 !important;
 			}
+
+			/* Dark mode for max loan result section */
+			body.dark-mode #maxLoanResult {
+			    background: #1a1a1a !important;
+			    color: #e0e0e0 !important;
+			    border: 1px solid #333;
+			}
+
+			body.dark-mode #maxLoanResult h2,
+			body.dark-mode #maxLoanResult h3,
+			body.dark-mode #maxLoanResult h4 {
+			    color: #e0e0e0 !important;
+			}
+
+			body.dark-mode #maxLoanResult p {
+			    color: #e0e0e0 !important;
+			}
+
+			body.dark-mode #maxLoanResult [style*="background: #f8f9fa"] {
+			    background: #2d2d2d !important;
+			    border: 1px solid #444;
+			}
+
+			body.dark-mode #maxLoanResult [style*="background: #f0f8ff"] {
+			    background: #2d2d2d !important;
+			    border-left: 4px solid #f9532d !important;
+			}
+
+			body.dark-mode #maxLoanResult [style*="background: #fff3cd"] {
+			    background: #3d3d1a !important;
+			    border-left: 4px solid #ffc107 !important;
+			}
+
+			body.dark-mode #maxLoanResult [style*="color: #856404"] {
+			    color: #e6d700 !important;
+			}
+
+			body.dark-mode #maxLoanResult [style*="color: #333"] {
+			    color: #e0e0e0 !important;
+			}
+
+			body.dark-mode #maxLoanResult [style*="color: #666"] {
+			    color: #ccc !important;
+			}
 		</style>
 		<title>Loan Calculator</title>
 	</head>
@@ -368,6 +412,117 @@
 				</button>
 			</div>
 
+			<!-- Max Loan Calculator (MSR/TDSR) -->
+			<div
+				id="maxLoanSection"
+				class="loan-form"
+				style="background: #f8f9fa; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-top: 30px;">
+				<h3
+					style="color: #f9532d; margin-bottom: 20px; text-align: center;">
+					<i class="bx bx-line-chart"></i> Max Loan Calculator (MSR
+					30% / TDSR 55%)
+				</h3>
+
+				<div
+					class="input-group"
+					style="margin-bottom: 20px; text-align: left;">
+					<label
+						for="grossMonthlyIncome"
+						style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+						Gross Monthly Income ($):
+					</label>
+					<div
+						style="position: relative; display: flex; align-items: center;">
+						<span
+							style="position: absolute; left: 12px; color: #666; font-weight: 500;"
+							>$</span
+						>
+						<input
+							type="text"
+							id="grossMonthlyIncome"
+							placeholder="e.g., 8,000"
+							style="width: 100%; font-size: 1em; padding: 12px 16px 12px 28px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;" />
+					</div>
+				</div>
+
+				<div
+					class="input-group"
+					style="margin-bottom: 20px; text-align: left;">
+					<label
+						for="existingMonthlyDebt"
+						style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+						Existing Monthly Debt ($):
+					</label>
+					<div
+						style="position: relative; display: flex; align-items: center;">
+						<span
+							style="position: absolute; left: 12px; color: #666; font-weight: 500;"
+							>$</span
+						>
+						<input
+							type="text"
+							id="existingMonthlyDebt"
+							placeholder="e.g., 1,000"
+							style="width: 100%; font-size: 1em; padding: 12px 16px 12px 28px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;" />
+					</div>
+				</div>
+
+				<div
+					class="input-group"
+					style="margin-bottom: 20px; text-align: left;">
+					<label
+						for="maxLoanInterestRate"
+						style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+						Annual Interest Rate (%):
+					</label>
+					<div
+						style="position: relative; display: flex; align-items: center;">
+						<input
+							type="number"
+							id="maxLoanInterestRate"
+							placeholder="e.g., 3.5"
+							min="0"
+							max="1000"
+							step="0.01"
+							style="width: 100%; font-size: 1em; padding: 12px 28px 12px 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;" />
+						<span
+							style="position: absolute; right: 12px; color: #666; font-weight: 500;"
+							>%</span
+						>
+					</div>
+				</div>
+
+				<div
+					class="input-group"
+					style="margin-bottom: 30px; text-align: left;">
+					<label
+						for="maxLoanTenure"
+						style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">
+						Loan Tenure (Years):
+					</label>
+					<div
+						style="position: relative; display: flex; align-items: center;">
+						<input
+							type="number"
+							id="maxLoanTenure"
+							placeholder="e.g., 30"
+							min="1"
+							max="100"
+							style="width: 100%; font-size: 1em; padding: 12px 52px 12px 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box;" />
+						<span
+							style="position: absolute; right: 12px; color: #666; font-weight: 500;"
+							>years</span
+						>
+					</div>
+				</div>
+
+				<button
+					id="calculateMaxLoanBtn"
+					style="width: 100%; padding: 15px; font-size: 1.2em; background: #f9532d; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.3s ease;">
+					<i class="bx bx-calculator"></i> Calculate Max Loan
+				</button>
+			</div>
+
 			<!-- Early Repayment Calculator -->
 			<div
 				id="earlyRepaymentSection"
@@ -484,6 +639,10 @@
 
 			<div
 				id="loanResult"
+				style="margin-top: 30px; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none;"></div>
+
+			<div
+				id="maxLoanResult"
 				style="margin-top: 30px; padding: 25px; background: white; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: none;"></div>
 
 			<div
