@@ -82,12 +82,13 @@ function generateWordleLink() {
 	// Encode the word
 	const encodedWord = encodeWord(word);
 
-	// Get current site URL (removing the admin page)
+	// Get current site URL
 	const currentUrl = window.location.href;
-	const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf("/") + 1);
+	// Get base URL (go up one directory from WordleAdmin to root, then to Wordle folder)
+	const baseUrl = currentUrl.substring(0, currentUrl.lastIndexOf("/WordleAdmin/"));
 
 	// Create the wordle game URL with encoded word
-	const wordleUrl = `${baseUrl}wordle.html?word=${encodedWord}`;
+	const wordleUrl = `${baseUrl}/Wordle/index.html?word=${encodedWord}`;
 
 	// Update UI
 	document.getElementById("currentWordDisplay").textContent = word;
