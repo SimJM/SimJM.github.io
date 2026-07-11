@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Flask & Jinja2 Notes</title>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0f1117;
+      --surface:     #1a1d27;
+      --surface2:    #222638;
+      --border:      #2e3250;
+      --accent:      #7c6af7;
+      --accent2:     #56cfb2;
+      --accent3:     #f7a76c;
+      --text:        #e2e4f0;
+      --text-muted:  #8b8fa8;
+      --flask:       #7c6af7;
+      --jinja:       #56cfb2;
+      --radius:      14px;
+      --radius-sm:   8px;
+      --font:        'Segoe UI', system-ui, -apple-system, sans-serif;
+      --font-mono:   'Fira Code', 'Cascadia Code', 'Courier New', monospace;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ─── Header ────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #1a1d27 0%, #12152a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 36px 20px 28px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    /* ─── Nav Pills ─────────────────────────────────── */
+    .nav-pills {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 14px 16px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      scrollbar-width: none;
+    }
+    .nav-pills::-webkit-scrollbar { display: none; }
+
+    .nav-pills a {
+      text-decoration: none;
+      white-space: nowrap;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    .nav-pills a:hover,
+    .nav-pills a:active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* ─── Main Layout ───────────────────────────────── */
+    main {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    /* ─── Section ───────────────────────────────────── */
+    section {
+      margin-bottom: 36px;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ─── Cards ─────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent2);
+      margin-bottom: 10px;
+    }
+
+    /* ─── Analogy Box ───────────────────────────────── */
+    .analogy {
+      background: linear-gradient(135deg, #1e2040, #1a2235);
+      border-left: 3px solid var(--accent);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      margin: 14px 0;
+      font-style: italic;
+      color: #c5c8e0;
+      font-size: 0.9rem;
+    }
+
+    /* ─── Comparison Table ──────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      margin: 14px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    thead tr {
+      background: var(--surface2);
+    }
+
+    th {
+      padding: 10px 14px;
+      text-align: left;
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--surface2); }
+
+    /* ─── Code Blocks ───────────────────────────────── */
+    .code-block {
+      background: #0d0f1a;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      overflow-x: auto;
+      margin: 14px 0;
+    }
+
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border);
+      background: #12152a;
+    }
+
+    .code-lang {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--accent3);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .code-dots {
+      display: flex;
+      gap: 5px;
+    }
+
+    .code-dots span {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+    .dot-r { background: #ff5f57; }
+    .dot-y { background: #febc2e; }
+    .dot-g { background: #28c840; }
+
+    pre {
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      color: #c9d1d9;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    /* Syntax colours */
+    .kw  { color: #c792ea; }   /* keywords */
+    .fn  { color: #82aaff; }   /* functions */
+    .st  { color: #c3e88d; }   /* strings */
+    .cm  { color: #546e7a; font-style: italic; } /* comments */
+    .dc  { color: var(--accent3); }  /* decorators */
+    .tg  { color: #f07178; }   /* html tags */
+    .at  { color: #ffcb6b; }   /* attributes */
+    .jj  { color: var(--accent2); }  /* jinja */
+
+    /* ─── Flow Steps ────────────────────────────────── */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 16px 0;
+    }
+
+    .flow-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 0;
+      position: relative;
+    }
+
+    .flow-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 46px;
+      bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .flow-num {
+      width: 38px;
+      height: 38px;
+      min-width: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #9b8df8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+      color: #fff;
+      position: relative;
+      z-index: 1;
+    }
+
+    .flow-body strong {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 3px;
+      color: var(--text);
+    }
+
+    .flow-body p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* ─── Badge Tags ────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      margin: 2px;
+    }
+    .badge-flask  { background: #2d2560; color: var(--accent); }
+    .badge-jinja  { background: #1a3530; color: var(--accent2); }
+    .badge-tip    { background: #2d2010; color: var(--accent3); }
+
+    /* ─── Rule Boxes ────────────────────────────────── */
+    .rule-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      margin: 10px 0;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .rule-icon {
+      font-size: 1.3rem;
+      min-width: 28px;
+    }
+
+    .rule-text strong {
+      display: block;
+      font-size: 0.88rem;
+      margin-bottom: 3px;
+    }
+
+    .rule-text p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    /* ─── Inline Code ───────────────────────────────── */
+    code {
+      background: #1e2240;
+      color: var(--accent2);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.82em;
+    }
+
+    /* ─── Folder Tree ───────────────────────────────── */
+    .folder-tree {
+      background: #0d0f1a;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      line-height: 2;
+      overflow-x: auto;
+    }
+
+    .folder-tree .folder { color: var(--accent3); }
+    .folder-tree .file   { color: var(--accent2); }
+    .folder-tree .note   { color: var(--text-muted); font-style: italic; }
+
+    /* ─── Jinja Syntax Table ────────────────────────── */
+    .syntax-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 14px 0;
+    }
+
+    .syntax-item {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      text-align: center;
+    }
+
+    .syntax-item .syn-code {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--accent2);
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .syntax-item .syn-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* ─── Mental Test Box ───────────────────────────── */
+    .test-box {
+      background: linear-gradient(135deg, #1a2030, #1e1a35);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .test-box h3 {
+      color: var(--accent);
+      margin-bottom: 14px;
+      font-size: 1rem;
+    }
+
+    .test-steps {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .test-steps li {
+      display: flex;
+      gap: 10px;
+      font-size: 0.85rem;
+      align-items: flex-start;
+    }
+
+    .test-steps li .step-num {
+      background: var(--accent);
+      color: #fff;
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 800;
+      margin-top: 1px;
+    }
+
+    /* ─── Footer ────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 24px 16px;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+
+    /* ─── Responsive ────────────────────────────────── */
+    @media (max-width: 480px) {
+      header h1 { font-size: 1.3rem; }
+      .syntax-grid { grid-template-columns: 1fr 1fr; }
+      pre { font-size: 0.74rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     HEADER
+════════════════════════════════════════════════════ -->
+<header>
+  <h1>🐍 Flask & Jinja2 Notes</h1>
+  <p>Your quick-reference guide to building web apps with Python</p>
+</header>
+
+<!-- ═══════════════════════════════════════════════════
+     NAV PILLS
+════════════════════════════════════════════════════ -->
+<nav class="nav-pills">
+  <a href="#mental-model">🧠 Mental Model</a>
+  <a href="#structure">🗂️ Structure</a>
+  <a href="#flow">🔄 The Flow</a>
+  <a href="#flask-layer">⚙️ Flask Layer</a>
+  <a href="#jinja-layer">🎨 Jinja2 Layer</a>
+  <a href="#inheritance">🧱 Inheritance</a>
+  <a href="#rules">💡 3 Rules</a>
+  <a href="#mental-test">🧪 Mental Test</a>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════
+     MAIN
+════════════════════════════════════════════════════ -->
+<main>
+
+  <!-- ── Mental Model ───────────────────────────────── -->
+  <section id="mental-model">
+    <h2 class="section-title">🧠 The Core Mental Model</h2>
+
+    <div class="analogy">
+      Think of building a Flask app like running a <strong>restaurant</strong>.<br>
+      The customer orders → Kitchen prepares → Dish is plated → Customer receives it.
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>🍽️ Restaurant</th><th>🐍 Flask App</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>👨‍🍳 Kitchen (prepares food)</td><td><code>app.py</code> — Python logic</td></tr>
+          <tr><td>📋 Menu (what's available)</td><td>Routes — URLs you can visit</td></tr>
+          <tr><td>🍽️ Plating the dish</td><td>Jinja2 — fills HTML with data</td></tr>
+          <tr><td>🪟 What customer sees</td><td>Final HTML in the browser</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Project Structure ──────────────────────────── -->
+  <section id="structure">
+    <h2 class="section-title">🗂️ Project Structure</h2>
+
+    <p style="margin-bottom:12px; color: var(--text-muted); font-size:0.88rem;">
+      Flask expects this exact folder layout. The names <strong>templates/</strong> and <strong>static/</strong> must be precise.
+    </p>
+
+    <div class="folder-tree">
+<span class="folder">my_app/</span>
+│
+├── <span class="file">app.py</span>               <span class="note">← Main Python file</span>
+│
+├── <span class="folder">templates/</span>          <span class="note">← ALL HTML files go here</span>
+│   ├── <span class="file">base.html</span>         <span class="note">← Shared layout</span>
+│   ├── <span class="file">home.html</span>         <span class="note">← Home page</span>
+│   └── <span class="file">profile.html</span>      <span class="note">← Profile page</span>
+│
+└── <span class="folder">static/</span>             <span class="note">← CSS, JS, images</span>
+    └── <span class="file">style.css</span>
+    </div>
+
+    <div class="rule-box" style="margin-top:14px;">
+      <span class="rule-icon">⚠️</span>
+      <div class="rule-text">
+        <strong>Critical</strong>
+        <p>Flask automatically looks inside <code>templates/</code> for HTML files. The folder name must be exactly that — no variations.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── The Flow ───────────────────────────────────── -->
+  <section id="flow">
+    <h2 class="section-title">🔄 The Flow — Step by Step</h2>
+
+    <p style="margin-bottom:16px; font-size:0.88rem; color:var(--text-muted);">
+      Every time a user visits a page, this exact sequence runs:
+    </p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-body">
+          <strong>🌐 User visits a URL</strong>
+          <p>e.g. the browser requests <code>/profile/alice</code></p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-body">
+          <strong>⚙️ Flask checks routes in app.py</strong>
+          <p>It looks for a matching <code>@app.route(...)</code> decorator</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-body">
+          <strong>▶️ Flask runs the matching Python function</strong>
+          <p>If no match → 404 Not Found</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-body">
+          <strong>🧠 Function prepares data</strong>
+          <p>Fetch from a database, compute values, build dictionaries, etc.</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div class="flow-body">
+          <strong>📤 render_template() is called</strong>
+          <p>You pass the HTML filename + all the data variables</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">6</div>
+        <div class="flow-body">
+          <strong>🎨 Jinja2 injects data into the HTML template</strong>
+          <p>Replaces all <code>{{ }}</code> and <code>{% %}</code> tags with real values</p>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">7</div>
+        <div class="flow-body">
+          <strong>🖥️ Final HTML is sent to the browser</strong>
+          <p>The user sees the fully rendered page</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Flask Layer ────────────────────────────────── -->
+  <section id="flask-layer">
+    <h2 class="section-title">⚙️ Layer 1 — The Route (app.py)</h2>
+
+    <p style="margin-bottom:12px; font-size:0.88rem;">
+      This is where you define <strong>what URL does what</strong>.
+    </p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">Python — app.py</span>
+        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+      </div>
+      <pre><span class="kw">from</span> flask <span class="kw">import</span> Flask, render_template
+
+app = <span class="fn">Flask</span>(__name__)
+
+<span class="cm"># When user visits "/profile/alice"</span>
+<span class="dc">@app.route</span>(<span class="st">"/profile/&lt;username&gt;"</span>)   <span class="cm"># dynamic variable</span>
+<span class="kw">def</span> <span class="fn">profile</span>(username):
+    <span class="cm"># Prepare whatever data you need</span>
+    user_data = {
+        <span class="st">"name"</span>: username,
+        <span class="st">"age"</span>: <span class="at">25</span>,
+        <span class="st">"hobbies"</span>: [<span class="st">"coding"</span>, <span class="st">"reading"</span>, <span class="st">"gaming"</span>]
+    }
+
+    <span class="cm"># Send data to the HTML template</span>
+    <span class="kw">return</span> <span class="fn">render_template</span>(<span class="st">"profile.html"</span>, user=user_data)
+    <span class="cm">#                      ^ which file    ^ key = value</span>
+
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    app.<span class="fn">run</span>(debug=<span class="kw">True</span>)</pre>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Key Takeaways</div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div class="rule-box" style="margin:0;">
+          <span class="rule-icon">🔗</span>
+          <div class="rule-text">
+            <strong><code>@app.route(...)</code></strong>
+            <p>Defines the URL that triggers this function</p>
+          </div>
+        </div>
+        <div class="rule-box" style="margin:0;">
+          <span class="rule-icon">📤</span>
+          <div class="rule-text">
+            <strong><code>render_template("file.html", key=value)</code></strong>
+            <p>Links Python → HTML. The <code>key</code> name is what you use in the template.</p>
+          </div>
+        </div>
+        <div class="rule-box" style="margin:0;">
+          <span class="rule-icon">🔀</span>
+          <div class="rule-text">
+            <strong><code>&lt;username&gt;</code> in the URL</strong>
+            <p>Dynamic segments — gets passed as a function argument automatically</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Jinja2 Layer ───────────────────────────────── -->
+  <section id="jinja-layer">
+    <h2 class="section-title">🎨 Layer 2 — Jinja2 Templates</h2>
+
+    <p style="margin-bottom:14px; font-size:0.88rem;">
+      Jinja2 syntax lives <strong>inside your HTML files</strong>. Three symbols to know:
+    </p>
+
+    <div class="syntax-grid">
+      <div class="syntax-item">
+        <div class="syn-code">{{ }}</div>
+        <div class="syn-label">Output a variable</div>
+      </div>
+      <div class="syntax-item">
+        <div class="syn-code">{% %}</div>
+        <div class="syn-label">Logic / control flow</div>
+      </div>
+      <div class="syntax-item">
+        <div class="syn-code">{# #}</div>
+        <div class="syn-label">Comments (hidden)</div>
+      </div>
+      <div class="syntax-item">
+        <div class="syn-code">{{ x | upper }}</div>
+        <div class="syn-label">Filters / formatting</div>
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">HTML + Jinja2 — profile.html</span>
+        <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+      </div>
+      <pre><span class="tg">&lt;!DOCTYPE html&gt;</span>
+<span class="tg">&lt;html&gt;</span>
+<span class="tg">&lt;body&gt;</span>
+
+  <span class="tg">&lt;h1&gt;</span>Hello, <span class="jj">{{ user.name }}</span>! 👋<span class="tg">&lt;/h1&gt;</span>
+  <span class="tg">&lt;p&gt;</span>Age: <span class="jj">{{ user.age }}</span><span class="tg">&lt;/p&gt;</span>
+
+  <span class="tg">&lt;h3&gt;</span>Hobbies:<span class="tg">&lt;/h3&gt;</span>
+  <span class="tg">&lt;ul&gt;</span>
+    <span class="jj">{% for hobby in user.hobbies %}</span>
+      <span class="tg">&lt;li&gt;</span><span class="jj">{{ hobby }}</span><span class="tg">&lt;/li&gt;</span>
+    <span class="jj">{% endfor %}</span>
+  <span class="tg">&lt;/ul&gt;</span>
+
+<span class="tg">&lt;/body&gt;</span>
+<span class="tg">&lt;/html&gt;</span></pre>
+    </div>
+
+    <div class="rule-box">
+      <span class="rule-icon">🔗</span>
+      <div class="rule-text">
+        <strong>The Variable Name Link</strong>
+        <p>The variable <code>user</code> in the HTML <strong>must exactly match</strong> the keyword you passed in <code>render_template(..., user=user_data)</code></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Template Inheritance ───────────────────────── -->
+  <section id="inheritance">
+    <h2 class="section-title">🧱 Layer 3 — Template Inheritance</h2>
+
+    <div class="analogy">
+      Instead of copying the same navbar and footer into <em>every</em> HTML file, create <strong>one base layout</strong> — all pages extend it. Write once, use everywhere.
+    </div>
+
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title">📄 templates/base.html — The Master Layout</div>
+      <div class="code-block" style="margin:0;">
+        <div class="code-header">
+          <span class="code-lang">base.html</span>
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+        </div>
+        <pre><span class="tg">&lt;!DOCTYPE html&gt;</span>
+<span class="tg">&lt;html&gt;</span>
+<span class="tg">&lt;head&gt;</span>
+  <span class="tg">&lt;title&gt;</span><span class="jj">{% block title %}My App{% endblock %}</span><span class="tg">&lt;/title&gt;</span>
+<span class="tg">&lt;/head&gt;</span>
+<span class="tg">&lt;body&gt;</span>
+
+  <span class="cm">&lt;!-- Navbar — written ONCE, appears on ALL pages --&gt;</span>
+  <span class="tg">&lt;nav&gt;</span>
+    <span class="tg">&lt;a</span> <span class="at">href</span>=<span class="st">"/"</span><span class="tg">&gt;</span>Home<span class="tg">&lt;/a&gt;</span> |
+    <span class="tg">&lt;a</span> <span class="at">href</span>=<span class="st">"/about"</span><span class="tg">&gt;</span>About<span class="tg">&lt;/a&gt;</span>
+  <span class="tg">&lt;/nav&gt;</span>
+
+  <span class="cm">&lt;!-- Each page's unique content goes here --&gt;</span>
+  <span class="jj">{% block content %}
+  {% endblock %}</span>
+
+  <span class="cm">&lt;!-- Footer — written ONCE --&gt;</span>
+  <span class="tg">&lt;footer&gt;</span>© 2025 My App<span class="tg">&lt;/footer&gt;</span>
+
+<span class="tg">&lt;/body&gt;</span>
+<span class="tg">&lt;/html&gt;</span></pre>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-title">📄 templates/home.html — A Child Page</div>
+      <div class="code-block" style="margin:0;">
+        <div class="code-header">
+          <span class="code-lang">home.html</span>
+          <div class="code-dots"><span class="dot-r"></span><span class="dot-y"></span><span class="dot-g"></span></div>
+        </div>
+        <pre><span class="jj">{% extends "base.html" %}</span>    <span class="cm">&lt;!-- inherit base --&gt;</span>
+
+<span class="jj">{% block title %}Home{% endblock %}</span>
+
+<span class="jj">{% block content %}</span>
+  <span class="tg">&lt;h1&gt;</span>Welcome to the Home Page! 🏠<span class="tg">&lt;/h1&gt;</span>
+  <span class="tg">&lt;p&gt;</span>This content is unique to home.<span class="tg">&lt;/p&gt;</span>
+<span class="jj">{% endblock %}</span></pre>
+      </div>
+    </div>
+
+    <div class="rule-box">
+      <span class="rule-icon">✅</span>
+      <div class="rule-text">
+        <strong>Both pages get navbar + footer automatically</strong>
+        <p>No repetition. Just fill in the <code>{% block content %}</code> slot with what's unique to each page.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 3 Rules ────────────────────────────────────── -->
+  <section id="rules">
+    <h2 class="section-title">💡 The 3 Rules to Remember</h2>
+
+    <div class="rule-box">
+      <span class="rule-icon">1️⃣</span>
+      <div class="rule-text">
+        <strong>render_template is the bridge</strong>
+        <p><code>render_template("file.html", key=value)</code> — whatever you name <code>key</code>, use <code>{{ key }}</code> in the HTML. Names must match exactly.</p>
+      </div>
+    </div>
+
+    <div class="rule-box">
+      <span class="rule-icon">2️⃣</span>
+      <div class="rule-text">
+        <strong>HTML files must live in templates/</strong>
+        <p>Flask automatically looks inside a folder called <code>templates/</code>. It won't find files anywhere else.</p>
+      </div>
+    </div>
+
+    <div class="rule-box">
+      <span class="rule-icon">3️⃣</span>
+      <div class="rule-text">
+        <strong>Use inheritance to avoid repetition</strong>
+        <p>Use <code>{% extends "base.html" %}</code> + <code>{% block %}</code> to write your layout once and reuse it everywhere.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Mental Test ────────────────────────────────── -->
+  <section id="mental-test">
+    <h2 class="section-title">🧪 Mental Test — /dashboard Page</h2>
+
+    <div class="test-box">
+      <h3>Can you build a /dashboard page that shows a username and list of tasks?</h3>
+      <ul class="test-steps">
+        <li>
+          <span class="step-num">1</span>
+          <span>Create the route in <code>app.py</code> — <code>@app.route("/dashboard")</code></span>
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <span>Prepare the data — a <code>username</code> string + a <code>tasks</code> list</span>
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <span>Pass it to a template — <code>render_template("dashboard.html", username=..., tasks=...)</code></span>
+        </li>
+        <li>
+          <span class="step-num">4</span>
+          <span>In <code>dashboard.html</code> — use <code>{% extends "base.html" %}</code>, display <code>{{ username }}</code>, loop through tasks with <code>{% for task in tasks %}</code></span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════
+     FOOTER
+════════════════════════════════════════════════════ -->
+<footer>
+  🐍 Flask & Jinja2 Notes &nbsp;·&nbsp; Study well, build cool things 🚀
+</footer>
+
+</body>
+</html>
