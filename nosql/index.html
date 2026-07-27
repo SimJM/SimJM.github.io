@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NoSQL Notes – Complete Guide</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f1117;
+      --surface:   #1a1d27;
+      --surface2:  #22263a;
+      --border:    #2e3250;
+      --accent:    #6c63ff;
+      --accent2:   #00d4aa;
+      --accent3:   #ff6b6b;
+      --text:      #e2e4f0;
+      --muted:     #8b90b0;
+      --code-bg:   #12151f;
+      --radius:    12px;
+      --radius-sm: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ── Top Nav / Header ── */
+    header {
+      background: linear-gradient(135deg, #1a1d27 0%, #12151f 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 16px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+
+    header h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header p { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+    /* ── TOC ── */
+    .toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin: 20px 16px;
+      padding: 16px;
+    }
+
+    .toc h2 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      color: var(--accent2);
+      margin-bottom: 10px;
+    }
+
+    .toc ol { padding-left: 18px; }
+    .toc li { margin: 5px 0; }
+    .toc a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: color .2s;
+    }
+    .toc a:hover { color: var(--accent); }
+
+    /* ── Main Layout ── */
+    main { padding: 0 16px 60px; max-width: 900px; margin: 0 auto; }
+
+    /* ── Section Card ── */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface2);
+    }
+
+    .section-icon {
+      width: 34px; height: 34px;
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .icon-purple { background: rgba(108,99,255,.2); }
+    .icon-teal   { background: rgba(0,212,170,.2); }
+    .icon-red    { background: rgba(255,107,107,.2); }
+    .icon-yellow { background: rgba(255,193,7,.2); }
+    .icon-blue   { background: rgba(66,165,245,.2); }
+    .icon-green  { background: rgba(102,187,106,.2); }
+
+    .section-header h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .section-body { padding: 18px; }
+
+    /* ── Sub-section ── */
+    .subsection { margin-bottom: 22px; }
+    .subsection:last-child { margin-bottom: 0; }
+
+    h3 {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--accent2);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    h4 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin: 14px 0 8px;
+    }
+
+    p { margin-bottom: 10px; font-size: 0.9rem; color: var(--text); }
+    p:last-child { margin-bottom: 0; }
+
+    /* ── Callout / Tip ── */
+    .callout {
+      border-left: 3px solid var(--accent);
+      background: rgba(108,99,255,.08);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      padding: 10px 14px;
+      margin: 12px 0;
+      font-size: 0.88rem;
+    }
+    .callout.teal  { border-color: var(--accent2); background: rgba(0,212,170,.08); }
+    .callout.red   { border-color: var(--accent3); background: rgba(255,107,107,.08); }
+    .callout.warn  { border-color: #ffc107;        background: rgba(255,193,7,.08); }
+
+    /* ── Code Block ── */
+    .code-wrap {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      margin: 12px 0;
+      overflow: hidden;
+    }
+
+    .code-label {
+      padding: 5px 12px;
+      background: var(--surface2);
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border);
+    }
+
+    pre {
+      padding: 14px;
+      overflow-x: auto;
+      font-size: 0.82rem;
+      line-height: 1.6;
+    }
+
+    code {
+      font-family: "Fira Code", "Cascadia Code", "JetBrains Mono", monospace;
+      color: #c9d1d9;
+    }
+
+    .inline-code {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.82rem;
+      color: var(--accent2);
+    }
+
+    /* Syntax highlight colours */
+    .kw  { color: #ff79c6; }
+    .fn  { color: #8be9fd; }
+    .str { color: #f1fa8c; }
+    .num { color: #bd93f9; }
+    .cmt { color: #6272a4; font-style: italic; }
+    .key { color: #50fa7b; }
+    .val { color: #ffb86c; }
+
+    /* ── Database State Block ── */
+    .db-state {
+      background: #0d1f17;
+      border: 1px solid #1a4a30;
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      margin: 12px 0;
+      font-size: 0.82rem;
+    }
+    .db-state .label {
+      font-size: 0.7rem;
+      color: var(--accent2);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 8px;
+    }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; margin: 12px 0; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    th {
+      background: var(--surface2);
+      color: var(--accent);
+      padding: 10px 12px;
+      text-align: left;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    td {
+      padding: 9px 12px;
+      border-top: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: top;
+    }
+    tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+
+    /* ── Lists ── */
+    ul, ol { padding-left: 20px; margin: 8px 0; }
+    li { margin: 5px 0; font-size: 0.88rem; }
+    li::marker { color: var(--accent); }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      margin: 2px;
+    }
+    .badge-purple { background: rgba(108,99,255,.2); color: #a99fff; border: 1px solid rgba(108,99,255,.3); }
+    .badge-teal   { background: rgba(0,212,170,.2);  color: #5fffda; border: 1px solid rgba(0,212,170,.3); }
+    .badge-red    { background: rgba(255,107,107,.2); color: #ff9999; border: 1px solid rgba(255,107,107,.3); }
+    .badge-yellow { background: rgba(255,193,7,.2);   color: #ffd54f; border: 1px solid rgba(255,193,7,.3); }
+
+    /* ── Divider ── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+
+    /* ── Complexity Pills ── */
+    .complexity {
+      display: inline-block;
+      background: rgba(108,99,255,.15);
+      border: 1px solid rgba(108,99,255,.3);
+      color: #c4bfff;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-family: monospace;
+      font-size: 0.82rem;
+    }
+    .complexity.good { background: rgba(0,212,170,.15); border-color: rgba(0,212,170,.3); color: #5fffda; }
+    .complexity.bad  { background: rgba(255,107,107,.15); border-color: rgba(255,107,107,.3); color: #ff9999; }
+
+    /* ── Two-Col Grid ── */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 10px 0; }
+    @media (max-width: 500px) { .grid2 { grid-template-columns: 1fr; } }
+
+    .mini-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+    }
+    .mini-card h4 { margin-top: 0; font-size: 0.82rem; }
+    .mini-card p  { font-size: 0.8rem; color: var(--muted); margin: 0; }
+
+    /* ── Back to top ── */
+    .back-top {
+      display: block;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-decoration: none;
+      margin-top: 10px;
+      padding: 8px;
+    }
+    .back-top:hover { color: var(--accent); }
+
+    /* ── Progress bar decoration ── */
+    .progress-bar {
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════ HEADER ═══ -->
+<header>
+  <h1>🗄️ NoSQL — Complete Study Notes</h1>
+  <p>MongoDB · Queries · Indexing · Time Complexity · Database Setup</p>
+</header>
+
+<div class="toc">
+  <h2>📋 Table of Contents</h2>
+  <ol>
+    <li><a href="#s1">What is NoSQL?</a></li>
+    <li><a href="#s2">SQL vs NoSQL</a></li>
+    <li><a href="#s3">Types of NoSQL Databases</a></li>
+    <li><a href="#s4">Core Concepts</a></li>
+    <li><a href="#s5">CRUD Queries (with DB State)</a></li>
+    <li><a href="#s6">Flexible / Mixed Schemas</a></li>
+    <li><a href="#s7">Time Complexity</a></li>
+    <li><a href="#s8">Indexing</a></li>
+    <li><a href="#s9">Creating a Database</a></li>
+    <li><a href="#s10">When to Use / Avoid NoSQL</a></li>
+  </ol>
+</div>
+
+<main>
+<div class="progress-bar"></div>
+
+<!-- ═══════════════════════════════════ 1. WHAT IS NOSQL ═══ -->
+<div class="section" id="s1">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🤔</div>
+    <h2>1 · What is NoSQL?</h2>
+  </div>
+  <div class="section-body">
+    <p><strong>NoSQL</strong> stands for <em>"Not Only SQL"</em>. It refers to databases that <strong>don't rely on the traditional relational (table-based) model</strong> used by MySQL or PostgreSQL.</p>
+
+    <div class="grid2">
+      <div class="mini-card">
+        <h4>🗂️ SQL Database</h4>
+        <p>Like a highly organized filing cabinet — fixed drawers, folders and labels.</p>
+      </div>
+      <div class="mini-card">
+        <h4>🎒 NoSQL Database</h4>
+        <p>Like a flexible backpack — store anything in any shape, rearrange freely.</p>
+      </div>
+    </div>
+
+    <h3>🌊 Why Does NoSQL Exist?</h3>
+    <p>Traditional SQL was built in the 1970s–80s for structured, manageable data. The modern web changed everything:</p>
+    <ul>
+      <li>📈 <strong>Massive scale</strong> — Billions of users (Facebook, Google, Amazon)</li>
+      <li>🌊 <strong>Unstructured data</strong> — Social posts, images, logs, sensor data</li>
+      <li>⚡ <strong>High speed</strong> — Real-time apps needing millisecond responses</li>
+      <li>🔄 <strong>Flexible data</strong> — Data that constantly changes shape</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ 2. SQL vs NOSQL ═══ -->
+<div class="section" id="s2">
+  <div class="section-header">
+    <div class="section-icon icon-teal">⚖️</div>
+    <h2>2 · SQL vs NoSQL</h2>
+  </div>
+  <div class="section-body">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Feature</th><th>SQL</th><th>NoSQL</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Data Structure</td><td>Tables, rows & columns</td><td>Documents, Key-Value, Graphs…</td></tr>
+          <tr><td>Schema</td><td>Fixed (rigid)</td><td>Flexible (dynamic)</td></tr>
+          <tr><td>Scalability</td><td>Vertical (bigger server)</td><td>Horizontal (more servers)</td></tr>
+          <tr><td>Relationships</td><td>Strong joins</td><td>Limited / handled differently</td></tr>
+          <tr><td>Best For</td><td>Structured, consistent data</td><td>Large, varied, fast-changing data</td></tr>
+          <tr><td>Examples</td><td>MySQL, PostgreSQL, Oracle</td><td>MongoDB, Redis, Cassandra, Neo4j</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ 3. TYPES ═══ -->
+<div class="section" id="s3">
+  <div class="section-header">
+    <div class="section-icon icon-yellow">📦</div>
+    <h2>3 · Types of NoSQL Databases</h2>
+  </div>
+  <div class="section-body">
+
+    <div class="subsection">
+      <h3>📄 Document Databases</h3>
+      <p>Store data as <strong>JSON-like documents</strong>. Each document can have a different structure.</p>
+      <p><span class="badge badge-purple">MongoDB</span> <span class="badge badge-purple">CouchDB</span></p>
+      <p><strong>Use Case:</strong> User profiles, product catalogs, blog posts</p>
+      <div class="code-wrap">
+        <div class="code-label">JSON Document</div>
+        <pre><code>{
+  <span class="key">"name"</span>: <span class="str">"Alice"</span>,
+  <span class="key">"age"</span>: <span class="num">28</span>,
+  <span class="key">"hobbies"</span>: [<span class="str">"reading"</span>, <span class="str">"coding"</span>],
+  <span class="key">"address"</span>: {
+    <span class="key">"city"</span>: <span class="str">"New York"</span>,
+    <span class="key">"zip"</span>: <span class="str">"10001"</span>
+  }
+}</code></pre>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>🔑 Key-Value Stores</h3>
+      <p>The simplest type — like a dictionary. Every piece of data is a <strong>key → value</strong> pair. Extremely fast for lookups.</p>
+      <p><span class="badge badge-teal">Redis</span> <span class="badge badge-teal">DynamoDB</span></p>
+      <p><strong>Use Case:</strong> Caching, sessions, shopping carts</p>
+      <div class="code-wrap">
+        <div class="code-label">Key-Value Example</div>
+        <pre><code><span class="str">"user:101"</span>       → <span class="str">"Alice"</span>
+<span class="str">"session:abc123"</span> → <span class="str">"{ logged_in: true, expires: ... }"</span></code></pre>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>📊 Wide-Column (Column-Family) Stores</h3>
+      <p>Store data in <strong>columns</strong> instead of rows. Great for reading specific columns across millions of rows.</p>
+      <p><span class="badge badge-yellow">Cassandra</span> <span class="badge badge-yellow">HBase</span></p>
+      <p><strong>Use Case:</strong> Time-series data, analytics, IoT sensor readings</p>
+    </div>
+
+    <div class="subsection">
+      <h3>🕸️ Graph Databases</h3>
+      <p>Store data as <strong>nodes (entities)</strong> and <strong>edges (relationships)</strong>. Perfect when relationships are the focus.</p>
+      <p><span class="badge badge-red">Neo4j</span> <span class="badge badge-red">Amazon Neptune</span></p>
+      <p><strong>Use Case:</strong> Social networks, fraud detection, recommendations</p>
+      <div class="code-wrap">
+        <div class="code-label">Graph Relationship</div>
+        <pre><code>(Alice) --[<span class="fn">FRIENDS_WITH</span>]--> (Bob)
+(Bob)   --[<span class="fn">LIKES</span>]--> (Movie: Inception)</code></pre>
+      </div>
+    </div>
+
+    <h3>🌟 Popular Databases at a Glance</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Database</th><th>Type</th><th>Known For</th></tr></thead>
+        <tbody>
+          <tr><td>MongoDB</td><td>Document</td><td>Flexibility, developer-friendly</td></tr>
+          <tr><td>Redis</td><td>Key-Value</td><td>Blazing fast, in-memory caching</td></tr>
+          <tr><td>Cassandra</td><td>Wide-Column</td><td>Massive scale, high availability</td></tr>
+          <tr><td>Neo4j</td><td>Graph</td><td>Relationship-heavy data</td></tr>
+          <tr><td>DynamoDB</td><td>Key-Value/Doc</td><td>AWS-native, serverless scale</td></tr>
+          <tr><td>Firebase</td><td>Document</td><td>Real-time sync, mobile apps</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ 4. CORE CONCEPTS ═══ -->
+<div class="section" id="s4">
+  <div class="section-header">
+    <div class="section-icon icon-blue">🧠</div>
+    <h2>4 · Core Concepts</h2>
+  </div>
+  <div class="section-body">
+    <ul>
+      <li><strong>Schema-less</strong> — No need to pre-define data structure; fields can vary per document</li>
+      <li><strong>Horizontal Scaling</strong> — Add more servers (nodes) instead of upgrading one big server</li>
+      <li><strong>Eventual Consistency</strong> — Data might not be instantly synced across all nodes, but will be <em>eventually</em></li>
+      <li><strong>CAP Theorem</strong> — A NoSQL DB can only guarantee 2 of 3: <em>Consistency</em>, <em>Availability</em>, <em>Partition Tolerance</em></li>
+      <li><strong>Replication</strong> — Data is copied across multiple servers for reliability</li>
+      <li><strong>Sharding</strong> — Data is split across multiple servers for performance</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ 5. CRUD QUERIES ═══ -->
+<div class="section" id="s5">
+  <div class="section-header">
+    <div class="section-icon icon-green">⚡</div>
+    <h2>5 · CRUD Queries (with DB State)</h2>
+  </div>
+  <div class="section-body">
+
+    <div class="callout teal">
+      💡 Using <strong>MongoDB</strong> with database <code class="inline-code">shopDB</code> and collection <code class="inline-code">products</code>. Starting with an <strong>empty collection</strong>.
+    </div>
+
+    <!-- INSERT ONE -->
+    <div class="subsection">
+      <h3>➕ insertOne</h3>
+      <div class="code-wrap">
+        <div class="code-label">JavaScript — MongoDB Shell</div>
+        <pre><code>db.products.<span class="fn">insertOne</span>({
+  <span class="key">name</span>: <span class="str">"Wireless Headphones"</span>,
+  <span class="key">brand</span>: <span class="str">"SoundMax"</span>,
+  <span class="key">price</span>: <span class="num">59.99</span>,
+  <span class="key">stock</span>: <span class="num">120</span>,
+  <span class="key">tags</span>: [<span class="str">"electronics"</span>, <span class="str">"audio"</span>]
+})</code></pre>
+      </div>
+      <div class="db-state">
+        <div class="label">📦 DB State After</div>
+        <pre><code>[
+  { <span class="key">"_id"</span>: <span class="str">"001"</span>, <span class="key">"name"</span>: <span class="str">"Wireless Headphones"</span>,
+    <span class="key">"brand"</span>: <span class="str">"SoundMax"</span>, <span class="key">"price"</span>: <span class="num">59.99</span>,
+    <span class="key">"stock"</span>: <span class="num">120</span>, <span class="key">"tags"</span>: [<span class="str">"electronics"</span>, <span class="str">"audio"</span>] }
+]  <span class="cmt">← 1 document</span></code></pre>
+      </div>
+      <div class="callout">💡 MongoDB auto-generates <code class="inline-code">_id</code> for every document.</div>
+    </div>
+
+    <!-- INSERT MANY -->
+    <div class="subsection">
+      <h3>➕ insertMany</h3>
+      <div class="code-wrap">
+        <div class="code-label">JavaScript</div>
+        <pre><code>db.products.<span class="fn">insertMany</span>([
+  { <span class="key">name</span>: <span class="str">"Running Shoes"</span>, <span class="key">brand</span>: <span class="str">"SpeedFit"</span>,
+    <span class="key">price</span>: <span class="num">89.99</span>, <span class="key">stock</span>: <span class="num">45</span>,
+    <span class="key">tags</span>: [<span class="str">"footwear"</span>, <span class="str">"sports"</span>] },
+  { <span class="key">name</span>: <span class="str">"Coffee Maker"</span>, <span class="key">brand</span>: <span class="str">"BrewKing"</span>,
+    <span class="key">price</span>: <span class="num">34.99</span>, <span class="key">stock</span>: <span class="num">200</span>,
+    <span class="key">tags</span>: [<span class="str">"kitchen"</span>, <span class="str">"appliances"</span>] },
+  { <span class="key">name</span>: <span class="str">"Yoga Mat"</span>, <span class="key">brand</span>: <span class="str">"FlexZone"</span>,
+    <span class="key">price</span>: <span class="num">24.99</span>, <span class="key">stock</span>: <span class="num">300</span>,
+    <span class="key">tags</span>: [<span class="str">"fitness"</span>, <span class="str">"sports"</span>] }
+])</code></pre>
+      </div>
+      <div class="db-state">
+        <div class="label">📦 DB State After (4 documents total)</div>
+        <pre><code><span class="cmt">_id  name                  price   stock</span>
+001  Wireless Headphones   59.99   120
+002  Running Shoes         89.99    45
+003  Coffee Maker          34.99   200
+004  Yoga Mat              24.99   300</code></pre>
+      </div>
+    </div>
+
+    <!-- FIND -->
+    <div class="subsection">
+      <h3>🔍 find — Basic Queries</h3>
+
+      <h4>Find All</h4>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code>db.products.<span class="fn">find</span>()  <span class="cmt">// returns all 4 documents</span></code></pre>
+      </div>
+
+      <h4>Find with Filter</h4>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code>db.products.<span class="fn">find</span>({ <span class="key">brand</span>: <span class="str">"SpeedFit"</span> })</code></pre>
+      </div>
+
+      <h4>Comparison Operators</h4>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code><span class="cmt">// price less than 40</span>
+db.products.<span class="fn">find</span>({ <span class="key">price</span>: { <span class="fn">$lt</span>: <span class="num">40</span> } })</code></pre>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Operator</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code class="inline-code">$lt</code></td><td>Less than</td></tr>
+            <tr><td><code class="inline-code">$lte</code></td><td>Less than or equal</td></tr>
+            <tr><td><code class="inline-code">$gt</code></td><td>Greater than</td></tr>
+            <tr><td><code class="inline-code">$gte</code></td><td>Greater than or equal</td></tr>
+            <tr><td><code class="inline-code">$eq</code></td><td>Equal to</td></tr>
+            <tr><td><code class="inline-code">$ne</code></td><td>Not equal to</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Projection (Select Specific Fields)</h4>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code><span class="cmt">// Only return name and price, hide _id</span>
+db.products.<span class="fn">find</span>({}, { <span class="key">name</span>: <span class="num">1</span>, <span class="key">price</span>: <span class="num">1</span>, <span class="key">_id</span>: <span class="num">0</span> })</code></pre>
+      </div>
+      <div class="callout">💡 <code class="inline-code">1</code> = include the field &nbsp;|&nbsp; <code class="inline-code">0</code> = exclude the field</div>
+    </div>
+
+    <!-- UPDATE -->
+    <div class="subsection">
+      <h3>✏️ updateOne &amp; updateMany</h3>
+
+      <h4>updateOne — Change a Value</h4>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code>db.products.<span class="fn">updateOne</span>(
+  { <span class="key">name</span>: <span class="str">"Coffee Maker"</span> },     <span class="cmt">// filter</span>
+  { <span class="fn">$set</span>: { <span class="key">price</span>: <span class="num">39.99</span> } }  <span class="cmt">// update</span>
+)</code></pre>
+      </div>
+      <div class="db-state">
+        <div class="label">📦 DB State After</div>
+        <pre><code>003  Coffee Maker   <span class="val">39.99</span>  ← was 34.99, now 39.99 ✅</code></pre>
+      </div>
+
+      <h4>$inc — Increment / Decrement</h4>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code><span class="cmt">// Reduce stock by 5</span>
+db.products.<span class="fn">updateOne</span>(
+  { <span class="key">name</span>: <span class="str">"Running Shoes"</span> },
+  { <span class="fn">$inc</span>: { <span class="key">stock</span>: <span class="num">-5</span> } }
+)</code></pre>
+      </div>
+      <div class="db-state">
+        <div class="label">📦 DB State After</div>
+        <pre><code>002  Running Shoes  stock: <span class="val">40</span>  ← was 45, now 40 ✅</code></pre>
+      </div>
+
+      <h4>updateMany — Add New Field to Multiple Docs</h4>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code><span class="cmt">// Add "discount: true" to products under $50</span>
+db.products.<span class="fn">updateMany</span>(
+  { <span class="key">price</span>: { <span class="fn">$lt</span>: <span class="num">50</span> } },
+  { <span class="fn">$set</span>: { <span class="key">discount</span>: <span class="kw">true</span> } }
+)</code></pre>
+      </div>
+      <div class="db-state">
+        <div class="label">📦 DB State After</div>
+        <pre><code>001  Wireless Headphones  59.99  <span class="cmt">← NOT affected (price ≥ 50)</span>
+002  Running Shoes        89.99  <span class="cmt">← NOT affected</span>
+003  Coffee Maker         39.99  discount: true ✅
+004  Yoga Mat             24.99  discount: true ✅</code></pre>
+      </div>
+      <div class="callout teal">🤯 Docs 001 &amp; 002 have NO <code class="inline-code">discount</code> field. In SQL this would require a schema change for the <em>entire</em> table — in NoSQL it's perfectly fine!</div>
+    </div>
+
+    <!-- DELETE -->
+    <div class="subsection">
+      <h3>🗑️ deleteOne &amp; deleteMany</h3>
+
+      <h4>deleteOne</h4>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code>db.products.<span class="fn">deleteOne</span>({ <span class="key">name</span>: <span class="str">"Yoga Mat"</span> })</code></pre>
+      </div>
+      <div class="db-state">
+        <div class="label">📦 DB State After (3 documents)</div>
+        <pre><code>001  Wireless Headphones
+002  Running Shoes
+003  Coffee Maker
+<span class="cmt">004  Yoga Mat  ← GONE ✅</span></code></pre>
+      </div>
+
+      <h4>deleteMany</h4>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code><span class="cmt">// Delete all products with stock > 100</span>
+db.products.<span class="fn">deleteMany</span>({ <span class="key">stock</span>: { <span class="fn">$gt</span>: <span class="num">100</span> } })</code></pre>
+      </div>
+      <div class="db-state">
+        <div class="label">📦 DB State After (1 document)</div>
+        <pre><code>002  Running Shoes  stock: 40
+<span class="cmt">001  (stock: 120) → DELETED</span>
+<span class="cmt">003  (stock: 200) → DELETED</span></code></pre>
+      </div>
+    </div>
+
+    <!-- ADVANCED -->
+    <div class="subsection">
+      <h3>🔗 Advanced Queries</h3>
+
+      <h4>Query Inside Arrays</h4>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code><span class="cmt">// Finds all products tagged "sports"</span>
+db.products.<span class="fn">find</span>({ <span class="key">tags</span>: <span class="str">"sports"</span> })</code></pre>
+      </div>
+
+      <h4>Logical Operators</h4>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code>db.products.<span class="fn">find</span>({
+  <span class="fn">$or</span>: [
+    { <span class="key">tags</span>: <span class="str">"electronics"</span> },
+    { <span class="key">price</span>: { <span class="fn">$lt</span>: <span class="num">30</span> } }
+  ]
+})</code></pre>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Operator</th><th>Meaning</th></tr></thead>
+          <tbody>
+            <tr><td><code class="inline-code">$or</code></td><td>At least one condition is true</td></tr>
+            <tr><td><code class="inline-code">$and</code></td><td>All conditions must be true</td></tr>
+            <tr><td><code class="inline-code">$not</code></td><td>Condition must be false</td></tr>
+            <tr><td><code class="inline-code">$nor</code></td><td>None of the conditions are true</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Aggregation Pipeline</h4>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code><span class="cmt">// Average price per tag, sorted highest first</span>
+db.products.<span class="fn">aggregate</span>([
+  { <span class="fn">$unwind</span>: <span class="str">"$tags"</span> },
+  { <span class="fn">$group</span>: {
+      <span class="key">_id</span>: <span class="str">"$tags"</span>,
+      <span class="key">avgPrice</span>: { <span class="fn">$avg</span>: <span class="str">"$price"</span> },
+      <span class="key">totalProducts</span>: { <span class="fn">$sum</span>: <span class="num">1</span> }
+  }},
+  { <span class="fn">$sort</span>: { <span class="key">avgPrice</span>: <span class="num">-1</span> } }
+])</code></pre>
+      </div>
+      <div class="callout warn">⚠️ Always put <code class="inline-code">$match</code> <strong>first</strong> in your pipeline — filter early to reduce load on later stages.</div>
+    </div>
+
+    <!-- Journey Summary -->
+    <h3>🗺️ Full Journey Summary</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Stage</th><th>Action</th><th>Docs</th></tr></thead>
+        <tbody>
+          <tr><td>🏁 Start</td><td>Empty collection</td><td>0</td></tr>
+          <tr><td>➕</td><td>insertOne</td><td>1</td></tr>
+          <tr><td>➕</td><td>insertMany (3 items)</td><td>4</td></tr>
+          <tr><td>✏️</td><td>updateOne — price</td><td>4</td></tr>
+          <tr><td>✏️</td><td>updateOne — $inc stock</td><td>4</td></tr>
+          <tr><td>✏️</td><td>updateMany — add discount field</td><td>4</td></tr>
+          <tr><td>🗑️</td><td>deleteOne — Yoga Mat</td><td>3</td></tr>
+          <tr><td>🗑️</td><td>deleteMany — stock &gt; 100</td><td>1</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ 6. MIXED SCHEMAS ═══ -->
+<div class="section" id="s6">
+  <div class="section-header">
+    <div class="section-icon icon-purple">🧩</div>
+    <h2>6 · Flexible / Mixed Schemas</h2>
+  </div>
+  <div class="section-body">
+    <p>This is one of NoSQL's <strong>biggest advantages</strong>. Documents in the same collection can have completely different fields.</p>
+
+    <div class="subsection">
+      <h3>➕ Insert a Digital Product</h3>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code>db.products.<span class="fn">insertOne</span>({
+  <span class="key">name</span>: <span class="str">"Photo Editing Software"</span>,
+  <span class="key">type</span>: <span class="str">"digital"</span>,
+  <span class="key">price</span>: <span class="num">149.99</span>,
+  <span class="key">license</span>: <span class="str">"annual"</span>,
+  <span class="key">platforms</span>: [<span class="str">"Windows"</span>, <span class="str">"macOS"</span>, <span class="str">"Linux"</span>],
+  <span class="key">features</span>: {
+    <span class="key">aiTools</span>: <span class="kw">true</span>,
+    <span class="key">cloudSync</span>: <span class="kw">true</span>,
+    <span class="key">maxProjects</span>: <span class="num">50</span>
+  }
+})</code></pre>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>➕ Insert a Food Product</h3>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code>db.products.<span class="fn">insertOne</span>({
+  <span class="key">name</span>: <span class="str">"Organic Green Tea"</span>,
+  <span class="key">category</span>: <span class="str">"food &amp; beverage"</span>,
+  <span class="key">price</span>: <span class="num">12.99</span>,
+  <span class="key">nutritionInfo</span>: {
+    <span class="key">calories</span>: <span class="num">2</span>,
+    <span class="key">caffeine</span>: <span class="str">"30mg"</span>
+  },
+  <span class="key">certifications</span>: [<span class="str">"Organic"</span>, <span class="str">"Fair Trade"</span>, <span class="str">"Vegan"</span>],
+  <span class="key">origin</span>: <span class="str">"Kyoto, Japan"</span>
+})</code></pre>
+      </div>
+    </div>
+
+    <h3>📊 Schema Field Comparison</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Field</th><th>Running Shoes</th><th>Photo Software</th><th>Green Tea</th></tr></thead>
+        <tbody>
+          <tr><td>price</td><td>✅</td><td>✅</td><td>✅</td></tr>
+          <tr><td>stock</td><td>✅</td><td>❌</td><td>✅</td></tr>
+          <tr><td>brand</td><td>✅</td><td>❌</td><td>❌</td></tr>
+          <tr><td>license</td><td>❌</td><td>✅</td><td>❌</td></tr>
+          <tr><td>platforms</td><td>❌</td><td>✅</td><td>❌</td></tr>
+          <tr><td>nutritionInfo</td><td>❌</td><td>❌</td><td>✅</td></tr>
+          <tr><td>certifications</td><td>❌</td><td>❌</td><td>✅</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout teal">✅ In SQL you'd need <strong>3 separate tables</strong> or a massive table full of NULL values. In NoSQL — <strong>one collection handles them all cleanly!</strong></div>
+
+    <div class="subsection">
+      <h3>🔍 Querying Mixed Schemas</h3>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code><span class="cmt">// Works across ALL schemas</span>
+db.products.<span class="fn">find</span>({ <span class="key">price</span>: { <span class="fn">$lt</span>: <span class="num">100</span> } })
+
+<span class="cmt">// Only matches docs WITH "type" field</span>
+db.products.<span class="fn">find</span>({ <span class="key">type</span>: <span class="str">"digital"</span> })
+
+<span class="cmt">// Check if a field exists</span>
+db.products.<span class="fn">find</span>({ <span class="key">certifications</span>: { <span class="fn">$exists</span>: <span class="kw">true</span> } })</code></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ 7. TIME COMPLEXITY ═══ -->
+<div class="section" id="s7">
+  <div class="section-header">
+    <div class="section-icon icon-red">⏱️</div>
+    <h2>7 · Time Complexity</h2>
+  </div>
+  <div class="section-body">
+    <p>Where <strong>n</strong> = number of documents &nbsp;|&nbsp; <strong>k</strong> = number of results returned</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Operation</th><th>No Index</th><th>With Index</th></tr></thead>
+        <tbody>
+          <tr><td>Insert</td><td><span class="complexity bad">O(1)</span></td><td><span class="complexity">O(log n)</span></td></tr>
+          <tr><td>Find by _id</td><td><span class="complexity good">O(1)</span></td><td><span class="complexity good">O(1)</span></td></tr>
+          <tr><td>Find by field</td><td><span class="complexity bad">O(n)</span></td><td><span class="complexity good">O(log n)</span></td></tr>
+          <tr><td>Find range query</td><td><span class="complexity bad">O(n)</span></td><td><span class="complexity good">O(log n + k)</span></td></tr>
+          <tr><td>Update by _id</td><td><span class="complexity good">O(1)</span></td><td><span class="complexity good">O(1)</span></td></tr>
+          <tr><td>Update by field</td><td><span class="complexity bad">O(n)</span></td><td><span class="complexity good">O(log n)</span></td></tr>
+          <tr><td>Delete by _id</td><td><span class="complexity good">O(1)</span></td><td><span class="complexity good">O(1)</span></td></tr>
+          <tr><td>Delete by field</td><td><span class="complexity bad">O(n)</span></td><td><span class="complexity good">O(log n)</span></td></tr>
+          <tr><td>Sort ($sort)</td><td><span class="complexity bad">O(n log n)</span></td><td><span class="complexity bad">O(n log n)</span></td></tr>
+          <tr><td>$lookup (join)</td><td><span class="complexity bad">O(n · m)</span></td><td><span class="complexity">O(n · log m)</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subsection">
+      <h3>📈 Scale Impact</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Documents</th><th>O(n) — No Index</th><th>O(log n) — Index</th></tr></thead>
+          <tbody>
+            <tr><td>1,000</td><td>1,000 ops</td><td>~10 ops</td></tr>
+            <tr><td>100,000</td><td>100,000 ops</td><td>~17 ops</td></tr>
+            <tr><td>1,000,000</td><td>1,000,000 ops</td><td>~20 ops</td></tr>
+            <tr><td>100,000,000</td><td>100,000,000 ops</td><td>~27 ops</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout teal">⚡ With 100 million documents, an index reduces operations from <strong>100 million → just 27!</strong></div>
+    </div>
+
+    <div class="subsection">
+      <h3>🧮 Aggregation Pipeline Stages</h3>
+      <ul>
+        <li><code class="inline-code">$match</code> — <span class="complexity bad">O(n)</span> without index, <span class="complexity good">O(log n)</span> with index</li>
+        <li><code class="inline-code">$group</code> — <span class="complexity bad">O(n)</span> — must process all matched documents</li>
+        <li><code class="inline-code">$sort</code> — <span class="complexity bad">O(n log n)</span> — always expensive</li>
+        <li><code class="inline-code">$limit</code> — <span class="complexity good">O(1)</span> — just cuts the result</li>
+        <li><code class="inline-code">$lookup</code> — <span class="complexity bad">O(n · m)</span> — very expensive, use carefully!</li>
+      </ul>
+      <div class="callout warn">⚠️ Always put <code class="inline-code">$match</code> <strong>first</strong> in aggregation pipelines to reduce documents processed by later stages.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ 8. INDEXING ═══ -->
+<div class="section" id="s8">
+  <div class="section-header">
+    <div class="section-icon icon-yellow">📇</div>
+    <h2>8 · Indexing</h2>
+  </div>
+  <div class="section-body">
+    <p>An index is a separate data structure (B-Tree) that MongoDB maintains for <strong>fast lookups</strong> without scanning every document.</p>
+    <div class="callout">📚 Like the index at the back of a book — instead of reading every page, you jump directly to the right page.</div>
+
+    <div class="subsection">
+      <h3>🔍 Check Existing Indexes</h3>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code>db.products.<span class="fn">getIndexes</span>()</code></pre>
+      </div>
+      <div class="callout">💡 MongoDB <strong>always</strong> creates an index on <code class="inline-code">_id</code> automatically — it can never be removed.</div>
+    </div>
+
+    <div class="subsection">
+      <h3>➕ Single Field Index</h3>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code><span class="cmt">// Ascending</span>
+db.products.<span class="fn">createIndex</span>({ <span class="key">price</span>: <span class="num">1</span> })
+
+<span class="cmt">// Descending</span>
+db.products.<span class="fn">createIndex</span>({ <span class="key">price</span>: <span class="num">-1</span> })</code></pre>
+      </div>
+      <div class="callout">💡 <code class="inline-code">1</code> = Ascending &nbsp;|&nbsp; <code class="inline-code">-1</code> = Descending</div>
+    </div>
+
+    <div class="subsection">
+      <h3>➕ Compound Index (Multiple Fields)</h3>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code>db.products.<span class="fn">createIndex</span>({ <span class="key">brand</span>: <span class="num">1</span>, <span class="key">price</span>: <span class="num">-1</span> })</code></pre>
+      </div>
+      <div class="callout teal">💡 <strong>ESR Rule</strong> — order fields as: <strong>E</strong>quality first → <strong>S</strong>ort second → <strong>R</strong>ange last</div>
+    </div>
+
+    <div class="subsection">
+      <h3>➕ Unique Index</h3>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code>db.products.<span class="fn">createIndex</span>(
+  { <span class="key">name</span>: <span class="num">1</span> },
+  { <span class="key">unique</span>: <span class="kw">true</span> }
+)
+<span class="cmt">// Inserting a duplicate name will throw:</span>
+<span class="cmt">// E11000 duplicate key error ❌</span></code></pre>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>➕ Text Index (Full-Text Search)</h3>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code>db.products.<span class="fn">createIndex</span>({ <span class="key">name</span>: <span class="str">"text"</span> })
+
+<span class="cmt">// Now search by text</span>
+db.products.<span class="fn">find</span>({ <span class="fn">$text</span>: { <span class="fn">$search</span>: <span class="str">"organic tea"</span> } })</code></pre>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>➕ TTL Index (Auto-Delete)</h3>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code><span class="cmt">// Auto-delete sessions after 1 hour</span>
+db.sessions.<span class="fn">createIndex</span>(
+  { <span class="key">createdAt</span>: <span class="num">1</span> },
+  { <span class="key">expireAfterSeconds</span>: <span class="num">3600</span> }
+)</code></pre>
+      </div>
+      <div class="callout teal">⏰ Perfect for: sessions, OTP codes, temporary carts — anything that should <strong>expire automatically!</strong></div>
+    </div>
+
+    <div class="subsection">
+      <h3>➕ Partial Index</h3>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code><span class="cmt">// Only index products actually in stock</span>
+db.products.<span class="fn">createIndex</span>(
+  { <span class="key">price</span>: <span class="num">1</span> },
+  { <span class="key">partialFilterExpression</span>: { <span class="key">stock</span>: { <span class="fn">$gt</span>: <span class="num">0</span> } } }
+)</code></pre>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>🗑️ Drop an Index</h3>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code>db.products.<span class="fn">dropIndex</span>(<span class="str">"price_1"</span>)   <span class="cmt">// by name</span>
+db.products.<span class="fn">dropIndexes</span>()          <span class="cmt">// drop ALL (except _id)</span></code></pre>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>🔎 Explain — Verify Index Usage</h3>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code>db.products.<span class="fn">find</span>({ <span class="key">price</span>: { <span class="fn">$lt</span>: <span class="num">50</span> } }).<span class="fn">explain</span>(<span class="str">"executionStats"</span>)</code></pre>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Field</th><th>Good ✅</th><th>Bad ❌</th></tr></thead>
+          <tbody>
+            <tr><td>winningPlan.stage</td><td>IXSCAN (index scan)</td><td>COLLSCAN (full scan)</td></tr>
+            <tr><td>totalDocsExamined</td><td>Small number</td><td>Equal to total docs</td></tr>
+            <tr><td>executionTimeMillis</td><td>Low</td><td>High</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h3>📊 Index Types Summary</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Type</th><th>Syntax</th><th>Best For</th></tr></thead>
+        <tbody>
+          <tr><td>Single Field</td><td><code class="inline-code">{ field: 1 }</code></td><td>Equality &amp; range queries</td></tr>
+          <tr><td>Compound</td><td><code class="inline-code">{ f1: 1, f2: -1 }</code></td><td>Multi-field queries</td></tr>
+          <tr><td>Unique</td><td><code class="inline-code">{ f: 1 }, { unique: true }</code></td><td>Preventing duplicates</td></tr>
+          <tr><td>Text</td><td><code class="inline-code">{ field: "text" }</code></td><td>Full-text search</td></tr>
+          <tr><td>TTL</td><td><code class="inline-code">{ date: 1 }, { expireAfterSeconds }</code></td><td>Auto-expiring documents</td></tr>
+          <tr><td>Partial</td><td><code class="inline-code">{ f: 1 }, { partialFilterExpression }</code></td><td>Indexing a subset</td></tr>
+          <tr><td>Sparse</td><td><code class="inline-code">{ f: 1 }, { sparse: true }</code></td><td>Fields absent in some docs</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ 9. CREATE DB ═══ -->
+<div class="section" id="s9">
+  <div class="section-header">
+    <div class="section-icon icon-teal">🏗️</div>
+    <h2>9 · Creating a Database</h2>
+  </div>
+  <div class="section-body">
+
+    <div class="subsection">
+      <h3>🛠️ Setup Options</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Option</th><th>Best For</th><th>Cost</th></tr></thead>
+          <tbody>
+            <tr><td>Local Installation</td><td>Full control, offline</td><td>Free</td></tr>
+            <tr><td>MongoDB Atlas (Cloud)</td><td>Quick start, no setup</td><td>Free tier</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>🖥️ Local — Start MongoDB</h3>
+      <div class="code-wrap"><div class="code-label">Windows</div>
+        <pre><code>net start MongoDB
+<span class="cmt">// or</span>
+mongod</code></pre>
+      </div>
+      <div class="code-wrap"><div class="code-label">macOS (Homebrew)</div>
+        <pre><code>brew services start mongodb-community</code></pre>
+      </div>
+      <div class="code-wrap"><div class="code-label">Linux</div>
+        <pre><code>sudo systemctl start mongod
+sudo systemctl enable mongod   <span class="cmt"># auto-start on boot</span></code></pre>
+      </div>
+      <div class="code-wrap"><div class="code-label">Open Shell</div>
+        <pre><code>mongosh</code></pre>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>💡 Key Concept</h3>
+      <div class="callout red">⚠️ MongoDB does <strong>NOT</strong> create a database until you insert at least one document. Just switching to it doesn't persist it.</div>
+    </div>
+
+    <div class="subsection">
+      <h3>🗄️ Database Commands</h3>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code><span class="fn">use</span> shopDB           <span class="cmt">// switch to (or create) a DB</span>
+db                   <span class="cmt">// show current DB</span>
+<span class="fn">show</span> dbs             <span class="cmt">// list all databases</span>
+<span class="fn">show</span> collections     <span class="cmt">// list all collections</span></code></pre>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>📁 Creating Collections</h3>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code><span class="cmt">// Method 1: Implicit (auto-created on insert)</span>
+db.products.<span class="fn">insertOne</span>({ <span class="key">name</span>: <span class="str">"Coffee Maker"</span> })
+
+<span class="cmt">// Method 2: Explicit</span>
+db.<span class="fn">createCollection</span>(<span class="str">"customers"</span>)
+
+<span class="cmt">// Method 3: With validation rules</span>
+db.<span class="fn">createCollection</span>(<span class="str">"orders"</span>, {
+  <span class="key">validator</span>: {
+    <span class="fn">$jsonSchema</span>: {
+      <span class="key">bsonType</span>: <span class="str">"object"</span>,
+      <span class="key">required</span>: [<span class="str">"customerId"</span>, <span class="str">"totalAmount"</span>, <span class="str">"status"</span>],
+      <span class="key">properties</span>: {
+        <span class="key">status</span>: {
+          <span class="key">enum</span>: [<span class="str">"pending"</span>, <span class="str">"shipped"</span>, <span class="str">"delivered"</span>, <span class="str">"cancelled"</span>]
+        }
+      }
+    }
+  }
+})</code></pre>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>🏪 Full ecommerceDB Setup</h3>
+      <div class="code-wrap"><div class="code-label">JavaScript — Complete Setup</div>
+        <pre><code><span class="cmt">// 1. Create & switch</span>
+<span class="fn">use</span> ecommerceDB
+
+<span class="cmt">// 2. Create collections</span>
+db.<span class="fn">createCollection</span>(<span class="str">"users"</span>)
+db.<span class="fn">createCollection</span>(<span class="str">"products"</span>)
+db.<span class="fn">createCollection</span>(<span class="str">"orders"</span>)
+
+<span class="cmt">// 3. Insert sample data</span>
+db.users.<span class="fn">insertMany</span>([
+  { <span class="key">name</span>: <span class="str">"Alice Johnson"</span>, <span class="key">email</span>: <span class="str">"alice@email.com"</span>,
+    <span class="key">address</span>: { <span class="key">city</span>: <span class="str">"New York"</span>, <span class="key">country</span>: <span class="str">"USA"</span> },
+    <span class="key">createdAt</span>: <span class="kw">new</span> <span class="fn">Date</span>() },
+  { <span class="key">name</span>: <span class="str">"Bob Smith"</span>, <span class="key">email</span>: <span class="str">"bob@email.com"</span>,
+    <span class="key">address</span>: { <span class="key">city</span>: <span class="str">"London"</span>, <span class="key">country</span>: <span class="str">"UK"</span> },
+    <span class="key">createdAt</span>: <span class="kw">new</span> <span class="fn">Date</span>() }
+])
+
+<span class="cmt">// 4. Add indexes</span>
+db.users.<span class="fn">createIndex</span>({ <span class="key">email</span>: <span class="num">1</span> }, { <span class="key">unique</span>: <span class="kw">true</span> })
+db.products.<span class="fn">createIndex</span>({ <span class="key">price</span>: <span class="num">1</span> })
+db.orders.<span class="fn">createIndex</span>({ <span class="key">customerId</span>: <span class="num">1</span> })
+
+<span class="cmt">// 5. Verify</span>
+<span class="fn">show</span> collections
+db.users.<span class="fn">countDocuments</span>()   <span class="cmt">// → 2</span></code></pre>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3>⚠️ Management Commands</h3>
+      <div class="code-wrap"><div class="code-label">JavaScript</div>
+        <pre><code>db.<span class="fn">stats</span>()                          <span class="cmt">// DB stats</span>
+db.products.<span class="fn">stats</span>()                 <span class="cmt">// Collection stats</span>
+db.products.<span class="fn">renameCollection</span>(<span class="str">"items"</span>) <span class="cmt">// Rename</span>
+db.products.<span class="fn">drop</span>()                  <span class="cmt">// Drop collection</span>
+db.<span class="fn">dropDatabase</span>()                   <span class="cmt">// ⚠️ Drop entire DB!</span></code></pre>
+      </div>
+      <div class="callout red">⚠️ <code class="inline-code">dropDatabase()</code> is <strong>permanent and irreversible</strong> — always double-check!</div>
+    </div>
+
+    <div class="subsection">
+      <h3>🔧 Recommended GUI Tools</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tool</th><th>Platform</th><th>Cost</th></tr></thead>
+          <tbody>
+            <tr><td>MongoDB Compass</td><td>Win / Mac / Linux</td><td>Free</td></tr>
+            <tr><td>Studio 3T</td><td>Win / Mac / Linux</td><td>Free tier</td></tr>
+            <tr><td>TablePlus</td><td>Win / Mac</td><td>Free tier</td></tr>
+            <tr><td>VS Code Extension</td><td>VS Code</td><td>Free</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ 10. WHEN TO USE ═══ -->
+<div class="section" id="s10">
+  <div class="section-header">
+    <div class="section-icon icon-green">🎯</div>
+    <h2>10 · When to Use / Avoid NoSQL</h2>
+  </div>
+  <div class="section-body">
+    <div class="grid2">
+      <div class="mini-card">
+        <h4 style="color: var(--accent2);">✅ Use NoSQL When…</h4>
+        <ul style="padding-left: 16px;">
+          <li>Large volumes of data</li>
+          <li>Rapidly changing structure</li>
+          <li>High-speed read/writes</li>
+          <li>Distributed systems</li>
+          <li>Unstructured / semi-structured data</li>
+          <li>Horizontal scaling needed</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h4 style="color: var(--accent3);">❌ Avoid NoSQL When…</h4>
+        <ul style="padding-left: 16px;">
+          <li>Complex table relationships</li>
+          <li>ACID transactions needed</li>
+          <li>Financial / banking data</li>
+          <li>Structured, predictable data</li>
+          <li>Complex joins & aggregations</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<a href="#" class="back-top">↑ Back to top</a>
+
+</main>
+</body>
+</html>
