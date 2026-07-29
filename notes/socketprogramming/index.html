@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Socket Programming Notes - Complete Guide</title>
+		<style>
+			*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+			:root {
+				--bg: #0f1117;
+				--surface: #1a1d27;
+				--surface2: #22263a;
+				--border: #2e3250;
+				--accent: #6c63ff;
+				--accent2: #00d4aa;
+				--accent3: #ff6b6b;
+				--text: #e2e4f0;
+				--muted: #8b90b0;
+				--code-bg: #12151f;
+				--radius: 12px;
+				--radius-sm: 8px;
+			}
+
+			html { scroll-behavior: smooth; }
+
+			body {
+				font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+				background: var(--bg);
+				color: var(--text);
+				line-height: 1.7;
+				font-size: 15px;
+			}
+
+			header {
+				background: linear-gradient(135deg, #1a1d27 0%, #12151f 100%);
+				border-bottom: 1px solid var(--border);
+				padding: 20px 16px 16px;
+				position: sticky;
+				top: 0;
+				z-index: 100;
+				backdrop-filter: blur(10px);
+			}
+
+			header h1 {
+				font-size: 1.3rem;
+				font-weight: 700;
+				background: linear-gradient(90deg, var(--accent), var(--accent2));
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+			}
+
+			header p { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+			.toc {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius);
+				margin: 20px 16px;
+				padding: 16px;
+			}
+
+			.toc h2 {
+				font-size: 0.85rem;
+				text-transform: uppercase;
+				letter-spacing: .1em;
+				color: var(--accent2);
+				margin-bottom: 10px;
+			}
+
+			.toc ol { padding-left: 18px; }
+			.toc li { margin: 5px 0; }
+			.toc a {
+				color: var(--muted);
+				text-decoration: none;
+				font-size: 0.88rem;
+				transition: color .2s;
+			}
+			.toc a:hover { color: var(--accent); }
+
+			main { padding: 0 16px 60px; max-width: 900px; margin: 0 auto; }
+
+			.section {
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: var(--radius);
+				margin-bottom: 24px;
+				overflow: hidden;
+			}
+
+			.section-header {
+				padding: 14px 18px;
+				border-bottom: 1px solid var(--border);
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				background: var(--surface2);
+			}
+
+			.section-icon {
+				width: 34px;
+				height: 34px;
+				border-radius: var(--radius-sm);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 1rem;
+				flex-shrink: 0;
+			}
+
+			.icon-purple { background: rgba(108,99,255,.2); }
+			.icon-teal { background: rgba(0,212,170,.2); }
+			.icon-red { background: rgba(255,107,107,.2); }
+			.icon-blue { background: rgba(66,165,245,.2); }
+			.icon-green { background: rgba(102,187,106,.2); }
+
+			.section-header h2 {
+				font-size: 1rem;
+				font-weight: 700;
+				color: var(--text);
+			}
+
+			.section-body { padding: 18px; }
+
+			h3 {
+				font-size: 0.92rem;
+				font-weight: 700;
+				color: var(--accent2);
+				margin-bottom: 10px;
+				margin-top: 16px;
+			}
+
+			p { margin-bottom: 10px; font-size: 0.9rem; color: var(--text); }
+			p:last-child { margin-bottom: 0; }
+
+			ul, ol { padding-left: 20px; margin: 8px 0; }
+			li { margin: 5px 0; font-size: 0.88rem; }
+			li::marker { color: var(--accent); }
+
+			.callout {
+				border-left: 3px solid var(--accent2);
+				background: rgba(0,212,170,.08);
+				border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+				padding: 10px 14px;
+				margin: 12px 0;
+				font-size: 0.88rem;
+			}
+
+			.callout.red {
+				border-color: var(--accent3);
+				background: rgba(255,107,107,.08);
+			}
+
+			.code-wrap {
+				background: var(--code-bg);
+				border: 1px solid var(--border);
+				border-radius: var(--radius-sm);
+				margin: 12px 0;
+				overflow: hidden;
+			}
+
+			.code-label {
+				padding: 5px 12px;
+				background: var(--surface2);
+				font-size: 0.72rem;
+				color: var(--muted);
+				letter-spacing: .05em;
+				text-transform: uppercase;
+				border-bottom: 1px solid var(--border);
+			}
+
+			pre {
+				padding: 14px;
+				overflow-x: auto;
+				font-size: 0.82rem;
+				line-height: 1.6;
+				margin: 0;
+			}
+
+			code {
+				font-family: "Fira Code", "Cascadia Code", "JetBrains Mono", monospace;
+				color: #c9d1d9;
+			}
+
+			.inline-code {
+				background: var(--surface2);
+				border: 1px solid var(--border);
+				padding: 1px 6px;
+				border-radius: 4px;
+				font-family: monospace;
+				font-size: 0.82rem;
+				color: var(--accent2);
+			}
+
+			.progress-bar {
+				height: 3px;
+				background: linear-gradient(90deg, var(--accent), var(--accent2));
+				border-radius: 2px;
+				margin-bottom: 20px;
+			}
+		</style>
+	</head>
+	<body>
+		<header>
+			<h1>Socket Programming - Complete Study Notes</h1>
+			<p>TCP · UDP · Python Socket Examples · Tic Tac Toe over TCP</p>
+		</header>
+
+		<div class="toc">
+			<h2>Table of Contents</h2>
+			<ol>
+				<li><a href="#s1">TCP Basics</a></li>
+				<li><a href="#s2">UDP Basics</a></li>
+				<li><a href="#s3">TCP Socket Example</a></li>
+				<li><a href="#s4">UDP Socket Example</a></li>
+				<li><a href="#s5">Tic Tac Toe (TCP)</a></li>
+				<li><a href="#s6">Testing Steps</a></li>
+			</ol>
+		</div>
+
+		<main>
+			<div class="progress-bar"></div>
+
+			<div class="section" id="s1">
+				<div class="section-header">
+					<div class="section-icon icon-purple">🔗</div>
+					<h2>1 - TCP (Transmission Control Protocol)</h2>
+				</div>
+				<div class="section-body">
+					<p>
+						TCP is connection-oriented and ensures data is received
+						in order and without errors.
+					</p>
+					<ul>
+						<li>Useful when data integrity is critical.</li>
+						<li>
+							Examples: HTTP/HTTPS, SMTP, IMAP, POP3, FTP, SSH.
+						</li>
+					</ul>
+					<div class="callout">
+						TCP provides reliable delivery, but it is generally
+						slower than UDP due to connection and acknowledgment
+						overhead.
+					</div>
+				</div>
+			</div>
+
+			<div class="section" id="s2">
+				<div class="section-header">
+					<div class="section-icon icon-teal">⚡</div>
+					<h2>2 - UDP (User Datagram Protocol)</h2>
+				</div>
+				<div class="section-body">
+					<p>
+						UDP is connectionless and faster, but less reliable than
+						TCP.
+					</p>
+					<ul>
+						<li>
+							Does not guarantee delivery, order, or error-free
+							transmission.
+						</li>
+						<li>
+							Great for real-time traffic like streaming, online
+							gaming, and VoIP.
+						</li>
+					</ul>
+					<div class="callout red">
+						Use UDP when speed is more important than guaranteed
+						delivery.
+					</div>
+				</div>
+			</div>
+
+			<div class="section" id="s3">
+				<div class="section-header">
+					<div class="section-icon icon-blue">🖥️</div>
+					<h2>3 - TCP Socket Example</h2>
+				</div>
+				<div class="section-body">
+					<div class="code-wrap">
+						<div class="code-label">Python TCP Server</div>
+						<pre><code>import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind(('localhost', 12345))
+s.listen(1)
+
+print("Server listening on port 12345")
+
+conn, addr = s.accept()
+print('Got connection from', addr)
+
+conn.sendall(b'Hello, client!')
+
+data = conn.recv(1024)
+print('Received', repr(data))
+
+conn.close()
+s.close()</code></pre>
+					</div>
+				</div>
+			</div>
+
+			<div class="section" id="s4">
+				<div class="section-header">
+					<div class="section-icon icon-green">📡</div>
+					<h2>4 - UDP Socket Example</h2>
+				</div>
+				<div class="section-body">
+					<div class="code-wrap">
+						<div class="code-label">Python UDP Server</div>
+						<pre><code>import socket
+
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+s.bind(('localhost', 12346))
+
+print("UDP server listening on port 12346")
+
+while True:
+		data, addr = s.recvfrom(1024)
+		print('Received', repr(data), 'from', addr)
+		s.sendto(b'Hello, client!', addr)</code></pre>
+					</div>
+				</div>
+			</div>
+
+			<div class="section" id="s5">
+				<div class="section-header">
+					<div class="section-icon icon-red">🎮</div>
+					<h2>5 - Tic Tac Toe Game Example (TCP)</h2>
+				</div>
+				<div class="section-body">
+					<p>
+						A simple Tic Tac Toe game can be built using TCP sockets
+						in Python.
+					</p>
+
+					<h3>Server Code</h3>
+					<div class="code-wrap">
+						<div class="code-label">Python Server</div>
+						<pre><code>import socket
+import threading
+
+board = [' ' for _ in range(9)]
+players = ['X', 'O']
+current_player = 0
+
+def handle_client(client_socket, player):
+		global current_player
+		print(f"Player {player} connected.")
+		while True:
+				try:
+						move = client_socket.recv(1024).decode()
+						if move in '123456789':
+								if board[int(move) - 1] == ' ':
+										board[int(move) - 1] = players[player]
+										client_socket.sendall(str(board).encode())
+										if check_winner(players[player]):
+												client_socket.sendall("You win!".encode())
+												break
+										current_player = 1 - current_player
+								else:
+										client_socket.sendall("Position already taken!".encode())
+						else:
+								client_socket.sendall("Invalid move!".encode())
+				except ConnectionResetError:
+						break
+
+		print(f"Player {player} disconnected.")
+		client_socket.close()
+
+def check_winner(player):
+		winning_combinations = [
+				(0, 1, 2), (3, 4, 5), (6, 7, 8),
+				(0, 3, 6), (1, 4, 7), (2, 5, 8),
+				(0, 4, 8), (2, 4, 6)
+		]
+		for combo in winning_combinations:
+				if board[combo[0]] == board[combo[1]] == board[combo[2]] == player:
+						return True
+		return False
+
+def start_server():
+		global board
+		board = [' ' for _ in range(9)]
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		s.bind(('localhost', 12345))
+		s.listen(2)
+		print("Server is listening on port 12345")
+
+		for i in range(2):
+				client_socket, addr = s.accept()
+				threading.Thread(target=handle_client, args=(client_socket, i)).start()
+
+		s.close()
+
+if __name__ == "__main__":
+		start_server()</code></pre>
+					</div>
+
+					<h3>Client Code</h3>
+					<div class="code-wrap">
+						<div class="code-label">Python Client</div>
+						<pre><code>import socket
+
+def main():
+		client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		client_socket.connect(('localhost', 12345))
+		player = client_socket.recv(1024).decode()
+		print(f"You are Player {player}")
+
+		while True:
+				try:
+						board_str = client_socket.recv(1024).decode()
+						print(board_str)
+
+						move = input("Enter your move (1-9): ")
+						client_socket.sendall(move.encode())
+
+						response = client_socket.recv(1024).decode()
+						print(response)
+						if "win" in response:
+								break
+				except ConnectionResetError:
+						break
+
+		client_socket.close()
+
+if __name__ == "__main__":
+		main()</code></pre>
+					</div>
+				</div>
+			</div>
+
+			<div class="section" id="s6">
+				<div class="section-header">
+					<div class="section-icon icon-teal">✅</div>
+					<h2>6 - Testing the Tic Tac Toe Game</h2>
+				</div>
+				<div class="section-body">
+					<ol>
+						<li>
+							Save the server code as
+							<span class="inline-code"
+								>tic_tac_toe_server.py</span
+							>.
+						</li>
+						<li>
+							Save the client code as
+							<span class="inline-code"
+								>tic_tac_toe_client.py</span
+							>.
+						</li>
+						<li>
+							Start the server first, then run two clients in
+							separate terminals.
+						</li>
+					</ol>
+				</div>
+			</div>
+		</main>
+	</body>
+</html>
