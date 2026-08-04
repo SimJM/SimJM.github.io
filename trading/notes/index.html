@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IBKR Trading Bot Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 1em 0;
+        }
+      .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 0.5em;
+        }
+      .section {
+            margin-bottom: 20px;
+        }
+      .section h3 {
+            margin: 0;
+            padding: 0 0 0.5em;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            background: #f9f9f9;
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        ul li:nth-child(even) {
+            background: #f1f1f1;
+        }
+        pre {
+            background: #2e2e2e;
+            border: 1px solid #ddd;
+            padding: 15px;
+            overflow: auto;
+            margin: 10px 0;
+            color: #fff;
+        }
+        footer {
+            text-align: center;
+            padding: 10px 0;
+            background-color: #4CAF50;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        @media (max-width: 600px) {
+          .container {
+                width: 100%;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>IBKR Trading Bot Details</h1>
+    </header>
+
+    <div class="container">
+        
+        <div class="section">
+            <h2>Introduction</h2>
+            <p>This document outlines the process and considerations for creating a day trading bot using the Interactive Brokers (IBKR) platform.</p>
+        </div>
+        
+        <div class="section">
+            <h3>Prerequisites</h3>
+            <ul>
+                <li><strong>IBKR Account:</strong> Open an IBKR account and request API access.</li>
+                <li><strong>Python Installed:</strong> Ensure Python is installed along with required libraries like <code>ib_insync</code> and <code>pandas</code>.</li>
+                <li><strong>IBKR SDK:</strong> Download and install the IBKR Trader SDK.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>Step-by-Step Guide</h3>
+            <ul>
+                <li><strong>Install Required Libraries:</strong> Use pip to install libraries.</li>
+                <li><strong>Set Up IBKR Connection:</strong> Establish a connection to the IBKR Trader API.</li>
+                <li><strong>Define Trading Strategy:</strong> Create a trading strategy based on technical indicators.</li>
+                <li><strong>Execute Trades:</strong> Use IBKR API to place trades based on your strategy.</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>Code and Strategy</h3>
+            <pre>
+{
+    "Install Required Libraries": "pip install ib_insync pandas",
+    "Set Up IBKR Connection": """
+    from ib_insync import IB, util
+    import time
+
+    # Create an instance of IB
+    ib = IB()
+
+    # Use a utility function to run the util loop
+    def run(util):
+        # Connect to the IBKR TWS gateway
+        ib.connect('127.0.0.1', 7497, clientId=1)
+
+        # Request market data
+        reqId = 1
+        symbol = 'EURUSD'  # Example: EUR/USD currency pair
+        contract = ib.Forex(symbol=symbol)
+        ib.reqMktData(reqId, contract, '', False, False)
+
+        # Wait for the market data to be received
+        while True:
+            if ib.isConnected():
+                break
+            time.sleep(1)
+
+        print(ib.marketData(reqId))
+
+        # Disconnect
+        ib.disconnect()
+    """,
+    "Define Trading Strategy": """
+    import pandas as pd
+    import numpy as np
+
+    def moving_average_crossover_strategy(prices):
+        short_window = 10
+        long_window = 30
+
+        short_ema = pd.DataFrame()
+        short_ema['price'] = prices
+        short_ema['short_ema'] = short_ema['price'].ewm(span=short_window, adjust=False).mean()
+
+        long_ema = pd.DataFrame()
+        long_ema['price'] = prices
+        long_ema['long_ema'] = long_ema['price'].ewm(span=long_window, adjust=False).mean()
+
+        signals = pd.DataFrame(index=short_ema.index)
+        signals['signal'] = 0.0
+
+        # Generate signals
+        signals['signal'][short_window:] = \
+            np.where(short_ema['short_ema'][short_window:] > long_ema['long_ema'][short_window:], 1.0, 0.0)
+
+        # Generate trading orders
+        signals['positions'] = signals['signal'].diff()
+
+        return signals
+    """,
+    "Execute Trades": """
+    def execute_trade(signal):
+        if signal['positions'] == 1.0:
+            # Place a buy order
+            contract = ib. Forex(symbol='EURUSD')
+            ib.placeOrder(order=ib.order('BUY', 1, marketOrder()), account='DemoID')
+        elif signal['positions'] == -1.0:
+            # Place a sell order
+            contract = ib. Forex(symbol='EURUSD')
+            ib.placeOrder(order=ib.order('SELL', 1, marketOrder()), account='DemoID')
+    """,
+    "Full Bot Code": """
+from ib_insync import IB, util
+import pandas as pd
+import numpy as np
+
+class ForexBot:
+    def __init__(self):
+        self.ib = IB()
+        self.util = util()
+
+    def connect(self):
+        self.ib.connect('127.0.0.1', 7497, clientId=1)
+        self.util.run(self.run)
+
+    def moving_average_crossover_strategy(self, prices):
+        short_window = 10
+        long_window = 30
+
+        short_ema = pd.DataFrame()
+        short_ema['price'] = prices
+        short_ema['short_ema'] = short_ema['price'].ewm(span=short_window, adjust=False).mean()
+
+        long_ema = pd.DataFrame()
+        long_ema['price'] = prices
+        long_ema['long_ema'] = long_ema['price'].ewm(span=long_window, adjust=False).mean()
+
+        signals = pd.DataFrame(index=short_ema.index)
+        signals['signal'] = 0.0
+
+        # Generate signals
+        signals['signal'][short_window:] = \
+            np.where(short_ema['short_ema'][short_window:] > long_ema['long_ema'][short_window:], 1.0, 0.0)
+
+        # Generate trading orders
+        signals['positions'] = signals['signal'].diff()
+
+        return signals
+
+    def execute_trade(self, signal):
+        if signal['positions'] == 1.0:
+            # Place a buy order
+            contract = self.ib.Forex(symbol='EURUSD')
+            self.ib.placeOrder(order=self.ib.order('BUY
+            order('BUY', 1, marketOrder()), account='DemoID')
+        elif signal['positions'] == -1.0:
+            # Place a sell order
+            contract = self.ib.Forex(symbol='EURUSD')
+            self.ib.placeOrder(order=self.ib.order('SELL', 1, marketOrder()), account='DemoID')
+
+    def run(self):
+        prices = self.market_data()
+        strategy = self.moving_average_crossover_strategy(prices)
+        for index, row in strategy.iterrows():
+            self.execute_trade(row)
+
+    def market_data(self):
+        reqId = 1
+        symbol = 'EURUSD'
+        contract = self.ib.Forex(symbol=symbol)
+        self.ib.reqMktData(reqId, contract, '', False, False)
+        while True:
+            if self.ib.isConnected():
+                break
+            time.sleep(1)
+        prices = self.ib.marketData(reqId)['price']
+        return prices
+
+if __name__ == '__main__':
+    bot = ForexBot()
+    bot.connect()
+    """
+}
+            </pre>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2023 IBKR Trading Bot Guide</p>
+    </footer>
+
+</body>
+</html>
