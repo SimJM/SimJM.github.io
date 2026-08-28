@@ -19,13 +19,13 @@ import java.util.Queue;
 
 Use only the imports needed by the final solution. You can use `import java.util.*;` in most coding platforms, but explicit imports make it clear which collections you chose and why.
 
-| Java type | Use | Typical cost |
-| --- | --- | --- |
-| `HashMap<K, V>` | Lookup, counting, grouping, complements | Average `O(1)` get/put |
-| `HashSet<E>` | Membership and uniqueness | Average `O(1)` add/contains |
-| `ArrayDeque<E>` | Stack or queue | `O(1)` end operations |
-| `PriorityQueue<E>` | Repeated min/max or top-*k* | `O(log n)` add/remove |
-| `TreeMap` / `TreeSet` | Ordered keys / values | `O(log n)` operations |
+| Java type             | Use                                     | Typical cost                |
+| --------------------- | --------------------------------------- | --------------------------- |
+| `HashMap<K, V>`       | Lookup, counting, grouping, complements | Average `O(1)` get/put      |
+| `HashSet<E>`          | Membership and uniqueness               | Average `O(1)` add/contains |
+| `ArrayDeque<E>`       | Stack or queue                          | `O(1)` end operations       |
+| `PriorityQueue<E>`    | Repeated min/max or top-_k_             | `O(log n)` add/remove       |
+| `TreeMap` / `TreeSet` | Ordered keys / values                   | `O(log n)` operations       |
 
 Use `ArrayDeque` rather than Java's legacy `Stack` class.
 
@@ -196,6 +196,12 @@ Time: `O(n)`, space: `O(1)`. Save `next` before changing a pointer.
 
 ## Trees and graphs
 
+### Graph representations
+
+- **Objects and pointers:** use node objects with neighbour references when vertices carry data or behaviour. This is expressive and uses `O(V + E)` space, but equality and visited-state handling need explicit choices.
+- **Adjacency list:** store each vertex's neighbours. It uses `O(V + E)` space, is usually best for sparse graphs, and makes neighbour traversal efficient.
+- **Adjacency matrix:** store `graph[from][to]`. It uses `O(V^2)` space but gives `O(1)` edge lookup, making it useful for dense graphs or frequent edge checks.
+
 ### Breadth-first search
 
 Use BFS for shortest paths in an unweighted graph, since it visits nodes by distance layers.
@@ -230,6 +236,8 @@ Time: `O(V + E)`. Mark nodes visited when enqueuing, not dequeuing.
 ### Depth-first search
 
 Use DFS for reachability, connected components, cycle detection, and backtracking.
+
+For connectivity, count the vertices reached from a start node. To count components, start another traversal from each unvisited vertex. In an undirected graph, an already visited neighbour that is not the parent indicates a cycle. In a directed graph, track unvisited, visiting, and finished states; an edge to a visiting node indicates a cycle.
 
 ```java
 public void dfs(int node, List<List<Integer>> graph, boolean[] visited) {

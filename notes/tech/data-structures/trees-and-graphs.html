@@ -30,14 +30,27 @@
       </section>
 
       <section>
-        <h2 class="section-title">Java templates</h2>
+        <h2 class="section-title">Graph representations</h2>
         <div class="content-grid">
+          <article class="card"><h3>Objects and pointers</h3><pre class="example">class Node {
+    int value;
+    List&lt;Node&gt; neighbours = new ArrayList&lt;&gt;();
+}</pre><p>Natural when each node carries data or behaviour, and pointers make object relationships easy to follow. It uses <code>O(V + E)</code> space, but identity, equality, and traversal bookkeeping require care.</p></article>
           <article class="card"><h3>Adjacency list</h3><pre class="example">List&lt;List&lt;Integer&gt;&gt; graph = new ArrayList&lt;&gt;();
 for (int i = 0; i &lt; n; i++) {
     graph.add(new ArrayList&lt;&gt;());
 }
 graph.get(from).add(to);
-graph.get(to).add(from); // only if undirected</pre><p>An adjacency list uses <code>O(V + E)</code> space and is usually best for sparse interview graphs. Be explicit about whether every edge is one-way (directed) or added in both directions (undirected).</p></article>
+graph.get(to).add(from); // only if undirected</pre><p>Stores only existing edges, so it uses <code>O(V + E)</code> space and is usually best for sparse graphs. Neighbour iteration is efficient; checking whether one specific edge exists may require scanning a list.</p></article>
+          <article class="card"><h3>Adjacency matrix</h3><pre class="example">boolean[][] graph = new boolean[n][n];
+graph[from][to] = true;
+graph[to][from] = true; // only if undirected</pre><p>Uses <code>O(V^2)</code> space regardless of edge count. It gives <code>O(1)</code> edge lookup, but scanning neighbours costs <code>O(V)</code>, so it fits dense graphs or problems with frequent edge-existence checks.</p></article>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-title">Java templates</h2>
+        <div class="content-grid">
           <article class="card"><h3>DFS</h3><pre class="example">void dfs(int node, List&lt;List&lt;Integer&gt;&gt; graph,
          boolean[] visited) {
     visited[node] = true;
@@ -65,6 +78,23 @@ while (!queue.isEmpty()) {
     }
     distance++;
 }</pre><p>The outer loop represents one distance layer. The first time BFS reaches the target is the fewest-edge path. Mark nodes visited when enqueuing them, otherwise several parents can add the same node.</p></article>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-title">Connectivity and cycles</h2>
+        <div class="content-grid">
+          <article class="card"><h3>Connectivity</h3><p>For an undirected graph, start DFS or BFS from one vertex and count visited vertices. The graph is connected when every vertex is reached. To count connected components, repeat the traversal from each unvisited vertex.</p><p>For a directed graph, distinguish one-way reachability from strong connectivity: strong connectivity requires every vertex to reach every other vertex.</p></article>
+          <article class="card"><h3>Cycle detection</h3><pre class="example">boolean hasCycle(int node, int parent,
+                 List&lt;List&lt;Integer&gt;&gt; graph,
+                 boolean[] visited) {
+    visited[node] = true;
+    for (int next : graph.get(node)) {
+        if (!visited[next] &amp;&amp; hasCycle(next, node, graph, visited)) return true;
+        if (visited[next] &amp;&amp; next != parent) return true;
+    }
+    return false;
+}</pre><p>For an undirected graph, an already visited neighbour is a cycle unless it is the node's parent. For directed graphs, use three states: unvisited, visiting, and finished; an edge to a visiting node is a back edge and proves a cycle.</p></article>
         </div>
       </section>
 
