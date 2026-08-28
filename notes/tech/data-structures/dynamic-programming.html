@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Programming | DSA Notes</title>
+    <link rel="stylesheet" href="../styles.css">
+  </head>
+  <body>
+    <header>
+      <p class="eyebrow">DSA topic</p>
+      <h1>Dynamic programming</h1>
+      <p class="header-copy">Turn repeated subproblems into a state, a transition, and a reliable answer.</p>
+    </header>
+    <nav class="nav-pills" aria-label="Data structures topic navigation">
+      <a href="index.html#topics">All topics</a><a href="arrays-and-strings.html">Arrays</a><a href="strings.html">Strings</a><a href="sliding-window.html">Sliding window</a><a href="linear-structures.html">Linear structures</a><a href="trees-and-graphs.html">Trees &amp; graphs</a><a href="dynamic-programming.html">Dynamic programming</a>
+    </nav>
+    <main>
+      <a class="back-link" href="index.html">← Data structures &amp; algorithms</a>
+      <p class="page-intro">Use dynamic programming when subproblems overlap and an answer can be built from answers to smaller subproblems.</p>
+      <div class="callout"><strong>Imports for this page:</strong> <code>import java.util.Arrays;</code>. This provides <code>Arrays.fill</code>, which sets all entries to an “unreachable” sentinel before the transition runs.</div>
+
+      <section>
+        <h2 class="section-title">Build a DP solution</h2>
+        <div class="content-grid">
+          <article class="card"><span class="tag">1 · State</span><h3>Define what each entry means</h3><p>Example: <code>dp[i]</code> is the fewest coins needed to make amount <code>i</code>. A good state is precise enough to compute the next answer.</p></article>
+          <article class="card"><span class="tag">2 · Base case</span><h3>Seed known answers</h3><p>For coin change, zero coins make amount zero, so <code>dp[0] = 0</code>. Initialise impossible states with a sentinel value.</p></article>
+          <article class="card"><span class="tag">3 · Transition</span><h3>Connect smaller states</h3><p>Describe how every legal final choice maps to an earlier state. Then identify where the final answer lives.</p></article>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-title">Memoisation vs tabulation</h2>
+        <div class="content-grid">
+          <article class="card"><h3>Memoisation</h3><p>Top-down recursion plus a cache. It follows the problem's natural recurrence and computes only states reached by the input. Watch recursion depth in Java.</p></article>
+          <article class="card"><h3>Tabulation</h3><p>Bottom-up iteration. It avoids recursion overhead and makes it easier to reduce memory when each state depends only on a recent row or value.</p></article>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-title">Java template: Coin Change</h2>
+        <div class="card">
+          <pre class="example">public int coinChange(int[] coins, int amount) {
+    int[] dp = new int[amount + 1];
+    Arrays.fill(dp, amount + 1);
+    dp[0] = 0;
+
+    for (int current = 1; current &lt;= amount; current++) {
+        for (int coin : coins) {
+            if (coin &lt;= current) {
+                dp[current] = Math.min(
+                    dp[current],
+                    dp[current - coin] + 1
+                );
+            }
+        }
+    }
+    return dp[amount] == amount + 1 ? -1 : dp[amount];
+}</pre>
+          <p><strong>State:</strong> <code>dp[current]</code> is the fewest coins for <code>current</code>. <strong>Base case:</strong> <code>dp[0] = 0</code>. <strong>Transition:</strong> choose each usable final coin, then add one to the best answer for the remaining amount. <code>amount + 1</code> is a safe sentinel because no valid solution needs more than <code>amount</code> coins when every denomination is at least one. Time <code>O(amount × coins.length)</code>; space <code>O(amount)</code>.</p>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-title">Practice</h2>
+        <div class="card"><ol class="practice"><li><strong>Climbing Stairs:</strong> identify the Fibonacci-like recurrence.</li><li><strong>House Robber:</strong> at each house, choose between taking it and skipping it.</li><li><strong>Coin Change:</strong> decide whether to minimise, maximise, or count solutions.</li><li><strong>Longest Common Subsequence:</strong> define a two-index state.</li></ol></div>
+      </section>
+    </main>
+    <footer>Interview Preparation Notes · <a href="index.html">Data structures &amp; algorithms</a></footer>
+  </body>
+</html>

@@ -1,16 +1,388 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Data Structures | Interview Notes</title><link rel="stylesheet" href="../styles.css"></head><body>
-<header><p class="eyebrow">Module 2</p><h1>Data structures & algorithms</h1><p class="header-copy">Choose a structure because of the operation you need—not because it is familiar.</p></header>
-<nav class="nav-pills"><a href="#structures">Structures</a><a href="#patterns">Patterns</a><a href="#graphs">Graphs</a><a href="#practice">Practice</a></nav>
-<main><a class="back-link" href="../index.html">← All study modules</a><p class="page-intro">For each structure, learn its operations, complexity, and the signal in a question that suggests using it.</p>
-<section id="structures"><h2 class="section-title">Core structures</h2><div class="content-grid"><article class="card"><span class="tag">Fast lookup</span><h3>Hash map / set</h3><p>Use for membership, counts, grouping, and complements. Average insert and lookup are <code>O(1)</code>. A map stores key-value pairs; a set stores unique values.</p></article><article class="card"><span class="tag">Ordered data</span><h3>Array, linked list, stack, queue</h3><p>Arrays offer <code>O(1)</code> indexed access but insertions in the middle cost <code>O(n)</code>. Linked lists trade direct access for cheap local insertions. Stacks are LIFO; queues are FIFO.</p></article><article class="card"><span class="tag">Prioritised work</span><h3>Heap and tree</h3><p>A heap gives efficient min/max retrieval: insert and remove are <code>O(log n)</code>. A balanced binary-search tree keeps ordered data and supports lookup, insert, and delete in <code>O(log n)</code>.</p></article></div></section>
-<section id="patterns"><h2 class="section-title">Recognise the pattern</h2><div class="card"><h3>Question language is a clue</h3><div class="example">“pair / sorted array”             → two pointers
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Data structures, algorithms, and Java interview templates.">
+    <title>Data Structures & Algorithms | Interview Notes</title>
+    <link rel="stylesheet" href="../styles.css">
+  </head>
+  <body>
+    <header>
+      <p class="eyebrow">Module 2</p>
+      <h1>Data structures &amp; algorithms</h1>
+      <p class="header-copy">Choose a structure because of the operation you need—not because it is familiar.</p>
+    </header>
+
+    <nav class="nav-pills" aria-label="Data structures study sections">
+      <a href="#topics">Topic notes</a>
+      <a href="#structures">Structures</a>
+      <a href="#patterns">Patterns</a>
+      <a href="#java">Java templates</a>
+      <a href="#lru">LRU cache</a>
+      <a href="#graphs">Graphs &amp; DP</a>
+      <a href="#practice">Practice</a>
+    </nav>
+
+    <main>
+      <a class="back-link" href="../index.html">← All study modules</a>
+      <p class="page-intro">For each structure, learn its operations, complexity, and the signal in a question that suggests using it. The Java examples use clear standard-library code suitable for interviews.</p>
+
+      <section id="topics">
+        <h2 class="section-title">Topic notes</h2>
+        <div class="module-grid">
+          <a class="module-card" href="arrays-and-strings.html">
+            <span class="module-icon">↔️</span>
+            <h3>Arrays &amp; strings</h3>
+            <p>Traversal, prefix sums, two pointers, sliding windows, and Java string handling.</p>
+            <span class="module-link">Study topic →</span>
+          </a>
+          <a class="module-card" href="strings.html">
+            <span class="module-icon">🔤</span>
+            <h3>String problems</h3>
+            <p>Character counts, palindromes, anagrams, substring windows, and Java string tools.</p>
+            <span class="module-link">Study topic →</span>
+          </a>
+          <a class="module-card" href="sliding-window.html">
+            <span class="module-icon">🪟</span>
+            <h3>Sliding window</h3>
+            <p>Fixed and variable windows for contiguous arrays and substrings, with Java templates.</p>
+            <span class="module-link">Study topic →</span>
+          </a>
+          <a class="module-card" href="linear-structures.html">
+            <span class="module-icon">📚</span>
+            <h3>Linked lists, stacks &amp; queues</h3>
+            <p>Pointer manipulation, LIFO/FIFO patterns, monotonic stacks, and Java deques.</p>
+            <span class="module-link">Study topic →</span>
+          </a>
+          <a class="module-card" href="trees-and-graphs.html">
+            <span class="module-icon">🌳</span>
+            <h3>Trees &amp; graphs</h3>
+            <p>DFS, BFS, binary-search trees, graph representations, and shortest paths.</p>
+            <span class="module-link">Study topic →</span>
+          </a>
+          <a class="module-card" href="dynamic-programming.html">
+            <span class="module-icon">🧠</span>
+            <h3>Dynamic programming</h3>
+            <p>States, transitions, memoisation, tabulation, and common problem shapes.</p>
+            <span class="module-link">Study topic →</span>
+          </a>
+        </div>
+      </section>
+
+      <section id="structures">
+        <h2 class="section-title">Core structures</h2>
+        <div class="content-grid">
+          <article class="card">
+            <span class="tag">Fast lookup</span>
+            <h3>Hash map / set</h3>
+            <p>Use for membership, counts, grouping, and complements. Average insert and lookup are <code>O(1)</code>. A map stores key-value pairs; a set stores unique values.</p>
+            <p>In Java, reach for <code>HashMap</code> and <code>HashSet</code>. Use <code>TreeMap</code> or <code>TreeSet</code> when you need ordered values and can accept <code>O(log n)</code> operations.</p>
+          </article>
+          <article class="card">
+            <span class="tag">Ordered data</span>
+            <h3>Array, linked list, stack, queue</h3>
+            <p>Arrays offer <code>O(1)</code> indexed access but insertions in the middle cost <code>O(n)</code>. Linked lists trade direct access for cheap local insertions. Stacks are LIFO; queues are FIFO.</p>
+            <p>Use <code>ArrayDeque</code> for both stacks and queues in Java; avoid the legacy <code>Stack</code> class.</p>
+          </article>
+          <article class="card">
+            <span class="tag">Prioritised work</span>
+            <h3>Heap and tree</h3>
+            <p>A heap gives efficient min/max retrieval: insert and remove are <code>O(log n)</code>. A balanced binary-search tree keeps ordered data and supports lookup, insert, and delete in <code>O(log n)</code>.</p>
+            <p>Java's <code>PriorityQueue</code> is a min-heap by default. Use <code>Comparator.reverseOrder()</code> when you need a max-heap.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="patterns">
+        <h2 class="section-title">Recognise the pattern</h2>
+        <div class="card">
+          <h3>Question language is a clue</h3>
+          <pre class="example">“pair / sorted array”             → two pointers
 “contiguous subarray / substring” → sliding window or prefix sum
 “top k / next smallest”           → heap
 “all combinations”                → backtracking
-“minimum steps / repeated choice” → BFS or dynamic programming</div><p>Patterns are not shortcuts around reasoning. State the invariant: for a sliding window, for example, identify exactly what stays true as the window expands and shrinks.</p></div></section>
-<section id="graphs"><h2 class="section-title">Graphs, recursion, and DP</h2><div class="card"><h3>Traversal first, optimisation second</h3><p>Use BFS for shortest paths in an unweighted graph because it explores by distance layers. Use DFS for reachability, connected components, cycle detection, and backtracking. Dynamic programming applies when subproblems overlap and an optimal answer can be built from smaller answers.</p><div class="example">BFS template
-1. Put the start node in a queue and mark it visited.
-2. Remove a node; inspect each unvisited neighbour.
-3. Mark and enqueue those neighbours.
-4. The first time you reach a target is its shortest edge-count path.</div></div></section>
-<section id="practice"><h2 class="section-title">Practice questions</h2><div class="card"><ol class="practice"><li><strong>Group Anagrams:</strong> choose a stable key for every word and analyse the cost of constructing it.</li><li><strong>Number of Islands:</strong> model the grid as a graph. Compare DFS recursion with an explicit stack.</li><li><strong>Kth Largest Element:</strong> compare sorting with a size-<em>k</em> min-heap.</li><li><strong>Coin Change:</strong> define the DP state, base case, recurrence, and answer location.</li></ol></div></section></main><footer>Interview Preparation Notes</footer></body></html>
+“minimum steps / repeated choice” → BFS or dynamic programming</pre>
+          <p>Patterns are not shortcuts around reasoning. State the invariant: for a sliding window, explain exactly what remains true as the window expands and shrinks.</p>
+        </div>
+      </section>
+
+      <section id="java">
+        <h2 class="section-title">Java templates</h2>
+        <div class="callout">
+          <strong>Start most interview solutions with these imports:</strong>
+          <pre class="example">import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Set;</pre>
+          <p>Only include the types your solution uses. <code>java.util.*</code> is also accepted in most interview platforms, but explicit imports make dependencies easier to see.</p>
+        </div>
+        <div class="content-grid">
+          <article class="card">
+            <span class="tag">Counting</span>
+            <h3>Frequency map</h3>
+            <p>Use <code>getOrDefault</code> to count characters, numbers, or objects without special-case branching.</p>
+            <pre class="example">Map&lt;Character, Integer&gt; count = new HashMap&lt;&gt;();
+for (char ch : s.toCharArray()) {
+    count.put(ch, count.getOrDefault(ch, 0) + 1);
+}</pre>
+          </article>
+
+          <article class="card">
+            <span class="tag">Complement lookup</span>
+            <h3>Two Sum</h3>
+            <pre class="example">public int[] twoSum(int[] nums, int target) {
+    Map&lt;Integer, Integer&gt; indexByValue = new HashMap&lt;&gt;();
+
+    for (int i = 0; i &lt; nums.length; i++) {
+        int complement = target - nums[i];
+        if (indexByValue.containsKey(complement)) {
+            return new int[] {indexByValue.get(complement), i};
+        }
+        indexByValue.put(nums[i], i);
+    }
+    return new int[0];
+}</pre>
+            <p>Check the complement before storing the current value, so the same element is not used twice. The map stores <code>value → earlier index</code>; each lookup and insert is <code>O(1)</code> on average. Overall time is <code>O(n)</code> and space is <code>O(n)</code>.</p>
+          </article>
+
+          <article class="card">
+            <span class="tag">Stack</span>
+            <h3>Valid Parentheses</h3>
+            <pre class="example">Deque&lt;Character&gt; stack = new ArrayDeque&lt;&gt;();
+
+for (char ch : s.toCharArray()) {
+    if (ch == '(' || ch == '[' || ch == '{') {
+        stack.push(ch);
+    } else {
+        if (stack.isEmpty()) return false;
+        char open = stack.pop();
+        if (ch == ')' &amp;&amp; open != '(') return false;
+        if (ch == ']' &amp;&amp; open != '[') return false;
+        if (ch == '}' &amp;&amp; open != '{') return false;
+    }
+}
+return stack.isEmpty();</pre>
+            <p>Invariant: the stack holds unmatched opening brackets in the order they must be closed. A closing bracket must match the stack's top value. This uses <code>O(n)</code> time and, in the worst case, <code>O(n)</code> space.</p>
+          </article>
+
+          <article class="card">
+            <span class="tag">Sorted input</span>
+            <h3>Two pointers</h3>
+            <pre class="example">int left = 0;
+int right = nums.length - 1;
+
+while (left &lt; right) {
+    int sum = nums[left] + nums[right];
+    if (sum == target) return true;
+    if (sum &lt; target) left++;
+    else right--;
+}
+return false;</pre>
+            <p>For a sorted array, moving <code>left</code> increases the sum and moving <code>right</code> decreases it. That monotonic behaviour proves no candidate pair is skipped. The scan is <code>O(n)</code>; include an extra <code>O(n log n)</code> cost if you must sort first.</p>
+          </article>
+
+          <article class="card">
+            <span class="tag">Contiguous range</span>
+            <h3>Sliding window</h3>
+            <pre class="example">Map&lt;Character, Integer&gt; lastSeen = new HashMap&lt;&gt;();
+int left = 0;
+int best = 0;
+
+for (int right = 0; right &lt; s.length(); right++) {
+    char ch = s.charAt(right);
+    if (lastSeen.containsKey(ch)) {
+        left = Math.max(left, lastSeen.get(ch) + 1);
+    }
+    lastSeen.put(ch, right);
+    best = Math.max(best, right - left + 1);
+}</pre>
+            <p>This finds the longest substring without repeated characters. The invariant is that <code>s[left..right]</code> has no duplicate character. Use <code>Math.max</code> when moving <code>left</code> so it never moves backwards after seeing an older duplicate. Time <code>O(n)</code>, space <code>O(min(n, alphabet size))</code>.</p>
+          </article>
+
+          <article class="card">
+            <span class="tag">Top k</span>
+            <h3>Size-k min-heap</h3>
+            <pre class="example">PriorityQueue&lt;Integer&gt; minHeap = new PriorityQueue&lt;&gt;();
+
+for (int num : nums) {
+    minHeap.offer(num);
+    if (minHeap.size() &gt; k) {
+        minHeap.poll();
+    }
+}
+return minHeap.peek();</pre>
+            <p>Keep only the largest <code>k</code> values seen so far to find the kth largest. The heap's smallest value is therefore the kth largest overall. Time <code>O(n log k)</code>, space <code>O(k)</code>. For a max-heap, create <code>new PriorityQueue&lt;&gt;(Comparator.reverseOrder())</code>.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="graphs">
+        <h2 class="section-title">Graphs, recursion, and DP</h2>
+        <div class="content-grid">
+          <article class="card">
+            <h3>Traversal first, optimisation second</h3>
+            <p>Use BFS for shortest paths in an unweighted graph because it explores by distance layers. Use DFS for reachability, connected components, cycle detection, and backtracking. Dynamic programming applies when subproblems overlap and an optimal answer can be built from smaller answers.</p>
+            <pre class="example">Queue&lt;Integer&gt; queue = new ArrayDeque&lt;&gt;();
+boolean[] visited = new boolean[graph.size()];
+queue.offer(start);
+visited[start] = true;
+
+while (!queue.isEmpty()) {
+    int node = queue.poll();
+    for (int neighbour : graph.get(node)) {
+        if (!visited[neighbour]) {
+            visited[neighbour] = true;
+            queue.offer(neighbour);
+        }
+    }
+}</pre>
+            <p>For BFS, mark a node visited when enqueuing it, not when dequeuing it. This prevents duplicate queue entries. A graph traversal takes <code>O(V + E)</code> time.</p>
+          </article>
+          <article class="card">
+            <span class="tag">Dynamic programming</span>
+            <h3>Coin Change</h3>
+            <pre class="example">int[] dp = new int[amount + 1];
+Arrays.fill(dp, amount + 1);
+dp[0] = 0;
+
+for (int current = 1; current &lt;= amount; current++) {
+    for (int coin : coins) {
+        if (coin &lt;= current) {
+            dp[current] = Math.min(
+                dp[current], dp[current - coin] + 1
+            );
+        }
+    }
+}
+return dp[amount] == amount + 1 ? -1 : dp[amount];</pre>
+            <p><strong>State:</strong> <code>dp[current]</code> is the fewest coins needed for <code>current</code>. <strong>Base case:</strong> <code>dp[0] = 0</code>. <strong>Transition:</strong> try every coin that can be the final coin, then add one to the best answer for the remaining amount. The initial value <code>amount + 1</code> marks unreachable states safely. Time <code>O(amount × coins.length)</code>; space <code>O(amount)</code>.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="lru">
+        <h2 class="section-title">LRU cache</h2>
+        <div class="content-grid">
+          <article class="card">
+            <span class="tag">Core idea</span>
+            <h3>Least recently used eviction</h3>
+            <p>An LRU cache has a fixed capacity. When full, it removes the item that has not been accessed for the longest time. Every successful <code>get</code> and every <code>put</code> makes that item the most recently used.</p>
+            <p>The interview goal is usually <code>O(1)</code> average time for both <code>get(key)</code> and <code>put(key, value)</code>.</p>
+          </article>
+          <article class="card">
+            <span class="tag">Data structures</span>
+            <h3>Hash map + doubly linked list</h3>
+            <p>A <code>HashMap&lt;Integer, Node&gt;</code> finds a node by key in average <code>O(1)</code>. A doubly linked list moves a known node to the front and removes the least-recent node from the back in <code>O(1)</code>.</p>
+            <p>Keep the most recently used node beside a dummy <code>head</code>, and the least recently used node beside a dummy <code>tail</code>. Dummy nodes remove empty-list edge cases.</p>
+          </article>
+        </div>
+
+        <div class="card">
+          <h3>Java implementation</h3>
+          <pre class="example">import java.util.HashMap;
+import java.util.Map;
+
+class LRUCache {
+    private class Node {
+        int key;
+        int value;
+        Node prev;
+        Node next;
+
+        Node(int key, int value) {
+            this.key = key;
+            this.value = value;
+        }
+    }
+
+    private final int capacity;
+    private final Map&lt;Integer, Node&gt; cache = new HashMap&lt;&gt;();
+    private final Node head = new Node(0, 0); // most-recent side
+    private final Node tail = new Node(0, 0); // least-recent side
+
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+        head.next = tail;
+        tail.prev = head;
+    }
+
+    public int get(int key) {
+        Node node = cache.get(key);
+        if (node == null) return -1;
+        moveToFront(node);
+        return node.value;
+    }
+
+    public void put(int key, int value) {
+        Node node = cache.get(key);
+
+        if (node != null) {
+            node.value = value;
+            moveToFront(node);
+            return;
+        }
+
+        Node added = new Node(key, value);
+        cache.put(key, added);
+        addToFront(added);
+
+        if (cache.size() &gt; capacity) {
+            Node leastRecent = removeLast();
+            cache.remove(leastRecent.key);
+        }
+    }
+
+    private void moveToFront(Node node) {
+        remove(node);
+        addToFront(node);
+    }
+
+    private void addToFront(Node node) {
+        node.prev = head;
+        node.next = head.next;
+        head.next.prev = node;
+        head.next = node;
+    }
+
+    private void remove(Node node) {
+        node.prev.next = node.next;
+        node.next.prev = node.prev;
+    }
+
+    private Node removeLast() {
+        Node node = tail.prev;
+        remove(node);
+        return node;
+    }
+}</pre>
+          <p><strong>Invariants:</strong> the map contains every real list node; nodes are ordered from most recent after <code>head</code> to least recent before <code>tail</code>; dummy nodes are never added to the map or evicted.</p>
+          <p><strong>Complexity:</strong> <code>get</code> and <code>put</code> are average <code>O(1)</code>. Space is <code>O(capacity)</code>.</p>
+        </div>
+
+        <div class="callout"><strong>Interview explanation:</strong> “The map gives me direct access to a key’s node. The doubly linked list lets me move that node to the most-recent position, or remove the least-recent node, without scanning the cache. Each operation changes only a constant number of pointers.”</div>
+      </section>
+
+      <section id="practice">
+        <h2 class="section-title">Practice questions</h2>
+        <div class="card">
+          <ol class="practice">
+            <li><strong>Group Anagrams:</strong> choose a stable key for every word and analyse the cost of constructing it.</li>
+            <li><strong>Number of Islands:</strong> model the grid as a graph. Compare DFS recursion with an explicit stack.</li>
+            <li><strong>Kth Largest Element:</strong> compare sorting with a size-<em>k</em> min-heap.</li>
+            <li><strong>Coin Change:</strong> define the DP state, base case, recurrence, and answer location.</li>
+          </ol>
+        </div>
+      </section>
+    </main>
+    <footer>Interview Preparation Notes</footer>
+  </body>
+</html>

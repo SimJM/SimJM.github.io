@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="NP problems, reductions, 0/1 Knapsack, and Travelling Salesman notes.">
+    <title>NP Problems | Interview Notes</title>
+    <link rel="stylesheet" href="../styles.css">
+  </head>
+  <body>
+    <header>
+      <p class="eyebrow">Theory &amp; algorithms</p>
+      <h1>NP problems</h1>
+      <p class="header-copy">Understand what is efficiently solvable, efficiently verifiable, and why some dynamic-programming solutions are still expensive.</p>
+    </header>
+    <nav class="nav-pills" aria-label="NP problems sections">
+      <a href="#classes">Complexity classes</a><a href="#reductions">Reductions</a><a href="#knapsack">0/1 Knapsack</a><a href="#tsp">Travelling Salesman</a><a href="#compare">Comparison</a><a href="#practice">Checklist</a>
+    </nav>
+    <main>
+      <a class="back-link" href="../index.html">← All study modules</a>
+      <p class="page-intro">Focus on the concepts most often expected in algorithm courses and technical discussions: decision versions, reductions, exact algorithms, and realistic alternatives when exact computation is too costly.</p>
+
+      <section id="classes">
+        <h2 class="section-title">P, NP, NP-hard, and NP-complete</h2>
+        <div class="content-grid">
+          <article class="card"><span class="tag">Polynomial time</span><h3>P</h3><p>Decision problems a deterministic algorithm can solve in polynomial time, such as <code>O(n)</code>, <code>O(n²)</code>, or <code>O(n³)</code>. Examples include shortest path and minimum spanning tree.</p></article>
+          <article class="card"><span class="tag">Verifiable</span><h3>NP</h3><p>Decision problems where a proposed solution (a certificate) can be verified in polynomial time. NP does <strong>not</strong> mean “not polynomial”: every problem in P is also in NP.</p></article>
+          <article class="card"><span class="tag">At least as hard</span><h3>NP-hard</h3><p>Problems at least as difficult as every problem in NP. They do not have to be decision problems or belong to NP. Optimisation Knapsack and TSP are NP-hard.</p></article>
+          <article class="card"><span class="tag">Hardest in NP</span><h3>NP-complete</h3><p>Decision problems that are both in NP and NP-hard. A polynomial-time algorithm for any NP-complete problem would prove <code>P = NP</code>.</p></article>
+        </div>
+        <div class="callout"><strong>Important:</strong> whether <code>P = NP</code> is unknown. Most computer scientists believe <code>P ≠ NP</code>, but there is no proof.</div>
+      </section>
+
+      <section id="reductions">
+        <h2 class="section-title">Reductions</h2>
+        <div class="card">
+          <h3>How to show a problem is NP-hard</h3>
+          <pre class="example">To prove B is NP-hard:
+
+1. Start with a known NP-hard or NP-complete problem A.
+2. Transform an input x of A into f(x), an input of B, in polynomial time.
+3. Prove: x is YES for A if and only if f(x) is YES for B.
+4. If B were easy, A would also be easy; therefore B is NP-hard.</pre>
+          <p>The direction matters: reduce a known hard problem <strong>to</strong> the problem you want to prove hard. To prove NP-completeness, additionally show that the target decision problem is in NP by giving a polynomial-time verifier.</p>
+        </div>
+      </section>
+
+      <section id="knapsack">
+        <h2 class="section-title">0/1 Knapsack</h2>
+        <div class="content-grid">
+          <article class="card"><h3>Problem</h3><p>There are <code>n</code> items. Item <code>i</code> has weight <code>w[i]</code> and value <code>v[i]</code>. Choose every item once or not at all, with total weight at most <code>W</code>, to maximise total value.</p><p>Unlike fractional knapsack, you cannot take part of an item. A greedy value/weight ratio is optimal for fractional knapsack but not for 0/1 Knapsack.</p></article>
+          <article class="card"><h3>Decision vs optimisation</h3><p><strong>Decision:</strong> “Is there a subset with weight at most <code>W</code> and value at least <code>V</code>?” This is NP-complete.</p><p><strong>Optimisation:</strong> “What is the greatest value within weight <code>W</code>?” This is NP-hard.</p></article>
+        </div>
+        <div class="card">
+          <h3>Dynamic-programming recurrence</h3>
+          <pre class="example">dp[i][capacity] = best value using the first i items
+                  with weight limit capacity
+
+Do not take item i: dp[i - 1][capacity]
+
+Take item i, if weight[i - 1] ≤ capacity:
+value[i - 1] + dp[i - 1][capacity - weight[i - 1]]
+
+dp[i][capacity] = maximum of the valid choices</pre>
+          <p>The answer is <code>dp[n][W]</code>. The full table takes <code>O(nW)</code> time and <code>O(nW)</code> space.</p>
+        </div>
+        <div class="card">
+          <h3>Java: space-optimised 0/1 Knapsack</h3>
+          <pre class="example">public int knapsack(int[] weights, int[] values, int capacity) {
+    int[] dp = new int[capacity + 1];
+
+    for (int item = 0; item &lt; weights.length; item++) {
+        for (int current = capacity; current &gt;= weights[item]; current--) {
+            dp[current] = Math.max(
+                dp[current],
+                values[item] + dp[current - weights[item]]
+            );
+        }
+    }
+    return dp[capacity];
+}</pre>
+          <p>Time <code>O(nW)</code>; space <code>O(W)</code>. Iterate capacity <strong>backwards</strong> for 0/1 Knapsack. A forward loop would reuse the same item during its iteration, which instead solves unbounded knapsack.</p>
+        </div>
+        <div class="callout"><strong>Pseudo-polynomial:</strong> <code>O(nW)</code> is polynomial in the numeric value of <code>W</code>, but <code>W</code> takes only <code>log W</code> bits to write down. If <code>W</code> is huge, this is exponential in input length—so it does not contradict NP-hardness.</div>
+      </section>
+
+      <section id="tsp">
+        <h2 class="section-title">Travelling Salesman Problem (TSP)</h2>
+        <div class="content-grid">
+          <article class="card"><h3>Problem</h3><p>Given distances between cities, find the shortest tour that starts at a city, visits every city exactly once, and returns to its start.</p></article>
+          <article class="card"><h3>Decision vs optimisation</h3><p><strong>Decision:</strong> “Is there a tour with cost at most <code>K</code>?” This is NP-complete.</p><p><strong>Optimisation:</strong> “What is the minimum tour cost?” This is NP-hard.</p></article>
+          <article class="card"><h3>Baseline</h3><p>Fix a start city and try every ordering of the rest. This takes <code>O(n!)</code> time, which is impractical even for moderate <code>n</code>.</p></article>
+        </div>
+        <div class="card">
+          <h3>Held–Karp dynamic programming</h3>
+          <pre class="example">State: dp[mask][last]
+
+mask = cities already visited
+last = final city in the partial path
+
+dp[mask][last] = minimum cost to start at city 0,
+                 visit exactly mask, and finish at last
+
+Transition:
+add an unvisited next city to mask
+
+Answer:
+minimum dp[allCities][last] + distance[last][0]</pre>
+          <p>This exact algorithm takes <code>O(n² × 2ⁿ)</code> time and <code>O(n × 2ⁿ)</code> space. It improves on factorial brute force but remains exponential.</p>
+        </div>
+        <div class="card">
+          <h3>Java: Held–Karp TSP</h3>
+          <pre class="example">import java.util.Arrays;
+
+public int tsp(int[][] distance) {
+    int n = distance.length;
+    if (n &lt;= 1) return 0;
+    int all = (1 &lt;&lt; n) - 1;
+    int inf = 1_000_000_000;
+    int[][] dp = new int[1 &lt;&lt; n][n];
+
+    for (int[] row : dp) Arrays.fill(row, inf);
+    dp[1][0] = 0; // city 0 is the fixed start
+
+    for (int mask = 1; mask &lt;= all; mask++) {
+        for (int last = 0; last &lt; n; last++) {
+            if ((mask &amp; (1 &lt;&lt; last)) == 0 || dp[mask][last] == inf) continue;
+
+            for (int next = 0; next &lt; n; next++) {
+                if ((mask &amp; (1 &lt;&lt; next)) != 0) continue;
+                int nextMask = mask | (1 &lt;&lt; next);
+                dp[nextMask][next] = Math.min(
+                    dp[nextMask][next],
+                    dp[mask][last] + distance[last][next]
+                );
+            }
+        }
+    }
+
+    int answer = inf;
+    for (int last = 1; last &lt; n; last++) {
+        answer = Math.min(answer, dp[all][last] + distance[last][0]);
+    }
+    return answer;
+}</pre>
+          <p>A bitmask stores a visited set: bit <code>i</code> is 1 when city <code>i</code> has been visited. This assumes a complete graph, city 0 as the start, and a square distance matrix. For missing edges, skip them or use a safely large value.</p>
+        </div>
+        <div class="callout"><strong>When exact TSP is too expensive:</strong> use heuristics or approximation algorithms. For metric TSP—non-negative distances satisfying the triangle inequality—a minimum-spanning-tree traversal gives a 2-approximation. Without those assumptions, there is no comparable general guarantee.</div>
+      </section>
+
+      <section id="compare">
+        <h2 class="section-title">Compare the two problems</h2>
+        <div class="card">
+          <pre class="example">                    0/1 Knapsack                 TSP
+Goal                maximise value               minimise tour length
+Decision problem    NP-complete                  NP-complete
+Optimisation        NP-hard                      NP-hard
+Exact DP            O(nW)                        O(n² × 2ⁿ)
+State               item index + capacity        visited set + last city
+Key caution         pseudo-polynomial            still exponential</pre>
+        </div>
+      </section>
+
+      <section id="practice">
+        <h2 class="section-title">Study checklist</h2>
+        <div class="card checklist">
+          <label><input type="checkbox"> <span>Explain the difference between solving and verifying a decision problem.</span></label>
+          <label><input type="checkbox"> <span>State why NP-complete means “in NP and NP-hard.”</span></label>
+          <label><input type="checkbox"> <span>Describe the correct direction for a hardness reduction.</span></label>
+          <label><input type="checkbox"> <span>Write the 0/1 Knapsack recurrence and explain backward capacity iteration.</span></label>
+          <label><input type="checkbox"> <span>Explain why Knapsack DP is pseudo-polynomial.</span></label>
+          <label><input type="checkbox"> <span>Define the Held–Karp state and complexity for TSP.</span></label>
+          <label><input type="checkbox"> <span>Distinguish an exact algorithm, an approximation algorithm, and a heuristic.</span></label>
+        </div>
+      </section>
+    </main>
+    <footer>Interview Preparation Notes</footer>
+  </body>
+</html>

@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Java string interview patterns and templates.">
+    <title>String Problems | DSA Notes</title>
+    <link rel="stylesheet" href="../styles.css">
+  </head>
+  <body>
+    <header>
+      <p class="eyebrow">DSA topic</p>
+      <h1>String problems</h1>
+      <p class="header-copy">Turn text into a sequence of characters, then choose the pattern that preserves the property you need.</p>
+    </header>
+
+    <nav class="nav-pills" aria-label="Data structures topic navigation">
+      <a href="index.html#topics">All topics</a>
+      <a href="arrays-and-strings.html">Arrays</a>
+      <a href="strings.html">Strings</a>
+      <a href="sliding-window.html">Sliding window</a>
+      <a href="linear-structures.html">Linear structures</a>
+      <a href="trees-and-graphs.html">Trees &amp; graphs</a>
+      <a href="dynamic-programming.html">Dynamic programming</a>
+    </nav>
+
+    <main>
+      <a class="back-link" href="index.html">← Data structures &amp; algorithms</a>
+      <p class="page-intro">Strings are immutable in Java. Read characters with <code>charAt</code> or <code>toCharArray</code>; use <code>StringBuilder</code> when constructing or repeatedly changing text.</p>
+
+      <div class="callout">
+        <strong>Common imports:</strong>
+        <pre class="example">import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;</pre>
+        <p><code>String</code>, <code>Character</code>, and <code>StringBuilder</code> are in <code>java.lang</code>, so they need no import.</p>
+      </div>
+
+      <section>
+        <h2 class="section-title">Recognise the pattern</h2>
+        <div class="content-grid">
+          <article class="card"><h3>Counts or matching characters</h3><p>Use a frequency array for a known small alphabet, such as lowercase English letters. Use a <code>HashMap</code> for general characters or Unicode-like input.</p></article>
+          <article class="card"><h3>Contiguous substring</h3><p>Use a sliding window. State what must remain true in the current substring, then move the left pointer until it is valid again.</p></article>
+          <article class="card"><h3>Comparison from both ends</h3><p>Use two pointers for palindromes and similar symmetry checks. Decide whether case and punctuation should be ignored before coding.</p></article>
+          <article class="card"><h3>Build or reverse a string</h3><p>Use <code>StringBuilder</code>; repeated <code>+</code> concatenation can repeatedly copy a growing string and become inefficient.</p></article>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-title">Java templates</h2>
+        <div class="content-grid">
+          <article class="card">
+            <span class="tag">Character count</span>
+            <h3>Frequency array</h3>
+            <pre class="example">int[] count = new int[26];
+for (char ch : s.toCharArray()) {
+    count[ch - 'a']++;
+}</pre>
+            <p>Use only when the input is guaranteed to be lowercase <code>a</code>–<code>z</code>. The index expression converts each character to a value from 0 to 25. Time <code>O(n)</code>; extra space <code>O(1)</code>.</p>
+          </article>
+
+          <article class="card">
+            <span class="tag">Anagram</span>
+            <h3>Compare character counts</h3>
+            <pre class="example">public boolean isAnagram(String s, String t) {
+    if (s.length() != t.length()) return false;
+
+    int[] count = new int[26];
+    for (int i = 0; i &lt; s.length(); i++) {
+        count[s.charAt(i) - 'a']++;
+        count[t.charAt(i) - 'a']--;
+    }
+
+    for (int value : count) {
+        if (value != 0) return false;
+    }
+    return true;
+}</pre>
+            <p>Increment for the first string and decrement for the second. All counts must return to zero. For broader character sets, replace the array with a <code>HashMap&lt;Character, Integer&gt;</code>.</p>
+          </article>
+
+          <article class="card">
+            <span class="tag">Two pointers</span>
+            <h3>Valid palindrome</h3>
+            <pre class="example">public boolean isPalindrome(String s) {
+    int left = 0, right = s.length() - 1;
+
+    while (left &lt; right) {
+        while (left &lt; right &amp;&amp; !Character.isLetterOrDigit(s.charAt(left))) {
+            left++;
+        }
+        while (left &lt; right &amp;&amp; !Character.isLetterOrDigit(s.charAt(right))) {
+            right--;
+        }
+        if (Character.toLowerCase(s.charAt(left))
+                != Character.toLowerCase(s.charAt(right))) {
+            return false;
+        }
+        left++;
+        right--;
+    }
+    return true;
+}</pre>
+            <p>The inner loops skip characters outside the problem's comparison rules. Each pointer only moves inward, so time is <code>O(n)</code> and extra space is <code>O(1)</code>.</p>
+          </article>
+
+          <article class="card">
+            <span class="tag">Sliding window</span>
+            <h3>Longest substring without repeats</h3>
+            <pre class="example">public int lengthOfLongestSubstring(String s) {
+    Map&lt;Character, Integer&gt; lastSeen = new HashMap&lt;&gt;();
+    int left = 0, best = 0;
+
+    for (int right = 0; right &lt; s.length(); right++) {
+        char ch = s.charAt(right);
+        if (lastSeen.containsKey(ch)) {
+            left = Math.max(left, lastSeen.get(ch) + 1);
+        }
+        lastSeen.put(ch, right);
+        best = Math.max(best, right - left + 1);
+    }
+    return best;
+}</pre>
+            <p>Invariant: the window from <code>left</code> to <code>right</code> contains no repeated character. <code>Math.max</code> prevents <code>left</code> from moving backwards when a duplicate occurred before the current window. Time <code>O(n)</code>.</p>
+          </article>
+
+          <article class="card">
+            <span class="tag">Build text</span>
+            <h3>Reverse words</h3>
+            <pre class="example">String[] words = s.trim().split("\\s+");
+StringBuilder result = new StringBuilder();
+
+for (int i = words.length - 1; i &gt;= 0; i--) {
+    if (result.length() &gt; 0) result.append(' ');
+    result.append(words[i]);
+}
+return result.toString();</pre>
+            <p><code>trim()</code> removes surrounding whitespace and <code>split("\\s+")</code> treats consecutive whitespace as one separator. The escaped backslash is required because the regex is inside a Java string literal.</p>
+          </article>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-title">Java string reminders</h2>
+        <div class="card">
+          <ul class="practice">
+            <li><code>s.length()</code> gives the character count; arrays use <code>array.length</code>.</li>
+            <li>Use <code>s.equals(t)</code> to compare string contents—not <code>==</code>.</li>
+            <li><code>substring(start, end)</code> includes <code>start</code> and excludes <code>end</code>.</li>
+            <li>Use <code>Character.isLetterOrDigit</code>, <code>Character.toLowerCase</code>, and <code>Character.isWhitespace</code> instead of manual ASCII checks when the requirements allow general text.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-title">Practice</h2>
+        <div class="card"><ol class="practice"><li><strong>Valid Anagram:</strong> compare frequency counts.</li><li><strong>Valid Palindrome:</strong> clarify whether non-alphanumeric characters and case matter.</li><li><strong>Longest Substring Without Repeating Characters:</strong> state the sliding-window invariant.</li><li><strong>Group Anagrams:</strong> choose a stable key: sorted characters or a frequency signature.</li><li><strong>Minimum Window Substring:</strong> track counts still needed and shrink only when the window is valid.</li></ol></div>
+      </section>
+    </main>
+    <footer>Interview Preparation Notes · <a href="index.html">Data structures &amp; algorithms</a></footer>
+  </body>
+</html>

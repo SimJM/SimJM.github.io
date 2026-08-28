@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Structures | DSA Notes</title>
+    <link rel="stylesheet" href="../styles.css">
+  </head>
+  <body>
+    <header>
+      <p class="eyebrow">DSA topic</p>
+      <h1>Linked lists, stacks &amp; queues</h1>
+      <p class="header-copy">Follow pointers deliberately, and use LIFO or FIFO to model the order the problem needs.</p>
+    </header>
+    <nav class="nav-pills" aria-label="Data structures topic navigation">
+      <a href="index.html#topics">All topics</a><a href="arrays-and-strings.html">Arrays</a><a href="strings.html">Strings</a><a href="sliding-window.html">Sliding window</a><a href="linear-structures.html">Linear structures</a><a href="trees-and-graphs.html">Trees &amp; graphs</a><a href="dynamic-programming.html">Dynamic programming</a>
+    </nav>
+    <main>
+      <a class="back-link" href="index.html">← Data structures &amp; algorithms</a>
+      <p class="page-intro">Linked lists are ideal when you can work from a node reference; stacks and queues model processing order. In Java, use <code>ArrayDeque</code> for stacks and queues.</p>
+      <div class="callout"><strong>Imports for this page:</strong> <code>import java.util.ArrayDeque;</code> and <code>import java.util.Deque;</code>. Define <code>ListNode</code> when the platform does not supply it: <code>class ListNode { int val; ListNode next; }</code>.</div>
+      <section>
+        <h2 class="section-title">Recognise the structure</h2>
+        <div class="content-grid">
+          <article class="card"><h3>Linked list</h3><p>Think pointer changes, a dummy head, or fast/slow pointers. Indexed access is <code>O(n)</code>; inserting after a known node is <code>O(1)</code>.</p></article>
+          <article class="card"><h3>Stack</h3><p>Use for matching, undoing, nested structure, or “next greater/smaller” problems. A monotonic stack keeps values in a deliberate order.</p></article>
+          <article class="card"><h3>Queue</h3><p>Use when work must be processed first-in, first-out: BFS, task scheduling, and level-order traversal.</p></article>
+        </div>
+      </section>
+      <section>
+        <h2 class="section-title">Java templates</h2>
+        <div class="content-grid">
+          <article class="card"><h3>Reverse a linked list</h3><pre class="example">ListNode previous = null;
+ListNode current = head;
+while (current != null) {
+    ListNode next = current.next;
+    current.next = previous;
+    previous = current;
+    current = next;
+}
+return previous;</pre><p>Save <code>next</code> before overwriting the current pointer; otherwise the remainder of the list is lost. At every step, <code>previous</code> is the already-reversed prefix and <code>current</code> starts the unprocessed suffix. Time <code>O(n)</code>, space <code>O(1)</code>.</p></article>
+          <article class="card"><h3>Fast and slow pointers</h3><pre class="example">ListNode slow = head;
+ListNode fast = head;
+while (fast != null &amp;&amp; fast.next != null) {
+    slow = slow.next;
+    fast = fast.next.next;
+    if (slow == fast) return true;
+}
+return false;</pre><p>Use this for cycle detection; it also helps find a middle node. If a cycle exists, the fast pointer eventually laps the slow pointer. Check both <code>fast</code> and <code>fast.next</code> before moving it two steps.</p></article>
+          <article class="card"><h3>Java deque</h3><pre class="example">Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;();
+stack.push(value);
+int top = stack.pop();
+
+Deque&lt;Integer&gt; queue = new ArrayDeque&lt;&gt;();
+queue.offer(value);
+int first = queue.poll();</pre><p><code>push/pop</code> are stack operations; <code>offer/poll</code> are queue operations.</p></article>
+        </div>
+      </section>
+      <section>
+        <h2 class="section-title">Practice</h2>
+        <div class="card"><ol class="practice"><li><strong>Reverse Linked List:</strong> use previous, current, and next pointers.</li><li><strong>Linked List Cycle:</strong> apply fast and slow pointers.</li><li><strong>Daily Temperatures:</strong> use a monotonic decreasing stack of indices.</li><li><strong>Implement Queue Using Stacks:</strong> separate input and output stacks.</li></ol></div>
+      </section>
+    </main>
+    <footer>Interview Preparation Notes · <a href="index.html">Data structures &amp; algorithms</a></footer>
+  </body>
+</html>
