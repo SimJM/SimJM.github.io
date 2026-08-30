@@ -351,6 +351,96 @@ return minHeap.peek();</pre
 				</div>
 			</section>
 
+			<section id="comparators">
+				<h2 class="section-title">Comparator patterns</h2>
+				<div class="content-grid">
+					<article class="card">
+						<span class="tag">Sorting</span>
+						<h3>Sort by a custom rule</h3>
+						<p>
+							A comparator tells Java how to order items when the
+							natural ordering is not enough. In interviews, this
+							is common for sorting events, tasks, or objects by a
+							priority, timestamp, or tie-breaker.
+						</p>
+						<pre class="example">
+List&lt;int[]&gt; tasks = new ArrayList&lt;&gt;();
+
+tasks.sort((a, b) -> {
+    if (a[1] != b[1]) return Integer.compare(a[1], b[1]);
+    return Integer.compare(a[0], b[0]);
+});</pre
+						>
+						<p>
+							This sorts by end time first, then by start time.
+							Use
+							<code>Integer.compare</code> to avoid mistakes with
+							negative numbers and keep the comparator readable.
+						</p>
+					</article>
+
+					<article class="card">
+						<span class="tag">Priority queue</span>
+						<h3>Min-heap or max-heap by custom field</h3>
+						<pre class="example">
+PriorityQueue&lt;int[]&gt; pq = new PriorityQueue&lt;&gt;((a, b) -> {
+    if (a[0] != b[0]) return Integer.compare(a[0], b[0]);
+    return Integer.compare(a[1], b[1]);
+});
+
+// Use the comparator to control ordering in the heap</pre
+						>
+						<p>
+							Priority queues often need a custom ordering, such
+							as lowest cost first, earliest deadline first, or
+							highest frequency with a tie-break on value. The
+							comparator must be consistent with the rule you are
+							optimising.
+						</p>
+					</article>
+
+					<article class="card">
+						<span class="tag">Tie-breakers</span>
+						<h3>Common comparator patterns</h3>
+						<pre class="example">
+// ascending by value
+Comparator&lt;Integer&gt; byValue = Integer::compareTo;
+
+// descending by frequency, then ascending by value
+Comparator&lt;int[]&gt; byFreqThenValue = (a, b) -> {
+    if (a[1] != b[1]) return Integer.compare(b[1], a[1]);
+    return Integer.compare(a[0], b[0]);
+};
+
+// longer string first, then alphabetic
+Comparator&lt;String&gt; byLengthDesc =
+    (s1, s2) -> s2.length() == s1.length()
+        ? s1.compareTo(s2)
+        : Integer.compare(s2.length(), s1.length());</pre
+						>
+						<p>
+							The usual pattern is: compare the primary field,
+							then the secondary field only when the primary is
+							equal. This gives deterministic ordering and avoids
+							surprising behaviour in tests or heaps.
+						</p>
+						<p>
+							<code>Integer.compare(a, b)</code> returns:
+							<code>-1</code> if <code>a &lt; b</code>,
+							<code>0</code> if <code>a == b</code>, and
+							<code>1</code> if <code>a &gt; b</code>. Layman's
+							rule: a negative result means <code>a</code> should
+							come before <code>b</code>, and a positive result
+							means <code>a</code> should come after
+							<code>b</code>. So for ascending order, return
+							<code>Integer.compare(a, b)</code>; for descending,
+							swap the arguments or negate the result, e.g.
+							<code>Integer.compare(b, a)</code>.
+						</p>
+					</article>
+				</div>
+			</section>
+
 			<section id="graphs">
 				<h2 class="section-title">Graphs, recursion, and DP</h2>
 				<div class="content-grid">
