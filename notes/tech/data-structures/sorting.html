@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta
+			name="description"
+			content="Common sorting algorithms used in coding interviews." />
+		<title>Sorting | DSA Notes</title>
+		<link rel="stylesheet" href="../styles.css" />
+		<script src="../theme-toggle.js" defer></script>
+	</head>
+	<body>
+		<header>
+			<p class="eyebrow">DSA topic</p>
+			<h1>Sorting</h1>
+			<p class="header-copy">
+				Interview questions often test the idea behind the algorithm
+				more than the exact code.
+			</p>
+		</header>
+
+		<nav class="nav-pills" aria-label="Data structures topic navigation">
+			<a href="index.html#topics">All topics</a>
+			<a href="arrays-and-strings.html">Arrays</a>
+			<a href="strings.html">Strings</a>
+			<a href="sliding-window.html">Sliding window</a>
+			<a href="linear-structures.html">Linear structures</a>
+			<a href="trees-and-graphs.html">Trees &amp; graphs</a>
+			<a href="sorting.html">Sorting</a>
+			<a href="dynamic-programming.html">Dynamic programming</a>
+		</nav>
+
+		<main>
+			<a class="back-link" href="index.html"
+				>← Data structures &amp; algorithms</a
+			>
+			<p class="page-intro">
+				Sorting questions usually test the trade-off: time, space,
+				stability, and when the data shape makes a special algorithm
+				worth it.
+			</p>
+
+			<section>
+				<h2 class="section-title">
+					Common interview sorting algorithms
+				</h2>
+				<div class="content-grid">
+					<article class="card">
+						<span class="tag">Divide and conquer</span>
+						<h3>Merge sort</h3>
+						<p>
+							Split the array into halves, sort each half, then
+							merge the results. It is stable, has predictable
+							<code>O(n log n)</code> time, and is often used when
+							you want a reliable sort without worrying about
+							partitioning corner cases.
+						</p>
+						<pre class="example">
+void mergeSort(int[] nums, int left, int right) {
+    if (left >= right) return;
+    int mid = left + (right - left) / 2;
+    mergeSort(nums, left, mid);
+    mergeSort(nums, mid + 1, right);
+    merge(nums, left, mid, right);
+}
+
+void merge(int[] nums, int left, int mid, int right) {
+    int[] temp = new int[right - left + 1];
+    int i = left, j = mid + 1, k = 0;
+
+    while (i <= mid && j <= right) {
+        if (nums[i] <= nums[j]) temp[k++] = nums[i++];
+        else temp[k++] = nums[j++];
+    }
+
+    while (i <= mid) temp[k++] = nums[i++];
+    while (j <= right) temp[k++] = nums[j++];
+
+    for (int idx = 0; idx < temp.length; idx++) {
+        nums[left + idx] = temp[idx];
+    }
+}</pre
+						>
+						<p>
+							<strong>Common interview angle:</strong> “Can you
+							sort this in <code>O(n log n)</code> time while
+							preserving relative order?”
+						</p>
+					</article>
+
+					<article class="card">
+						<span class="tag">Partitioning</span>
+						<h3>Quick sort</h3>
+						<p>
+							Pick a pivot, partition into smaller and larger
+							values, and recurse on the partitions. It is usually
+							the fastest in practice for arrays in memory and is
+							often tested because the pitfall is choosing the
+							pivot and handling duplicates correctly.
+						</p>
+						<pre class="example">
+int partition(int[] nums, int low, int high) {
+    int pivot = nums[high];
+    int i = low - 1;
+
+    for (int j = low; j < high; j++) {
+        if (nums[j] <= pivot) {
+            i++;
+            int temp = nums[i];
+            nums[i] = nums[j];
+            nums[j] = temp;
+        }
+    }
+
+    int temp = nums[i + 1];
+    nums[i + 1] = nums[high];
+    nums[high] = temp;
+    return i + 1;
+}
+
+void quickSort(int[] nums, int low, int high) {
+    if (low >= high) return;
+    int pivotIndex = partition(nums, low, high);
+    quickSort(nums, low, pivotIndex - 1);
+    quickSort(nums, pivotIndex + 1, high);
+}</pre
+						>
+						<p>
+							<strong>Best/average:</strong>
+							<code>O(n log n)</code>.
+							<strong>Worst-case:</strong> <code>O(n^2)</code> if
+							the pivot is poor every time.
+						</p>
+					</article>
+
+					<article class="card">
+						<span class="tag">Heap</span>
+						<h3>Heap sort</h3>
+						<p>
+							Build a max-heap or min-heap, then repeatedly remove
+							the root. It guarantees <code>O(n log n)</code> time
+							and uses <code>O(1)</code> extra space if done
+							in-place, but it is less often the “first-choice”
+							answer unless the problem is specifically about a
+							heap or kth largest values.
+						</p>
+						<pre class="example">
+void heapSort(int[] nums) {
+    int n = nums.length;
+
+    for (int i = n / 2 - 1; i >= 0; i--) {
+        heapify(nums, n, i);
+    }
+
+    for (int end = n - 1; end > 0; end--) {
+        int temp = nums[0];
+        nums[0] = nums[end];
+        nums[end] = temp;
+        heapify(nums, end, 0);
+    }
+}
+
+void heapify(int[] nums, int size, int root) {
+    int largest = root;
+    int left = 2 * root + 1;
+    int right = 2 * root + 2;
+
+    if (left < size && nums[left] > nums[largest]) largest = left;
+    if (right < size && nums[right] > nums[largest]) largest = right;
+
+    if (largest != root) {
+        int temp = nums[root];
+        nums[root] = nums[largest];
+        nums[largest] = temp;
+        heapify(nums, size, largest);
+    }
+}</pre
+						>
+					</article>
+
+					<article class="card">
+						<span class="tag">Insertion</span>
+						<h3>Insertion sort</h3>
+						<p>
+							Build the sorted prefix one element at a time. It is
+							simple, stable, and good for small arrays or nearly
+							sorted data. In interviews, it is often used as a
+							teaching example for why naive sorting can be enough
+							in specific cases.
+						</p>
+						<pre class="example">
+void insertionSort(int[] nums) {
+    for (int i = 1; i < nums.length; i++) {
+        int key = nums[i];
+        int j = i - 1;
+
+        while (j >= 0 && nums[j] > key) {
+            nums[j + 1] = nums[j];
+            j--;
+        }
+        nums[j + 1] = key;
+    }
+}</pre
+						>
+						<p>
+							<strong>Time:</strong> <code>O(n^2)</code>.
+							<strong>Space:</strong> <code>O(1)</code>.
+						</p>
+					</article>
+
+					<article class="card">
+						<span class="tag">Counting</span>
+						<h3>Counting sort</h3>
+						<p>
+							Use when the value range is small and known in
+							advance, such as integers within a limited range
+							like 0 to 100. Count frequencies, then rebuild the
+							output. This can beat comparison sorts when the
+							range is small.
+						</p>
+						<pre class="example">
+void countingSort(int[] nums, int min, int max) {
+    int range = max - min + 1;
+    int[] counts = new int[range];
+
+    for (int num : nums) {
+        counts[num - min]++;
+    }
+
+    int index = 0;
+    for (int value = min; value <= max; value++) {
+        while (counts[value - min]-- > 0) {
+            nums[index++] = value;
+        }
+    }
+}</pre
+						>
+						<p>
+							<strong>Time:</strong> <code>O(n + k)</code>, where
+							<code>k</code> is the value range.
+							<strong>Space:</strong> <code>O(k)</code>.
+						</p>
+					</article>
+
+					<article class="card">
+						<span class="tag">Digit-based</span>
+						<h3>Radix sort</h3>
+						<p>
+							Sort by one digit at a time, starting from the least
+							significant digit or the most significant digit
+							depending on the implementation. It is useful for
+							fixed-width integers or strings with limited
+							character sets, and it avoids comparison-based
+							ordering.
+						</p>
+						<pre class="example">
+void radixSort(int[] nums) {
+    int max = Arrays.stream(nums).max().orElse(0);
+    for (int exp = 1; max / exp > 0; exp *= 10) {
+        countingSortByDigit(nums, exp);
+    }
+}
+
+void countingSortByDigit(int[] nums, int exp) {
+    int[] output = new int[nums.length];
+    int[] counts = new int[10];
+
+    for (int num : nums) {
+        counts[(num / exp) % 10]++;
+    }
+
+    for (int i = 1; i < 10; i++) {
+        counts[i] += counts[i - 1];
+    }
+
+    for (int i = nums.length - 1; i >= 0; i--) {
+        int digit = (nums[i] / exp) % 10;
+        output[counts[digit] - 1] = nums[i];
+        counts[digit]--;
+    }
+
+    System.arraycopy(output, 0, nums, 0, nums.length);
+}</pre
+						>
+						<p>
+							<strong>Typical use:</strong> sort integers or
+							strings with a bounded digit set, often in
+							<code>O(d(n + k))</code> time where
+							<code>d</code> is the number of digits.
+						</p>
+					</article>
+				</div>
+			</section>
+
+			<section>
+				<h2 class="section-title">How to choose</h2>
+				<div class="card">
+					<p><strong>If the question says:</strong></p>
+					<ul class="practice">
+						<li>
+							<strong>“Sort this in general efficiently”:</strong>
+							think merge sort or quick sort.
+						</li>
+						<li>
+							<strong>“Data is nearly sorted”:</strong> insertion
+							sort can be surprisingly effective.
+						</li>
+						<li>
+							<strong>“Small fixed value range”:</strong> counting
+							sort is a strong answer.
+						</li>
+						<li>
+							<strong
+								>“Need a stable sort or you must preserve
+								order”:</strong
+							>
+							merge sort is often the safe choice.
+						</li>
+						<li>
+							<strong
+								>“Need kth largest / smallest with a
+								heap”:</strong
+							>
+							priority queue and heap sort patterns are relevant.
+						</li>
+					</ul>
+				</div>
+			</section>
+
+			<section>
+				<h2 class="section-title">Interview cheat sheet</h2>
+				<div class="card">
+					<pre class="example">
+Algorithm        Time (avg)    Space    Stable?    Typical use
+Merge sort       O(n log n)   O(n)     Yes        Safe general-purpose sort
+Quick sort       O(n log n)   O(log n) Average    Fastest in practice for arrays
+Heap sort        O(n log n)   O(1)     No         Good for heap-based problems
+Insertion sort   O(n^2)       O(1)     Yes        Small or nearly sorted arrays
+Counting sort    O(n + k)     O(k)     Yes        Small integer range
+Radix sort       O(d(n + k))  O(n + k) Yes/depends  Fixed-width digits</pre
+					>
+					<p>
+						For interviews, the most commonly tested “big idea”
+						sorting algorithms are merge sort, quick sort, heap
+						sort, and counting sort. If the problem is about order,
+						stability, or a narrow numeric range, the algorithm
+						choice becomes much more obvious.
+					</p>
+				</div>
+			</section>
+		</main>
+
+		<footer>
+			Interview Preparation Notes ·
+			<a href="index.html">Data structures &amp; algorithms</a>
+		</footer>
+	</body>
+</html>
