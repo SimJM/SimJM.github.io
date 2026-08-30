@@ -1,68 +1,131 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Sliding window algorithm notes and Java templates.">
-    <title>Sliding Window | DSA Notes</title>
-    <link rel="stylesheet" href="../styles.css">
-  </head>
-  <body>
-    <header>
-      <p class="eyebrow">DSA topic</p>
-      <h1>Sliding window</h1>
-      <p class="header-copy">Solve contiguous array and substring problems by moving each boundary forward at most once.</p>
-    </header>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta
+			name="description"
+			content="Sliding window algorithm notes and Java templates." />
+		<title>Sliding Window | DSA Notes</title>
+		<link rel="stylesheet" href="../styles.css" />
+		<script src="../theme-toggle.js" defer></script>
+	</head>
+	<body>
+		<header>
+			<p class="eyebrow">DSA topic</p>
+			<h1>Sliding window</h1>
+			<p class="header-copy">
+				Solve contiguous array and substring problems by moving each
+				boundary forward at most once.
+			</p>
+		</header>
 
-    <nav class="nav-pills" aria-label="Data structures topic navigation">
-      <a href="index.html#topics">All topics</a>
-      <a href="arrays-and-strings.html">Arrays</a>
-      <a href="strings.html">Strings</a>
-      <a href="sliding-window.html">Sliding window</a>
-      <a href="linear-structures.html">Linear structures</a>
-      <a href="trees-and-graphs.html">Trees &amp; graphs</a>
-      <a href="dynamic-programming.html">Dynamic programming</a>
-    </nav>
+		<nav class="nav-pills" aria-label="Data structures topic navigation">
+			<a href="index.html#topics">All topics</a>
+			<a href="arrays-and-strings.html">Arrays</a>
+			<a href="strings.html">Strings</a>
+			<a href="sliding-window.html">Sliding window</a>
+			<a href="linear-structures.html">Linear structures</a>
+			<a href="trees-and-graphs.html">Trees &amp; graphs</a>
+			<a href="dynamic-programming.html">Dynamic programming</a>
+		</nav>
 
-    <main>
-      <a class="back-link" href="index.html">← Data structures &amp; algorithms</a>
-      <p class="page-intro">Sliding window is a pattern for <strong>contiguous</strong> data: subarrays and substrings. It is very common in string questions, but the same idea works for arrays, such as maximum sum over a fixed number of values.</p>
+		<main>
+			<a class="back-link" href="index.html"
+				>← Data structures &amp; algorithms</a
+			>
+			<p class="page-intro">
+				Sliding window is a pattern for
+				<strong>contiguous</strong> data: subarrays and substrings. It
+				is very common in string questions, but the same idea works for
+				arrays, such as maximum sum over a fixed number of values.
+			</p>
 
-      <div class="callout">
-        <strong>Imports for the string templates:</strong>
-        <pre class="example">import java.util.HashMap;
-import java.util.Map;</pre>
-        <p>For simple lowercase English letters, an <code>int[26]</code> frequency array is often faster and simpler than a map.</p>
-      </div>
+			<div class="callout">
+				<strong>Imports for the string templates:</strong>
+				<pre class="example">
+import java.util.HashMap;
+import java.util.Map;</pre
+				>
+				<p>
+					For simple lowercase English letters, an
+					<code>int[26]</code> frequency array is often faster and
+					simpler than a map.
+				</p>
+			</div>
 
-      <section>
-        <h2 class="section-title">When should I use it?</h2>
-        <div class="content-grid">
-          <article class="card"><span class="tag">Use it</span><h3>Contiguous range</h3><p>Look for “subarray,” “substring,” “consecutive,” “longest,” “shortest,” “at most,” or “exactly <em>k</em>.” These often mean a moving left/right boundary can avoid recomputing work.</p></article>
-          <article class="card"><span class="tag">Fixed window</span><h3>Window length is given</h3><p>Examples: maximum sum of a subarray of size <em>k</em>, or count anagrams in every substring of length <em>k</em>. Add the new right value and remove the old left value.</p></article>
-          <article class="card"><span class="tag">Variable window</span><h3>Window length is discovered</h3><p>Examples: longest substring without repeats or minimum substring containing required characters. Expand right; shrink left only when the window violates or already satisfies the condition.</p></article>
-        </div>
-      </section>
+			<section>
+				<h2 class="section-title">When should I use it?</h2>
+				<div class="content-grid">
+					<article class="card">
+						<span class="tag">Use it</span>
+						<h3>Contiguous range</h3>
+						<p>
+							Look for “subarray,” “substring,” “consecutive,”
+							“longest,” “shortest,” “at most,” or “exactly
+							<em>k</em>.” These often mean a moving left/right
+							boundary can avoid recomputing work.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">Fixed window</span>
+						<h3>Window length is given</h3>
+						<p>
+							Examples: maximum sum of a subarray of size
+							<em>k</em>, or count anagrams in every substring of
+							length <em>k</em>. Add the new right value and
+							remove the old left value.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">Variable window</span>
+						<h3>Window length is discovered</h3>
+						<p>
+							Examples: longest substring without repeats or
+							minimum substring containing required characters.
+							Expand right; shrink left only when the window
+							violates or already satisfies the condition.
+						</p>
+					</article>
+				</div>
+			</section>
 
-      <section>
-        <h2 class="section-title">The invariant</h2>
-        <div class="card">
-          <h3>Say what is true inside the current window</h3>
-          <p>The invariant is the rule your window maintains. For example:</p>
-          <ul class="practice">
-            <li>“The current substring contains no repeated character.”</li>
-            <li>“The current window contains at most <em>k</em> distinct characters.”</li>
-            <li>“The current window contains all required characters.”</li>
-          </ul>
-          <p>Explain this rule before coding. It tells the interviewer exactly when to move <code>left</code>, and prevents random pointer movement.</p>
-        </div>
-      </section>
+			<section>
+				<h2 class="section-title">The invariant</h2>
+				<div class="card">
+					<h3>Say what is true inside the current window</h3>
+					<p>
+						The invariant is the rule your window maintains. For
+						example:
+					</p>
+					<ul class="practice">
+						<li>
+							“The current substring contains no repeated
+							character.”
+						</li>
+						<li>
+							“The current window contains at most
+							<em>k</em> distinct characters.”
+						</li>
+						<li>
+							“The current window contains all required
+							characters.”
+						</li>
+					</ul>
+					<p>
+						Explain this rule before coding. It tells the
+						interviewer exactly when to move <code>left</code>, and
+						prevents random pointer movement.
+					</p>
+				</div>
+			</section>
 
-      <section>
-        <h2 class="section-title">Fixed-size window</h2>
-        <div class="card">
-          <h3>Maximum sum of a subarray of size k</h3>
-          <pre class="example">public int maxSumOfSizeK(int[] nums, int k) {
+			<section>
+				<h2 class="section-title">Fixed-size window</h2>
+				<div class="card">
+					<h3>Maximum sum of a subarray of size k</h3>
+					<pre class="example">
+public int maxSumOfSizeK(int[] nums, int k) {
     int sum = 0;
     int best = Integer.MIN_VALUE;
 
@@ -77,17 +140,27 @@ import java.util.Map;</pre>
         }
     }
     return best;
-}</pre>
-          <p>Once <code>right ≥ k - 1</code>, <code>sum</code> represents exactly <code>k</code> elements. Each number is added once and removed once: time <code>O(n)</code>, extra space <code>O(1)</code>. Clarify how to handle <code>k ≤ 0</code> or <code>k &gt; nums.length</code> if the prompt does not guarantee valid input.</p>
-        </div>
-      </section>
+}</pre
+					>
+					<p>
+						Once <code>right ≥ k - 1</code>,
+						<code>sum</code> represents exactly
+						<code>k</code> elements. Each number is added once and
+						removed once: time <code>O(n)</code>, extra space
+						<code>O(1)</code>. Clarify how to handle
+						<code>k ≤ 0</code> or <code>k &gt; nums.length</code> if
+						the prompt does not guarantee valid input.
+					</p>
+				</div>
+			</section>
 
-      <section>
-        <h2 class="section-title">Variable-size windows</h2>
-        <div class="content-grid">
-          <article class="card">
-            <h3>Longest substring without repeating characters</h3>
-            <pre class="example">public int lengthOfLongestSubstring(String s) {
+			<section>
+				<h2 class="section-title">Variable-size windows</h2>
+				<div class="content-grid">
+					<article class="card">
+						<h3>Longest substring without repeating characters</h3>
+						<pre class="example">
+public int lengthOfLongestSubstring(String s) {
     Map&lt;Character, Integer&gt; lastSeen = new HashMap&lt;&gt;();
     int left = 0;
     int best = 0;
@@ -101,13 +174,25 @@ import java.util.Map;</pre>
         best = Math.max(best, right - left + 1);
     }
     return best;
-}</pre>
-            <p><strong>Invariant:</strong> <code>s[left..right]</code> has no repeated character. The map stores each character’s latest index. Use <code>Math.max</code> so an earlier duplicate never moves <code>left</code> backwards. Time <code>O(n)</code>, space <code>O(min(n, alphabet size))</code>.</p>
-          </article>
+}</pre
+						>
+						<p>
+							<strong>Invariant:</strong>
+							<code>s[left..right]</code> has no repeated
+							character. The map stores each character’s latest
+							index. Use <code>Math.max</code> so an earlier
+							duplicate never moves <code>left</code> backwards.
+							Time <code>O(n)</code>, space
+							<code>O(min(n, alphabet size))</code>.
+						</p>
+					</article>
 
-          <article class="card">
-            <h3>Longest substring with at most k distinct characters</h3>
-            <pre class="example">public int lengthOfLongestSubstringKDistinct(String s, int k) {
+					<article class="card">
+						<h3>
+							Longest substring with at most k distinct characters
+						</h3>
+						<pre class="example">
+public int lengthOfLongestSubstringKDistinct(String s, int k) {
     Map&lt;Character, Integer&gt; count = new HashMap&lt;&gt;();
     int left = 0;
     int best = 0;
@@ -124,44 +209,107 @@ import java.util.Map;</pre>
         best = Math.max(best, right - left + 1);
     }
     return best;
-}</pre>
-            <p><strong>Invariant:</strong> the window has at most <code>k</code> distinct characters. Expand first; then repeatedly shrink while invalid. Removing a key at count zero is essential, because <code>count.size()</code> measures distinct characters.</p>
-          </article>
-        </div>
-      </section>
+}</pre
+						>
+						<p>
+							<strong>Invariant:</strong> the window has at most
+							<code>k</code> distinct characters. Expand first;
+							then repeatedly shrink while invalid. Removing a key
+							at count zero is essential, because
+							<code>count.size()</code> measures distinct
+							characters.
+						</p>
+					</article>
+				</div>
+			</section>
 
-      <section>
-        <h2 class="section-title">Minimum-window pattern</h2>
-        <div class="card">
-          <h3>Shortest valid window</h3>
-          <pre class="example">// 1. Add s.charAt(right) to the window count.
+			<section>
+				<h2 class="section-title">Minimum-window pattern</h2>
+				<div class="card">
+					<h3>Shortest valid window</h3>
+					<pre class="example">
+// 1. Add s.charAt(right) to the window count.
 // 2. When all required counts are satisfied:
 //    - record this window if it is the shortest so far;
 //    - remove s.charAt(left) and increment left;
 //    - keep shrinking while the window remains valid.
-// 3. Repeat for every right pointer position.</pre>
-          <p>For “longest valid” problems, shrink only while the window is invalid. For “shortest valid” problems, shrink while it is valid after recording the answer. That distinction is the source of many sliding-window mistakes.</p>
-        </div>
-      </section>
+// 3. Repeat for every right pointer position.</pre
+					>
+					<p>
+						For “longest valid” problems, shrink only while the
+						window is invalid. For “shortest valid” problems, shrink
+						while it is valid after recording the answer. That
+						distinction is the source of many sliding-window
+						mistakes.
+					</p>
+				</div>
+			</section>
 
-      <section>
-        <h2 class="section-title">Common mistakes</h2>
-        <div class="card">
-          <ul class="practice">
-            <li>Using sliding window for a non-contiguous subsequence problem.</li>
-            <li>Moving <code>left</code> without updating the count, sum, or other window state.</li>
-            <li>Forgetting to remove a map key after its frequency becomes zero.</li>
-            <li>Updating the answer before the window has the required size or validity.</li>
-            <li>Calling the approach <code>O(n²)</code>: both pointers only move forward, so the usual total work is <code>O(n)</code>.</li>
-          </ul>
-        </div>
-      </section>
+			<section>
+				<h2 class="section-title">Common mistakes</h2>
+				<div class="card">
+					<ul class="practice">
+						<li>
+							Using sliding window for a non-contiguous
+							subsequence problem.
+						</li>
+						<li>
+							Moving <code>left</code> without updating the count,
+							sum, or other window state.
+						</li>
+						<li>
+							Forgetting to remove a map key after its frequency
+							becomes zero.
+						</li>
+						<li>
+							Updating the answer before the window has the
+							required size or validity.
+						</li>
+						<li>
+							Calling the approach <code>O(n²)</code>: both
+							pointers only move forward, so the usual total work
+							is <code>O(n)</code>.
+						</li>
+					</ul>
+				</div>
+			</section>
 
-      <section>
-        <h2 class="section-title">Practice</h2>
-        <div class="card"><ol class="practice"><li><strong>Maximum Average Subarray I:</strong> fixed-size numeric window.</li><li><strong>Permutation in String:</strong> fixed-size character-count window.</li><li><strong>Longest Repeating Character Replacement:</strong> variable window with a frequency maximum.</li><li><strong>Minimum Window Substring:</strong> shortest valid variable window.</li><li><strong>Subarrays With K Different Integers:</strong> use “at most k” minus “at most k - 1.”</li></ol></div>
-      </section>
-    </main>
-    <footer>Interview Preparation Notes · <a href="index.html">Data structures &amp; algorithms</a></footer>
-  </body>
+			<section>
+				<h2 class="section-title">Practice</h2>
+				<div class="card">
+					<ol class="practice">
+						<li>
+							<strong>Maximum Average Subarray I:</strong>
+							fixed-size numeric window.
+						</li>
+						<li>
+							<strong>Permutation in String:</strong> fixed-size
+							character-count window.
+						</li>
+						<li>
+							<strong
+								>Longest Repeating Character
+								Replacement:</strong
+							>
+							variable window with a frequency maximum.
+						</li>
+						<li>
+							<strong>Minimum Window Substring:</strong> shortest
+							valid variable window.
+						</li>
+						<li>
+							<strong
+								>Subarrays With K Different Integers:</strong
+							>
+							use “at most k” minus “at most k - 1.”
+						</li>
+					</ol>
+				</div>
+			</section>
+		</main>
+		<footer>
+			Interview Preparation Notes ·
+			<a href="index.html">Data structures &amp; algorithms</a>
+		</footer>
+	</body>
 </html>

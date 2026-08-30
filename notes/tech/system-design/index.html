@@ -1,110 +1,199 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="System design interview fundamentals, building blocks, and reusable design templates.">
-    <title>System Design | Interview Notes</title>
-    <link rel="stylesheet" href="../styles.css">
-  </head>
-  <body>
-    <header>
-      <p class="eyebrow">Module 3</p>
-      <h1>System design</h1>
-      <p class="header-copy">Move from requirements to a scalable design by making every trade-off explicit.</p>
-    </header>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta
+			name="description"
+			content="System design interview fundamentals, building blocks, and reusable design templates." />
+		<title>System Design | Interview Notes</title>
+		<link rel="stylesheet" href="../styles.css" />
+		<script src="../theme-toggle.js" defer></script>
+	</head>
+	<body>
+		<header>
+			<p class="eyebrow">Module 3</p>
+			<h1>System design</h1>
+			<p class="header-copy">
+				Move from requirements to a scalable design by making every
+				trade-off explicit.
+			</p>
+		</header>
 
-    <nav class="nav-pills" aria-label="System design study sections">
-      <a href="#framework">Framework</a>
-      <a href="#must-know">Must know</a>
-      <a href="#estimates">Estimates</a>
-      <a href="#templates">Design templates</a>
-      <a href="#example">URL shortener</a>
-      <a href="#practice">Practice</a>
-    </nav>
+		<nav class="nav-pills" aria-label="System design study sections">
+			<a href="#framework">Framework</a>
+			<a href="#must-know">Must know</a>
+			<a href="#estimates">Estimates</a>
+			<a href="#templates">Design templates</a>
+			<a href="#example">URL shortener</a>
+			<a href="#practice">Practice</a>
+		</nav>
 
-    <main>
-      <a class="back-link" href="../index.html">← All study modules</a>
-      <p class="page-intro">A strong system-design interview is a guided discussion. Start with what the product must do, quantify the scale, draw a simple first design, then improve its bottlenecks with a clear reason for every component.</p>
+		<main>
+			<a class="back-link" href="../index.html">← All study modules</a>
+			<p class="page-intro">
+				A strong system-design interview is a guided discussion. Start
+				with what the product must do, quantify the scale, draw a simple
+				first design, then improve its bottlenecks with a clear reason
+				for every component.
+			</p>
 
-      <section id="framework">
-        <h2 class="section-title">A repeatable interview framework</h2>
-        <div class="content-grid">
-          <article class="card">
-            <span class="tag">1 · Scope</span>
-            <h3>Clarify requirements</h3>
-            <p>Ask who uses the product, its core operations, expected scale, and what is out of scope. Separate functional requirements (“create a post”) from non-functional requirements (“p99 reads under 200 ms”).</p>
-          </article>
-          <article class="card">
-            <span class="tag">2 · Prioritise</span>
-            <h3>Name the important qualities</h3>
-            <p>Confirm the priority among latency, availability, consistency, freshness, durability, cost, and security. You cannot optimise every quality at the same time.</p>
-          </article>
-          <article class="card">
-            <span class="tag">3 · Estimate</span>
-            <h3>Make scale concrete</h3>
-            <p>Estimate requests per second, read/write ratio, object size, storage growth, bandwidth, and peak traffic. Round numbers are enough to identify the first bottleneck.</p>
-          </article>
-          <article class="card">
-            <span class="tag">4 · Design</span>
-            <h3>Draw the simple path first</h3>
-            <p>Show clients, API, services, data stores, and the main read/write flows. Define an API and data model before introducing specialised infrastructure.</p>
-          </article>
-          <article class="card">
-            <span class="tag">5 · Refine</span>
-            <h3>Remove the bottleneck</h3>
-            <p>Add caching, indexing, replication, partitioning, queues, and background workers only when a requirement or estimated bottleneck justifies them.</p>
-          </article>
-          <article class="card">
-            <span class="tag">6 · Close</span>
-            <h3>Discuss failure and trade-offs</h3>
-            <p>Explain how the system behaves when a dependency is slow or unavailable, what you monitor, and what you deliberately chose not to solve yet.</p>
-          </article>
-        </div>
-      </section>
+			<section id="framework">
+				<h2 class="section-title">A repeatable interview framework</h2>
+				<div class="content-grid">
+					<article class="card">
+						<span class="tag">1 · Scope</span>
+						<h3>Clarify requirements</h3>
+						<p>
+							Ask who uses the product, its core operations,
+							expected scale, and what is out of scope. Separate
+							functional requirements (“create a post”) from
+							non-functional requirements (“p99 reads under 200
+							ms”).
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">2 · Prioritise</span>
+						<h3>Name the important qualities</h3>
+						<p>
+							Confirm the priority among latency, availability,
+							consistency, freshness, durability, cost, and
+							security. You cannot optimise every quality at the
+							same time.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">3 · Estimate</span>
+						<h3>Make scale concrete</h3>
+						<p>
+							Estimate requests per second, read/write ratio,
+							object size, storage growth, bandwidth, and peak
+							traffic. Round numbers are enough to identify the
+							first bottleneck.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">4 · Design</span>
+						<h3>Draw the simple path first</h3>
+						<p>
+							Show clients, API, services, data stores, and the
+							main read/write flows. Define an API and data model
+							before introducing specialised infrastructure.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">5 · Refine</span>
+						<h3>Remove the bottleneck</h3>
+						<p>
+							Add caching, indexing, replication, partitioning,
+							queues, and background workers only when a
+							requirement or estimated bottleneck justifies them.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">6 · Close</span>
+						<h3>Discuss failure and trade-offs</h3>
+						<p>
+							Explain how the system behaves when a dependency is
+							slow or unavailable, what you monitor, and what you
+							deliberately chose not to solve yet.
+						</p>
+					</article>
+				</div>
+			</section>
 
-      <section id="must-know">
-        <h2 class="section-title">Common must-know knowledge</h2>
-        <div class="content-grid">
-          <article class="card">
-            <h3>APIs and communication</h3>
-            <p><strong>HTTP/REST</strong> suits request-response APIs. <strong>WebSockets</strong> fit persistent, low-latency bidirectional updates such as chat. <strong>gRPC/RPC</strong> is common for internal service-to-service calls. Design APIs to be idempotent when clients may retry.</p>
-          </article>
-          <article class="card">
-            <h3>Databases and indexes</h3>
-            <p>Use a relational database for transactions, joins, and strong constraints. Use key-value or document stores for simple high-scale access patterns. Index fields used for lookup, filtering, ordering, or joins; indexes speed reads but add storage and write cost.</p>
-          </article>
-          <article class="card">
-            <h3>Caching</h3>
-            <p>Cache read-heavy or expensive results close to the client or service. Cache-aside is the common default: read cache, fetch on miss, then populate it. Discuss TTL, invalidation after writes, cache stampedes, and the acceptable amount of staleness.</p>
-          </article>
-          <article class="card">
-            <h3>Scaling and partitioning</h3>
-            <p>Scale stateless services horizontally behind a load balancer. Partition data when one database node cannot handle size or throughput. Choose a stable partition key, avoid hot keys, and know how you would rebalance partitions.</p>
-          </article>
-          <article class="card">
-            <h3>Replication and consistency</h3>
-            <p>Replication improves read capacity and availability, but replicas can lag. State whether a user must read their own write, whether stale data is acceptable, and when to route requests to the primary.</p>
-          </article>
-          <article class="card">
-            <h3>Queues and background work</h3>
-            <p>Use a queue to absorb bursts and decouple slow, non-critical work: notifications, analytics, image processing, and email. Consumers need retries, dead-letter handling, idempotency, and a plan for duplicate delivery.</p>
-          </article>
-          <article class="card">
-            <h3>Reliability</h3>
-            <p>Set timeouts, retries with backoff and jitter, circuit breakers, rate limits, and graceful degradation. Do not retry a non-idempotent write blindly. Remove single points of failure where availability is important.</p>
-          </article>
-          <article class="card">
-            <h3>Observability and security</h3>
-            <p>Monitor latency, traffic, errors, saturation, queue depth, cache hit rate, and database health. Use structured logs, metrics, tracing, authentication, authorisation, encryption in transit, and least-privilege access.</p>
-          </article>
-        </div>
-      </section>
+			<section id="must-know">
+				<h2 class="section-title">Common must-know knowledge</h2>
+				<div class="content-grid">
+					<article class="card">
+						<h3>APIs and communication</h3>
+						<p>
+							<strong>HTTP/REST</strong> suits request-response
+							APIs. <strong>WebSockets</strong> fit persistent,
+							low-latency bidirectional updates such as chat.
+							<strong>gRPC/RPC</strong> is common for internal
+							service-to-service calls. Design APIs to be
+							idempotent when clients may retry.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Databases and indexes</h3>
+						<p>
+							Use a relational database for transactions, joins,
+							and strong constraints. Use key-value or document
+							stores for simple high-scale access patterns. Index
+							fields used for lookup, filtering, ordering, or
+							joins; indexes speed reads but add storage and write
+							cost.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Caching</h3>
+						<p>
+							Cache read-heavy or expensive results close to the
+							client or service. Cache-aside is the common
+							default: read cache, fetch on miss, then populate
+							it. Discuss TTL, invalidation after writes, cache
+							stampedes, and the acceptable amount of staleness.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Scaling and partitioning</h3>
+						<p>
+							Scale stateless services horizontally behind a load
+							balancer. Partition data when one database node
+							cannot handle size or throughput. Choose a stable
+							partition key, avoid hot keys, and know how you
+							would rebalance partitions.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Replication and consistency</h3>
+						<p>
+							Replication improves read capacity and availability,
+							but replicas can lag. State whether a user must read
+							their own write, whether stale data is acceptable,
+							and when to route requests to the primary.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Queues and background work</h3>
+						<p>
+							Use a queue to absorb bursts and decouple slow,
+							non-critical work: notifications, analytics, image
+							processing, and email. Consumers need retries,
+							dead-letter handling, idempotency, and a plan for
+							duplicate delivery.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Reliability</h3>
+						<p>
+							Set timeouts, retries with backoff and jitter,
+							circuit breakers, rate limits, and graceful
+							degradation. Do not retry a non-idempotent write
+							blindly. Remove single points of failure where
+							availability is important.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Observability and security</h3>
+						<p>
+							Monitor latency, traffic, errors, saturation, queue
+							depth, cache hit rate, and database health. Use
+							structured logs, metrics, tracing, authentication,
+							authorisation, encryption in transit, and
+							least-privilege access.
+						</p>
+					</article>
+				</div>
+			</section>
 
-      <section id="estimates">
-        <h2 class="section-title">Quick estimation cheat sheet</h2>
-        <div class="card">
-          <pre class="example">Average requests per second = daily requests / 86,400
+			<section id="estimates">
+				<h2 class="section-title">Quick estimation cheat sheet</h2>
+				<div class="card">
+					<pre class="example">
+Average requests per second = daily requests / 86,400
 Peak RPS                    ≈ average RPS × peak multiplier
 Daily storage               = writes/day × bytes per write
 Storage over N years        = daily storage × 365 × N
@@ -114,95 +203,191 @@ Useful approximations:
 1 KB  ≈ 10³ bytes
 1 MB  ≈ 10⁶ bytes
 1 GB  ≈ 10⁹ bytes
-1 day = 86,400 seconds</pre>
-          <p>Say your assumptions out loud. For example: “At 10 million reads per day, average traffic is about 115 reads per second. If peak is 10× higher, I will design the read path for roughly 1,200 RPS.” The estimate need not be exact; it should drive a design decision.</p>
-        </div>
-      </section>
+1 day = 86,400 seconds</pre
+					>
+					<p>
+						Say your assumptions out loud. For example: “At 10
+						million reads per day, average traffic is about 115
+						reads per second. If peak is 10× higher, I will design
+						the read path for roughly 1,200 RPS.” The estimate need
+						not be exact; it should drive a design decision.
+					</p>
+				</div>
+			</section>
 
-      <section id="templates">
-        <h2 class="section-title">Reusable design templates</h2>
-        <div class="content-grid">
-          <article class="card">
-            <span class="tag">Read-heavy lookup</span>
-            <h3>Cached lookup service</h3>
-            <pre class="example">Client → CDN / load balancer → API service
+			<section id="templates">
+				<h2 class="section-title">Reusable design templates</h2>
+				<div class="content-grid">
+					<article class="card">
+						<span class="tag">Read-heavy lookup</span>
+						<h3>Cached lookup service</h3>
+						<pre class="example">
+Client → CDN / load balancer → API service
                                  ↓
                               cache
                                  ↓ on miss
-                            primary database</pre>
-            <p>Use for URL shorteners, profiles, product details, configuration, and public content. Cache popular keys, index the primary lookup key, replicate for read scale, and define invalidation or TTL behaviour after a write.</p>
-          </article>
-          <article class="card">
-            <span class="tag">Write-heavy ingestion</span>
-            <h3>Durable write + asynchronous processing</h3>
-            <pre class="example">Client → API service → primary database
+                            primary database</pre
+						>
+						<p>
+							Use for URL shorteners, profiles, product details,
+							configuration, and public content. Cache popular
+							keys, index the primary lookup key, replicate for
+							read scale, and define invalidation or TTL behaviour
+							after a write.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">Write-heavy ingestion</span>
+						<h3>Durable write + asynchronous processing</h3>
+						<pre class="example">
+Client → API service → primary database
                          ↓
-                     event queue → workers → search / analytics / notifications</pre>
-            <p>Use for orders, posts, uploads, events, and activity logs. Commit the essential user-visible record first; publish downstream work asynchronously. Make consumers idempotent because events can be delivered more than once.</p>
-          </article>
-          <article class="card">
-            <span class="tag">Large files</span>
-            <h3>Object storage with metadata</h3>
-            <pre class="example">Client → API → metadata database
+                     event queue → workers → search / analytics / notifications</pre
+						>
+						<p>
+							Use for orders, posts, uploads, events, and activity
+							logs. Commit the essential user-visible record
+							first; publish downstream work asynchronously. Make
+							consumers idempotent because events can be delivered
+							more than once.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">Large files</span>
+						<h3>Object storage with metadata</h3>
+						<pre class="example">
+Client → API → metadata database
              └→ pre-signed upload URL → object storage → CDN
                                            ↓
-                                    processing queue → workers</pre>
-            <p>Use for photos, videos, and documents. Store file bytes in object storage, not the primary database. Keep ownership, file state, and object key in metadata. Upload directly to storage when possible.</p>
-          </article>
-          <article class="card">
-            <span class="tag">Real-time updates</span>
-            <h3>Connection gateway + event fan-out</h3>
-            <pre class="example">Client ⇄ WebSocket gateway ⇄ message service
+                                    processing queue → workers</pre
+						>
+						<p>
+							Use for photos, videos, and documents. Store file
+							bytes in object storage, not the primary database.
+							Keep ownership, file state, and object key in
+							metadata. Upload directly to storage when possible.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">Real-time updates</span>
+						<h3>Connection gateway + event fan-out</h3>
+						<pre class="example">
+Client ⇄ WebSocket gateway ⇄ message service
                                   ↓
                             queue / pub-sub
                                   ↓
-                         delivery workers / presence store</pre>
-            <p>Use for chat, live notifications, collaboration, and dashboards. Discuss connection ownership, ordering scope, offline delivery, backpressure, and whether messages are persisted before acknowledgement.</p>
-          </article>
-          <article class="card">
-            <span class="tag">Rate limiting</span>
-            <h3>Admission control at the edge</h3>
-            <pre class="example">Client → gateway / rate limiter → API service
+                         delivery workers / presence store</pre
+						>
+						<p>
+							Use for chat, live notifications, collaboration, and
+							dashboards. Discuss connection ownership, ordering
+							scope, offline delivery, backpressure, and whether
+							messages are persisted before acknowledgement.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">Rate limiting</span>
+						<h3>Admission control at the edge</h3>
+						<pre class="example">
+Client → gateway / rate limiter → API service
                     ↓
-          distributed counter store</pre>
-            <p>Use token bucket for controlled bursts and steady refill, or sliding/fixed windows for simpler limits. Key by user, API key, IP, route, or a combination. Return a clear retry response when rejecting traffic.</p>
-          </article>
-          <article class="card">
-            <span class="tag">Search and autocomplete</span>
-            <h3>Primary data + derived search index</h3>
-            <pre class="example">Write → primary database → change event → indexer → search index
-Read  → search API → search index → ranked results</pre>
-            <p>Use when users search text or filter many fields. The search index is a derived, eventually consistent view. Discuss indexing delay, ranking, typo tolerance, and a fallback when the index is unavailable.</p>
-          </article>
-        </div>
-      </section>
+          distributed counter store</pre
+						>
+						<p>
+							Use token bucket for controlled bursts and steady
+							refill, or sliding/fixed windows for simpler limits.
+							Key by user, API key, IP, route, or a combination.
+							Return a clear retry response when rejecting
+							traffic.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">Search and autocomplete</span>
+						<h3>Primary data + derived search index</h3>
+						<pre class="example">
+Write → primary database → change event → indexer → search index
+Read  → search API → search index → ranked results</pre
+						>
+						<p>
+							Use when users search text or filter many fields.
+							The search index is a derived, eventually consistent
+							view. Discuss indexing delay, ranking, typo
+							tolerance, and a fallback when the index is
+							unavailable.
+						</p>
+					</article>
+				</div>
+			</section>
 
-      <section id="example">
-        <h2 class="section-title">Worked example: URL shortener</h2>
-        <div class="card">
-          <h3>Requirements and API</h3>
-          <p>Core requirements: create a short URL, redirect quickly, and optionally record clicks. A minimal API is <code>POST /urls</code> to create a mapping and <code>GET /{code}</code> to redirect.</p>
-          <pre class="example">Client → load balancer → URL service → cache → key-value store
-                                      └────────→ event queue → analytics worker</pre>
-          <p>The service generates a unique ID, encodes it, and stores <code>code → destination URL</code>. Redirects check the cache first, then the primary store. Use a distributed ID generator or retry random codes after a uniqueness check to avoid collisions.</p>
-          <p>Cache popular mappings because redirects are read-heavy. Send click logging to a queue so redirect latency does not depend on analytics. Add expiration status to the mapping if links can expire; rate-limit creation to control abuse.</p>
-        </div>
-      </section>
+			<section id="example">
+				<h2 class="section-title">Worked example: URL shortener</h2>
+				<div class="card">
+					<h3>Requirements and API</h3>
+					<p>
+						Core requirements: create a short URL, redirect quickly,
+						and optionally record clicks. A minimal API is
+						<code>POST /urls</code> to create a mapping and
+						<code>GET /{code}</code> to redirect.
+					</p>
+					<pre class="example">
+Client → load balancer → URL service → cache → key-value store
+                                      └────────→ event queue → analytics worker</pre
+					>
+					<p>
+						The service generates a unique ID, encodes it, and
+						stores <code>code → destination URL</code>. Redirects
+						check the cache first, then the primary store. Use a
+						distributed ID generator or retry random codes after a
+						uniqueness check to avoid collisions.
+					</p>
+					<p>
+						Cache popular mappings because redirects are read-heavy.
+						Send click logging to a queue so redirect latency does
+						not depend on analytics. Add expiration status to the
+						mapping if links can expire; rate-limit creation to
+						control abuse.
+					</p>
+				</div>
+			</section>
 
-      <section id="practice">
-        <h2 class="section-title">Practice prompts</h2>
-        <div class="card">
-          <ol class="practice">
-            <li><strong>Rate limiter:</strong> compare token bucket, fixed window, and sliding window. Where do counters live, and what happens if the store is unavailable?</li>
-            <li><strong>News feed:</strong> compare fan-out on write with fan-out on read, especially for celebrity accounts.</li>
-            <li><strong>File storage:</strong> separate metadata from file bytes; explain upload, download, processing, and deletion.</li>
-            <li><strong>Chat service:</strong> discuss WebSocket connections, delivery order, presence, offline messages, and reconnects.</li>
-            <li><strong>Notification service:</strong> design preferences, deduplication, retries, channels, and provider failures.</li>
-            <li><strong>Autocomplete:</strong> design the write path to an index, the low-latency read path, and ranking or typo tolerance.</li>
-          </ol>
-        </div>
-      </section>
-    </main>
-    <footer>Interview Preparation Notes</footer>
-  </body>
+			<section id="practice">
+				<h2 class="section-title">Practice prompts</h2>
+				<div class="card">
+					<ol class="practice">
+						<li>
+							<strong>Rate limiter:</strong> compare token bucket,
+							fixed window, and sliding window. Where do counters
+							live, and what happens if the store is unavailable?
+						</li>
+						<li>
+							<strong>News feed:</strong> compare fan-out on write
+							with fan-out on read, especially for celebrity
+							accounts.
+						</li>
+						<li>
+							<strong>File storage:</strong> separate metadata
+							from file bytes; explain upload, download,
+							processing, and deletion.
+						</li>
+						<li>
+							<strong>Chat service:</strong> discuss WebSocket
+							connections, delivery order, presence, offline
+							messages, and reconnects.
+						</li>
+						<li>
+							<strong>Notification service:</strong> design
+							preferences, deduplication, retries, channels, and
+							provider failures.
+						</li>
+						<li>
+							<strong>Autocomplete:</strong> design the write path
+							to an index, the low-latency read path, and ranking
+							or typo tolerance.
+						</li>
+					</ol>
+				</div>
+			</section>
+		</main>
+		<footer>Interview Preparation Notes</footer>
+	</body>
 </html>

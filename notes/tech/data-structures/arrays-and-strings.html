@@ -1,82 +1,171 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arrays &amp; Strings | DSA Notes</title>
-    <link rel="stylesheet" href="../styles.css">
-  </head>
-  <body>
-    <header>
-      <p class="eyebrow">DSA topic</p>
-      <h1>Arrays &amp; strings</h1>
-      <p class="header-copy">Use indices and invariants to make contiguous-data problems predictable.</p>
-    </header>
-    <nav class="nav-pills" aria-label="Data structures topic navigation">
-      <a href="index.html#topics">All topics</a>
-      <a href="arrays-and-strings.html">Arrays</a>
-      <a href="strings.html">Strings</a>
-      <a href="sliding-window.html">Sliding window</a>
-      <a href="linear-structures.html">Linear structures</a>
-      <a href="trees-and-graphs.html">Trees &amp; graphs</a>
-      <a href="dynamic-programming.html">Dynamic programming</a>
-    </nav>
-    <main>
-      <a class="back-link" href="index.html">← Data structures &amp; algorithms</a>
-      <p class="page-intro">Arrays provide <code>O(1)</code> indexed access. Strings are immutable in Java, so use <code>StringBuilder</code> for repeated edits.</p>
-      <div class="callout"><strong>Imports for this page:</strong> <code>import java.util.HashMap;</code> and <code>import java.util.Map;</code>. Arrays and <code>StringBuilder</code> are available from <code>java.lang</code> and do not need imports.</div>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Arrays &amp; Strings | DSA Notes</title>
+		<link rel="stylesheet" href="../styles.css" />
+		<script src="../theme-toggle.js" defer></script>
+	</head>
+	<body>
+		<header>
+			<p class="eyebrow">DSA topic</p>
+			<h1>Arrays &amp; strings</h1>
+			<p class="header-copy">
+				Use indices and invariants to make contiguous-data problems
+				predictable.
+			</p>
+		</header>
+		<nav class="nav-pills" aria-label="Data structures topic navigation">
+			<a href="index.html#topics">All topics</a>
+			<a href="arrays-and-strings.html">Arrays</a>
+			<a href="strings.html">Strings</a>
+			<a href="sliding-window.html">Sliding window</a>
+			<a href="linear-structures.html">Linear structures</a>
+			<a href="trees-and-graphs.html">Trees &amp; graphs</a>
+			<a href="dynamic-programming.html">Dynamic programming</a>
+		</nav>
+		<main>
+			<a class="back-link" href="index.html"
+				>← Data structures &amp; algorithms</a
+			>
+			<p class="page-intro">
+				Arrays provide <code>O(1)</code> indexed access. Strings are
+				immutable in Java, so use <code>StringBuilder</code> for
+				repeated edits.
+			</p>
+			<div class="callout">
+				<strong>Imports for this page:</strong>
+				<code>import java.util.HashMap;</code> and
+				<code>import java.util.Map;</code>. Arrays and
+				<code>StringBuilder</code> are available from
+				<code>java.lang</code> and do not need imports.
+			</div>
 
-      <section>
-        <h2 class="section-title">When to use each pattern</h2>
-        <div class="content-grid">
-          <article class="card"><h3>Two pointers</h3><p>Use for sorted arrays, comparing both ends, or in-place edits. Moving a pointer must have a reason: in a sorted pair-sum problem, move the left pointer to increase the sum and the right pointer to decrease it.</p></article>
-          <article class="card"><h3>Sliding window</h3><p>Use for contiguous subarrays or substrings. Define what is always true inside the window, then expand and shrink while preserving it.</p></article>
-          <article class="card"><h3>Prefix sums</h3><p>Use for many range-sum queries. Store cumulative totals so any range is the difference between two prefix values.</p></article>
-        </div>
-      </section>
+			<section>
+				<h2 class="section-title">When to use each pattern</h2>
+				<div class="content-grid">
+					<article class="card">
+						<h3>Two pointers</h3>
+						<p>
+							Use for sorted arrays, comparing both ends, or
+							in-place edits. Moving a pointer must have a reason:
+							in a sorted pair-sum problem, move the left pointer
+							to increase the sum and the right pointer to
+							decrease it.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Sliding window</h3>
+						<p>
+							Use for contiguous subarrays or substrings. Define
+							what is always true inside the window, then expand
+							and shrink while preserving it.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Prefix sums</h3>
+						<p>
+							Use for many range-sum queries. Store cumulative
+							totals so any range is the difference between two
+							prefix values.
+						</p>
+					</article>
+				</div>
+			</section>
 
-      <section>
-        <h2 class="section-title">Java templates</h2>
-        <div class="content-grid">
-          <article class="card">
-            <h3>Two pointers: pair sum</h3>
-            <pre class="example">int left = 0, right = nums.length - 1;
+			<section>
+				<h2 class="section-title">Java templates</h2>
+				<div class="content-grid">
+					<article class="card">
+						<h3>Two pointers: pair sum</h3>
+						<pre class="example">
+int left = 0, right = nums.length - 1;
 while (left &lt; right) {
     int sum = nums[left] + nums[right];
     if (sum == target) return true;
     if (sum &lt; target) left++;
     else right--;
 }
-return false;</pre>
-            <p>Time <code>O(n)</code> after sorting. The key invariant is that all pairs outside the current <code>[left, right]</code> range have already been ruled out. If sorting is needed, include its <code>O(n log n)</code> cost.</p>
-          </article>
-          <article class="card">
-            <h3>Sliding window: fixed-size maximum sum</h3>
-            <pre class="example">int sum = 0;
+return false;</pre
+						>
+						<p>
+							Time <code>O(n)</code> after sorting. The key
+							invariant is that all pairs outside the current
+							<code>[left, right]</code> range have already been
+							ruled out. If sorting is needed, include its
+							<code>O(n log n)</code> cost.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Sliding window: fixed-size maximum sum</h3>
+						<pre class="example">
+int sum = 0;
 for (int i = 0; i &lt; nums.length; i++) {
     sum += nums[i];
     if (i &gt;= k) sum -= nums[i - k];
     if (i &gt;= k - 1) best = Math.max(best, sum);
-}</pre>
-            <p>Initialise <code>best</code> before this loop, usually to <code>Integer.MIN_VALUE</code> when negative values are possible. Invariant: once <code>i ≥ k - 1</code>, <code>sum</code> is the total of exactly <code>k</code> elements. Each value enters and leaves once, so time is <code>O(n)</code>.</p>
-          </article>
-          <article class="card">
-            <h3>Prefix sum</h3>
-            <pre class="example">int[] prefix = new int[nums.length + 1];
+}</pre
+						>
+						<p>
+							Initialise <code>best</code> before this loop,
+							usually to <code>Integer.MIN_VALUE</code> when
+							negative values are possible. Invariant: once
+							<code>i ≥ k - 1</code>, <code>sum</code> is the
+							total of exactly <code>k</code> elements. Each value
+							enters and leaves once, so time is
+							<code>O(n)</code>.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Prefix sum</h3>
+						<pre class="example">
+int[] prefix = new int[nums.length + 1];
 for (int i = 0; i &lt; nums.length; i++) {
     prefix[i + 1] = prefix[i] + nums[i];
 }
-int rangeSum = prefix[right + 1] - prefix[left];</pre>
-            <p><code>prefix[0]</code> represents the sum before the array starts, which removes special cases for ranges beginning at zero. Build in <code>O(n)</code>; each inclusive range query is <code>O(1)</code>.</p>
-          </article>
-        </div>
-      </section>
+int rangeSum = prefix[right + 1] - prefix[left];</pre
+						>
+						<p>
+							<code>prefix[0]</code> represents the sum before the
+							array starts, which removes special cases for ranges
+							beginning at zero. Build in <code>O(n)</code>; each
+							inclusive range query is <code>O(1)</code>.
+						</p>
+					</article>
+				</div>
+			</section>
 
-      <section>
-        <h2 class="section-title">Practice</h2>
-        <div class="card"><ol class="practice"><li><strong>Best Time to Buy and Sell Stock:</strong> track the lowest price seen so far.</li><li><strong>Product of Array Except Self:</strong> use prefix and suffix products without division.</li><li><strong>Longest Substring Without Repeating Characters:</strong> maintain a window with a last-seen map.</li><li><strong>Subarray Sum Equals K:</strong> combine a prefix sum with a frequency map.</li></ol></div>
-      </section>
-    </main>
-    <footer>Interview Preparation Notes · <a href="index.html">Data structures &amp; algorithms</a></footer>
-  </body>
+			<section>
+				<h2 class="section-title">Practice</h2>
+				<div class="card">
+					<ol class="practice">
+						<li>
+							<strong>Best Time to Buy and Sell Stock:</strong>
+							track the lowest price seen so far.
+						</li>
+						<li>
+							<strong>Product of Array Except Self:</strong> use
+							prefix and suffix products without division.
+						</li>
+						<li>
+							<strong
+								>Longest Substring Without Repeating
+								Characters:</strong
+							>
+							maintain a window with a last-seen map.
+						</li>
+						<li>
+							<strong>Subarray Sum Equals K:</strong> combine a
+							prefix sum with a frequency map.
+						</li>
+					</ol>
+				</div>
+			</section>
+		</main>
+		<footer>
+			Interview Preparation Notes ·
+			<a href="index.html">Data structures &amp; algorithms</a>
+		</footer>
+	</body>
 </html>

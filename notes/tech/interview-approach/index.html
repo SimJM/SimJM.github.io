@@ -1,17 +1,145 @@
-<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Interview Approach | Interview Notes</title><link rel="stylesheet" href="../styles.css"></head><body>
-<header><p class="eyebrow">Module 4</p><h1>Interview approach</h1><p class="header-copy">Good communication lets the interviewer assess your actual ability.</p></header>
-<nav class="nav-pills"><a href="#communication">Communication</a><a href="#stuck">When stuck</a><a href="#stories">Behavioural stories</a><a href="#practice">Practice</a></nav>
-<main><a class="back-link" href="../index.html">← All study modules</a><p class="page-intro">The interviewer is not looking for silence followed by perfect code. They need a clear view of how you analyse, choose, test, and adapt.</p>
-<section id="communication"><h2 class="section-title">Make your reasoning legible</h2><div class="content-grid"><article class="card"><span class="tag">Before coding</span><h3>Set the agenda out loud</h3><p>Try: “I’ll confirm assumptions, work through an example, describe a baseline, then optimise before implementing.” This makes the conversation collaborative and buys time to think.</p></article><article class="card"><span class="tag">During coding</span><h3>Narrate decisions, not every keystroke</h3><p>Explain invariants, variables, and meaningful branches. Pause when a requirement changes. Use clear function names and small helper methods when they make the logic easier to verify.</p></article><article class="card"><span class="tag">After coding</span><h3>Close the loop</h3><p>Test with an example, state complexity, then offer a possible extension. Do not claim a solution is optimal unless you can explain why a better bound is unlikely.</p></article></div></section>
-<section id="stuck"><h2 class="section-title">What to do when stuck</h2><div class="card"><h3>Recover productively</h3><p>First, say what you know: inputs, output, a small example, and a working baseline. Then ask a targeted question or propose a constrained next step. Avoid guessing silently for several minutes.</p><div class="example">Useful recovery language
-“The brute-force version is clear and runs in O(n²). I suspect we can avoid
-revisiting earlier values with a map. May I explore that approach?”
-
-“I am deciding between BFS and DFS. Since we need the fewest edges in an
-unweighted graph, I will choose BFS and keep a visited set.”</div></div><div class="callout"><strong>Remember:</strong> an interviewer can often help with a prompt, but only if you expose where your uncertainty is. Asking a precise question is a strength.</div></section>
-<section id="stories"><h2 class="section-title">Behavioural answers: STAR + reflection</h2><div class="card"><h3>Structure a concise, evidence-based story</h3><p><strong>Situation:</strong> enough context to understand the stakes. <strong>Task:</strong> your responsibility. <strong>Action:</strong> what you personally did and why. <strong>Result:</strong> measurable outcome. Finish with <strong>Reflection</strong>: what you learned or would change.</p><div class="example">Prompt: Tell me about a disagreement.
-Situation: Two engineers disagreed on a migration plan.
-Action: I wrote down latency, risk, and rollout criteria; we prototyped both paths.
-Result: We chose a staged migration and avoided a planned outage.
-Reflection: Shared decision criteria turned preference into a testable choice.</div></div></section>
-<section id="practice"><h2 class="section-title">Practice prompts</h2><div class="card"><ol class="practice"><li><strong>Clarification:</strong> receive “find the most frequent item” and list five assumptions you would confirm.</li><li><strong>Think aloud:</strong> explain how you would find a cycle in a linked list, without writing code.</li><li><strong>Recovery:</strong> practise a 30-second response after realising your first approach is too slow.</li><li><strong>STAR:</strong> prepare stories for conflict, failure, ownership, ambiguity, and learning something quickly.</li></ol></div></section></main><footer>Interview Preparation Notes</footer></body></html>
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+		<title>Interview Approach | Interview Notes</title>
+		<link rel="stylesheet" href="../styles.css" />
+		<script src="../theme-toggle.js" defer></script>
+	</head>
+	<body>
+		<header>
+			<p class="eyebrow">Module 4</p>
+			<h1>Interview approach</h1>
+			<p class="header-copy">
+				Good communication lets the interviewer assess your actual
+				ability.
+			</p>
+		</header>
+		<nav class="nav-pills">
+			<a href="#communication">Communication</a
+			><a href="#stuck">When stuck</a
+			><a href="#stories">Behavioural stories</a
+			><a href="#practice">Practice</a>
+		</nav>
+		<main>
+			<a class="back-link" href="../index.html">← All study modules</a>
+			<p class="page-intro">
+				The interviewer is not looking for silence followed by perfect
+				code. They need a clear view of how you analyse, choose, test,
+				and adapt.
+			</p>
+			<section id="communication">
+				<h2 class="section-title">Make your reasoning legible</h2>
+				<div class="content-grid">
+					<article class="card">
+						<span class="tag">Before coding</span>
+						<h3>Set the agenda out loud</h3>
+						<p>
+							Try: “I’ll confirm assumptions, work through an
+							example, describe a baseline, then optimise before
+							implementing.” This makes the conversation
+							collaborative and buys time to think.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">During coding</span>
+						<h3>Narrate decisions, not every keystroke</h3>
+						<p>
+							Explain invariants, variables, and meaningful
+							branches. Pause when a requirement changes. Use
+							clear function names and small helper methods when
+							they make the logic easier to verify.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">After coding</span>
+						<h3>Close the loop</h3>
+						<p>
+							Test with an example, state complexity, then offer a
+							possible extension. Do not claim a solution is
+							optimal unless you can explain why a better bound is
+							unlikely.
+						</p>
+					</article>
+				</div>
+			</section>
+			<section id="stuck">
+				<h2 class="section-title">What to do when stuck</h2>
+				<div class="card">
+					<h3>Recover productively</h3>
+					<p>
+						First, say what you know: inputs, output, a small
+						example, and a working baseline. Then ask a targeted
+						question or propose a constrained next step. Avoid
+						guessing silently for several minutes.
+					</p>
+					<div class="example">
+						Useful recovery language “The brute-force version is
+						clear and runs in O(n²). I suspect we can avoid
+						revisiting earlier values with a map. May I explore that
+						approach?” “I am deciding between BFS and DFS. Since we
+						need the fewest edges in an unweighted graph, I will
+						choose BFS and keep a visited set.”
+					</div>
+				</div>
+				<div class="callout">
+					<strong>Remember:</strong> an interviewer can often help
+					with a prompt, but only if you expose where your uncertainty
+					is. Asking a precise question is a strength.
+				</div>
+			</section>
+			<section id="stories">
+				<h2 class="section-title">
+					Behavioural answers: STAR + reflection
+				</h2>
+				<div class="card">
+					<h3>Structure a concise, evidence-based story</h3>
+					<p>
+						<strong>Situation:</strong> enough context to understand
+						the stakes. <strong>Task:</strong> your responsibility.
+						<strong>Action:</strong> what you personally did and
+						why. <strong>Result:</strong> measurable outcome. Finish
+						with <strong>Reflection</strong>: what you learned or
+						would change.
+					</p>
+					<div class="example">
+						Prompt: Tell me about a disagreement. Situation: Two
+						engineers disagreed on a migration plan. Action: I wrote
+						down latency, risk, and rollout criteria; we prototyped
+						both paths. Result: We chose a staged migration and
+						avoided a planned outage. Reflection: Shared decision
+						criteria turned preference into a testable choice.
+					</div>
+				</div>
+			</section>
+			<section id="practice">
+				<h2 class="section-title">Practice prompts</h2>
+				<div class="card">
+					<ol class="practice">
+						<li>
+							<strong>Clarification:</strong> receive “find the
+							most frequent item” and list five assumptions you
+							would confirm.
+						</li>
+						<li>
+							<strong>Think aloud:</strong> explain how you would
+							find a cycle in a linked list, without writing code.
+						</li>
+						<li>
+							<strong>Recovery:</strong> practise a 30-second
+							response after realising your first approach is too
+							slow.
+						</li>
+						<li>
+							<strong>STAR:</strong> prepare stories for conflict,
+							failure, ownership, ambiguity, and learning
+							something quickly.
+						</li>
+					</ol>
+				</div>
+			</section>
+		</main>
+		<footer>Interview Preparation Notes</footer>
+	</body>
+</html>

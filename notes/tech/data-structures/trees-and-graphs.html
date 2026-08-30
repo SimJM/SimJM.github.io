@@ -1,57 +1,143 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trees &amp; Graphs | DSA Notes</title>
-    <link rel="stylesheet" href="../styles.css">
-  </head>
-  <body>
-    <header>
-      <p class="eyebrow">DSA topic</p>
-      <h1>Trees &amp; graphs</h1>
-      <p class="header-copy">Choose DFS for deep exploration and BFS when distance or levels matter.</p>
-    </header>
-    <nav class="nav-pills" aria-label="Data structures topic navigation">
-      <a href="index.html#topics">All topics</a><a href="arrays-and-strings.html">Arrays</a><a href="strings.html">Strings</a><a href="sliding-window.html">Sliding window</a><a href="linear-structures.html">Linear structures</a><a href="trees-and-graphs.html">Trees &amp; graphs</a><a href="dynamic-programming.html">Dynamic programming</a>
-    </nav>
-    <main>
-      <a class="back-link" href="index.html">← Data structures &amp; algorithms</a>
-      <p class="page-intro">A tree is a specialised graph. Learn to define the node, traversal order, visited state, and the information returned from each recursive call.</p>
-      <div class="callout"><strong>Imports for this page:</strong> <code>import java.util.ArrayDeque;</code>, <code>import java.util.ArrayList;</code>, <code>import java.util.List;</code>, and <code>import java.util.Queue;</code>. For tree questions, define <code>TreeNode</code> only when the platform does not provide it.</div>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Trees &amp; Graphs | DSA Notes</title>
+		<link rel="stylesheet" href="../styles.css" />
+		<script src="../theme-toggle.js" defer></script>
+	</head>
+	<body>
+		<header>
+			<p class="eyebrow">DSA topic</p>
+			<h1>Trees &amp; graphs</h1>
+			<p class="header-copy">
+				Choose DFS for deep exploration and BFS when distance or levels
+				matter.
+			</p>
+		</header>
+		<nav class="nav-pills" aria-label="Data structures topic navigation">
+			<a href="index.html#topics">All topics</a
+			><a href="arrays-and-strings.html">Arrays</a
+			><a href="strings.html">Strings</a
+			><a href="sliding-window.html">Sliding window</a
+			><a href="linear-structures.html">Linear structures</a
+			><a href="trees-and-graphs.html">Trees &amp; graphs</a
+			><a href="dynamic-programming.html">Dynamic programming</a>
+		</nav>
+		<main>
+			<a class="back-link" href="index.html"
+				>← Data structures &amp; algorithms</a
+			>
+			<p class="page-intro">
+				A tree is a specialised graph. Learn to define the node,
+				traversal order, visited state, and the information returned
+				from each recursive call.
+			</p>
+			<div class="callout">
+				<strong>Imports for this page:</strong>
+				<code>import java.util.ArrayDeque;</code>,
+				<code>import java.util.ArrayList;</code>,
+				<code>import java.util.List;</code>, and
+				<code>import java.util.Queue;</code>. For tree questions, define
+				<code>TreeNode</code> only when the platform does not provide
+				it.
+			</div>
 
-      <section>
-        <h2 class="section-title">Choose a traversal</h2>
-        <div class="content-grid">
-          <article class="card"><h3>Depth-first search</h3><p>Use for reachability, connected components, cycle detection, backtracking, and tree recursion. Recursive DFS uses call-stack space proportional to depth.</p></article>
-          <article class="card"><h3>Breadth-first search</h3><p>Use for shortest paths in an unweighted graph and level-order traversal. It explores vertices by distance layers.</p></article>
-          <article class="card"><h3>Visited state</h3><p>Graphs can contain cycles. Keep a <code>boolean[]</code> or <code>HashSet</code> of visited nodes, and mark nodes when you enqueue them in BFS.</p></article>
-        </div>
-      </section>
+			<section>
+				<h2 class="section-title">Choose a traversal</h2>
+				<div class="content-grid">
+					<article class="card">
+						<h3>Depth-first search</h3>
+						<p>
+							Use for reachability, connected components, cycle
+							detection, backtracking, and tree recursion.
+							Recursive DFS uses call-stack space proportional to
+							depth.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Breadth-first search</h3>
+						<p>
+							Use for shortest paths in an unweighted graph and
+							level-order traversal. It explores vertices by
+							distance layers.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Visited state</h3>
+						<p>
+							Graphs can contain cycles. Keep a
+							<code>boolean[]</code> or <code>HashSet</code> of
+							visited nodes, and mark nodes when you enqueue them
+							in BFS.
+						</p>
+					</article>
+				</div>
+			</section>
 
-      <section>
-        <h2 class="section-title">Graph representations</h2>
-        <div class="content-grid">
-          <article class="card"><h3>Objects and pointers</h3><pre class="example">class Node {
+			<section>
+				<h2 class="section-title">Graph representations</h2>
+				<div class="content-grid">
+					<article class="card">
+						<h3>Objects and pointers</h3>
+						<pre class="example">
+class Node {
     int value;
     List&lt;Node&gt; neighbours = new ArrayList&lt;&gt;();
-}</pre><p>Natural when each node carries data or behaviour, and pointers make object relationships easy to follow. It uses <code>O(V + E)</code> space, but identity, equality, and traversal bookkeeping require care.</p></article>
-          <article class="card"><h3>Adjacency list</h3><pre class="example">List&lt;List&lt;Integer&gt;&gt; graph = new ArrayList&lt;&gt;();
+}</pre
+						>
+						<p>
+							Natural when each node carries data or behaviour,
+							and pointers make object relationships easy to
+							follow. It uses <code>O(V + E)</code> space, but
+							identity, equality, and traversal bookkeeping
+							require care.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Adjacency list</h3>
+						<pre class="example">
+List&lt;List&lt;Integer&gt;&gt; graph = new ArrayList&lt;&gt;();
 for (int i = 0; i &lt; n; i++) {
     graph.add(new ArrayList&lt;&gt;());
 }
 graph.get(from).add(to);
-graph.get(to).add(from); // only if undirected</pre><p>Stores only existing edges, so it uses <code>O(V + E)</code> space and is usually best for sparse graphs. Neighbour iteration is efficient; checking whether one specific edge exists may require scanning a list.</p></article>
-          <article class="card"><h3>Adjacency matrix</h3><pre class="example">boolean[][] graph = new boolean[n][n];
+graph.get(to).add(from); // only if undirected</pre
+						>
+						<p>
+							Stores only existing edges, so it uses
+							<code>O(V + E)</code> space and is usually best for
+							sparse graphs. Neighbour iteration is efficient;
+							checking whether one specific edge exists may
+							require scanning a list.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Adjacency matrix</h3>
+						<pre class="example">
+boolean[][] graph = new boolean[n][n];
 graph[from][to] = true;
-graph[to][from] = true; // only if undirected</pre><p>Uses <code>O(V^2)</code> space regardless of edge count. It gives <code>O(1)</code> edge lookup, but scanning neighbours costs <code>O(V)</code>, so it fits dense graphs or problems with frequent edge-existence checks.</p></article>
-        </div>
-      </section>
+graph[to][from] = true; // only if undirected</pre
+						>
+						<p>
+							Uses <code>O(V^2)</code> space regardless of edge
+							count. It gives <code>O(1)</code> edge lookup, but
+							scanning neighbours costs <code>O(V)</code>, so it
+							fits dense graphs or problems with frequent
+							edge-existence checks.
+						</p>
+					</article>
+				</div>
+			</section>
 
-      <section>
-        <h2 class="section-title">Java templates</h2>
-        <div class="content-grid">
-          <article class="card"><h3>DFS</h3><pre class="example">void dfs(int node, List&lt;List&lt;Integer&gt;&gt; graph,
+			<section>
+				<h2 class="section-title">Java templates</h2>
+				<div class="content-grid">
+					<article class="card">
+						<h3>DFS</h3>
+						<pre class="example">
+void dfs(int node, List&lt;List&lt;Integer&gt;&gt; graph,
          boolean[] visited) {
     visited[node] = true;
     for (int neighbour : graph.get(node)) {
@@ -59,8 +145,20 @@ graph[to][from] = true; // only if undirected</pre><p>Uses <code>O(V^2)</code> s
             dfs(neighbour, graph, visited);
         }
     }
-}</pre><p>Time <code>O(V + E)</code>. The recursive call means “visit everything reachable from this neighbour.” In a tree, you do not need a visited set if each node has one parent; in a graph, it prevents infinite loops.</p></article>
-          <article class="card"><h3>BFS shortest path</h3><pre class="example">Queue&lt;Integer&gt; queue = new ArrayDeque&lt;&gt;();
+}</pre
+						>
+						<p>
+							Time <code>O(V + E)</code>. The recursive call means
+							“visit everything reachable from this neighbour.” In
+							a tree, you do not need a visited set if each node
+							has one parent; in a graph, it prevents infinite
+							loops.
+						</p>
+					</article>
+					<article class="card">
+						<h3>BFS shortest path</h3>
+						<pre class="example">
+Queue&lt;Integer&gt; queue = new ArrayDeque&lt;&gt;();
 queue.offer(start);
 visited[start] = true;
 int distance = 0;
@@ -77,15 +175,41 @@ while (!queue.isEmpty()) {
         }
     }
     distance++;
-}</pre><p>The outer loop represents one distance layer. The first time BFS reaches the target is the fewest-edge path. Mark nodes visited when enqueuing them, otherwise several parents can add the same node.</p></article>
-        </div>
-      </section>
+}</pre
+						>
+						<p>
+							The outer loop represents one distance layer. The
+							first time BFS reaches the target is the fewest-edge
+							path. Mark nodes visited when enqueuing them,
+							otherwise several parents can add the same node.
+						</p>
+					</article>
+				</div>
+			</section>
 
-      <section>
-        <h2 class="section-title">Connectivity and cycles</h2>
-        <div class="content-grid">
-          <article class="card"><h3>Connectivity</h3><p>For an undirected graph, start DFS or BFS from one vertex and count visited vertices. The graph is connected when every vertex is reached. To count connected components, repeat the traversal from each unvisited vertex.</p><p>For a directed graph, distinguish one-way reachability from strong connectivity: strong connectivity requires every vertex to reach every other vertex.</p></article>
-          <article class="card"><h3>Cycle detection</h3><pre class="example">boolean hasCycle(int node, int parent,
+			<section>
+				<h2 class="section-title">Connectivity and cycles</h2>
+				<div class="content-grid">
+					<article class="card">
+						<h3>Connectivity</h3>
+						<p>
+							For an undirected graph, start DFS or BFS from one
+							vertex and count visited vertices. The graph is
+							connected when every vertex is reached. To count
+							connected components, repeat the traversal from each
+							unvisited vertex.
+						</p>
+						<p>
+							For a directed graph, distinguish one-way
+							reachability from strong connectivity: strong
+							connectivity requires every vertex to reach every
+							other vertex.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Cycle detection</h3>
+						<pre class="example">
+boolean hasCycle(int node, int parent,
                  List&lt;List&lt;Integer&gt;&gt; graph,
                  boolean[] visited) {
     visited[node] = true;
@@ -94,15 +218,46 @@ while (!queue.isEmpty()) {
         if (visited[next] &amp;&amp; next != parent) return true;
     }
     return false;
-}</pre><p>For an undirected graph, an already visited neighbour is a cycle unless it is the node's parent. For directed graphs, use three states: unvisited, visiting, and finished; an edge to a visiting node is a back edge and proves a cycle.</p></article>
-        </div>
-      </section>
+}</pre
+						>
+						<p>
+							For an undirected graph, an already visited
+							neighbour is a cycle unless it is the node's parent.
+							For directed graphs, use three states: unvisited,
+							visiting, and finished; an edge to a visiting node
+							is a back edge and proves a cycle.
+						</p>
+					</article>
+				</div>
+			</section>
 
-      <section>
-        <h2 class="section-title">Practice</h2>
-        <div class="card"><ol class="practice"><li><strong>Maximum Depth of Binary Tree:</strong> write a DFS recurrence.</li><li><strong>Binary Tree Level Order Traversal:</strong> process one queue level at a time.</li><li><strong>Number of Islands:</strong> treat each land cell as a graph node.</li><li><strong>Course Schedule:</strong> model dependencies as a directed graph and detect cycles.</li></ol></div>
-      </section>
-    </main>
-    <footer>Interview Preparation Notes · <a href="index.html">Data structures &amp; algorithms</a></footer>
-  </body>
+			<section>
+				<h2 class="section-title">Practice</h2>
+				<div class="card">
+					<ol class="practice">
+						<li>
+							<strong>Maximum Depth of Binary Tree:</strong> write
+							a DFS recurrence.
+						</li>
+						<li>
+							<strong>Binary Tree Level Order Traversal:</strong>
+							process one queue level at a time.
+						</li>
+						<li>
+							<strong>Number of Islands:</strong> treat each land
+							cell as a graph node.
+						</li>
+						<li>
+							<strong>Course Schedule:</strong> model dependencies
+							as a directed graph and detect cycles.
+						</li>
+					</ol>
+				</div>
+			</section>
+		</main>
+		<footer>
+			Interview Preparation Notes ·
+			<a href="index.html">Data structures &amp; algorithms</a>
+		</footer>
+	</body>
 </html>
