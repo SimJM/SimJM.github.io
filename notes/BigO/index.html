@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta
+			name="description"
+			content="A detailed guide to Big O notation with Java examples for technical interviews." />
+		<title>Big O Notation | Interview Notes</title>
+		<link rel="stylesheet" href="../tech/styles.css" />
+		<script src="../tech/theme-toggle.js" defer></script>
+	</head>
+	<body>
+		<header>
+			<p class="eyebrow">Complexity analysis</p>
+			<h1>Big O notation</h1>
+			<p class="header-copy">
+				Learn to measure how an algorithm grows, compare trade-offs, and
+				explain complexity clearly in an interview.
+			</p>
+		</header>
+
+		<nav class="nav-pills" aria-label="Big O study sections">
+			<a href="#meaning">What it means</a>
+			<a href="#growth">Growth rates</a>
+			<a href="#examples">Code examples</a>
+			<a href="#space">Space</a>
+			<a href="#structures">Structures</a>
+			<a href="#interview">Interview guide</a>
+		</nav>
+
+		<main>
+			<a class="back-link" href="../tech/index.html"
+				>&larr; All study modules</a
+			>
+			<p class="page-intro">
+				Big O notation describes how an algorithm's resource usage
+				changes as the input size grows. It is a model of growth, not a
+				stopwatch: two algorithms with the same Big O can still have
+				different real-world runtimes because of constants, hardware,
+				input shape, and implementation details.
+			</p>
+
+			<section id="meaning">
+				<h2 class="section-title">What Big O means</h2>
+				<div class="content-grid">
+					<article class="card">
+						<span class="tag">Definition</span>
+						<h3>Describe the upper growth rate</h3>
+						<p>
+							If an algorithm is <code>O(f(n))</code>, its work is
+							bounded by constant multiples of
+							<code>f(n)</code> for sufficiently large inputs.
+							Here, <code>n</code> is the input size: the number
+							of array elements, characters, vertices, or another
+							meaningful measure.
+						</p>
+						<p>
+							The notation ignores machine speed and focuses on
+							scalability. An <code>O(n)</code> algorithm
+							generally scales better than an
+							<code>O(n^2)</code> algorithm as
+							<code>n</code> becomes large.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">Two resources</span>
+						<h3>Time and auxiliary space</h3>
+						<p>
+							<strong>Time complexity</strong> estimates how the
+							number of operations grows.
+							<strong>Space complexity</strong> estimates how much
+							additional memory grows. State them separately: for
+							example, <code>O(n)</code> time and
+							<code>O(n)</code>
+							auxiliary space.
+						</p>
+						<p>
+							Input storage is often excluded from auxiliary
+							space. If a method creates a result array, ask
+							whether the interviewer counts that output as extra
+							memory and state your assumption.
+						</p>
+					</article>
+				</div>
+				<div class="callout">
+					<strong>Core habit:</strong> define what
+					<code>n</code> means before counting. In a graph, one input
+					may have <code>V</code> vertices and <code>E</code> edges,
+					so a traversal is usually described as
+					<code>O(V + E)</code>, not simply <code>O(n)</code>.
+				</div>
+			</section>
+
+			<section id="growth">
+				<h2 class="section-title">Common growth rates</h2>
+				<div class="card">
+					<div class="example">
+						Best scalability O(1) constant one lookup or a fixed
+						number of operations O(log n) logarithmic halve the
+						search space repeatedly O(n) linear visit each item once
+						O(n log n) linearithmic efficient comparison sorting
+						O(n^2) quadratic compare every pair in a simple nested
+						loop O(2^n) exponential explore include/exclude choices
+						O(n!) factorial try every permutation Worst scalability
+					</div>
+					<p>
+						The order matters for large inputs. For example, if one
+						algorithm performs <code>n</code> operations and another
+						performs <code>n^2</code>, doubling the input roughly
+						doubles the first work but quadruples the second.
+					</p>
+				</div>
+				<div class="content-grid">
+					<article class="card">
+						<h3><code>O(1)</code> - constant</h3>
+						<p>
+							The work does not depend on input length. Array
+							indexing is constant time because the address can be
+							calculated directly.
+						</p>
+						<pre class="example">
+int first = numbers[0];
+						int last = numbers[numbers.length - 1];</pre
+						>
+						<p>
+							A loop with a fixed limit, such as ten iterations,
+							is also
+							<code>O(1)</code>, even if it appears in the code.
+						</p>
+					</article>
+					<article class="card">
+						<h3><code>O(log n)</code> - logarithmic</h3>
+						<p>
+							Each step removes a constant fraction of the
+							remaining work. Binary search checks the middle item
+							and discards half the search range each time.
+						</p>
+						<pre class="example">
+int left = 0, right = numbers.length - 1;
+						while (left &lt;= right) {
+							int middle = left + (right - left) / 2;
+							if (numbers[middle] == target) return middle;
+							if (numbers[middle] &lt; target) left = middle + 1;
+							else right = middle - 1;
+						}</pre
+						>
+					</article>
+					<article class="card">
+						<h3><code>O(n)</code> - linear</h3>
+						<p>
+							The algorithm performs a constant amount of work per
+							item. A full scan remains linear even if it returns
+							early in some cases; Big O commonly describes the
+							worst case.
+						</p>
+						<pre class="example">
+int maximum = numbers[0];
+						for (int number : numbers) {
+							maximum = Math.max(maximum, number);
+						}</pre
+						>
+					</article>
+					<article class="card">
+						<h3><code>O(n log n)</code> - linearithmic</h3>
+						<p>
+							This commonly appears when each of
+							<code>n</code> items is processed across
+							<code>log n</code> levels. Merge sort divides into
+							levels and merges each level in linear total work.
+						</p>
+						<p>
+							Java's comparison sort implementations are typically
+							<code>O(n log n)</code> in the average or worst case
+							depending on the method and input type. Check the
+							contract when it matters.
+						</p>
+					</article>
+				</div>
+			</section>
+
+			<section id="examples">
+				<h2 class="section-title">How to count code</h2>
+				<div class="content-grid">
+					<article class="card">
+						<span class="tag">Drop constants</span>
+						<h3><code>3n + 7</code> becomes <code>O(n)</code></h3>
+						<p>
+							If a method scans an array three times and then
+							performs seven fixed operations, its work is
+							<code>3n + 7</code>. Big O keeps the growth term and
+							drops constant factors, so the result is
+							<code>O(n)</code>.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">Keep the dominant term</span>
+						<h3>
+							<code>n^2 + n</code> becomes <code>O(n^2)</code>
+						</h3>
+						<p>
+							When <code>n</code> is large, the quadratic term
+							grows faster than the linear term. Do not write
+							<code>O(n^2 + n)</code> when
+							<code>O(n^2)</code> communicates the asymptotic
+							growth clearly.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">Sequential work</span>
+						<h3>Add separate loops</h3>
+						<pre class="example">
+for (int number : numbers) { // O(n)
+							process(number);
+						}
+						for (int number : numbers) { // O(n)
+							validate(number);
+						}</pre
+						>
+						<p>
+							The loops perform <code>n + n = 2n</code> work,
+							which is <code>O(n)</code>, not <code>O(n^2)</code>.
+							Sequential blocks add; the dominant term wins
+							afterward.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">Nested work</span>
+						<h3>Multiply nested loops</h3>
+						<pre class="example">
+for (int first : numbers) {       // n times
+							for (int second : numbers) {  // n per first
+								compare(first, second);
+							}
+						}</pre
+						>
+						<p>
+							The inner loop runs for every outer-loop item,
+							producing
+							<code>n * n = n^2</code>, or <code>O(n^2)</code>.
+							This pattern is common in brute-force pair and
+							duplicate checks.
+						</p>
+					</article>
+				</div>
+				<div class="card">
+					<h3>Different input sizes</h3>
+					<p>
+						Do not automatically call every nested loop
+						<code>O(n^2)</code>. If one loop uses an array of length
+						<code>m</code> and another uses an array of length
+						<code>n</code>, the complexity is <code>O(mn)</code>.
+						This distinction matters when the inputs can have very
+						different sizes.
+					</p>
+				</div>
+			</section>
+
+			<section id="space">
+				<h2 class="section-title">Space complexity</h2>
+				<div class="content-grid">
+					<article class="card">
+						<h3>Input versus auxiliary memory</h3>
+						<p>
+							A few variables such as <code>left</code>,
+							<code>right</code>, and <code>sum</code> use
+							constant auxiliary space: <code>O(1)</code>. A hash
+							set that stores up to every input value uses
+							<code>O(n)</code> auxiliary space.
+						</p>
+						<pre class="example">
+Set&lt;Integer&gt; seen = new HashSet&lt;&gt;();
+						for (int number : numbers) {
+							if (!seen.add(number)) return true;
+						}
+						return false;</pre
+						>
+						<p>
+							This duplicate check is <code>O(n)</code> time on
+							average and <code>O(n)</code> extra space.
+						</p>
+					</article>
+					<article class="card">
+						<h3>Recursion uses the call stack</h3>
+						<p>
+							A recursive method can use memory even when it
+							creates no explicit collection. The maximum number
+							of active calls is its recursion depth. A
+							linked-list recursion with depth
+							<code>n</code> uses <code>O(n)</code> stack space.
+						</p>
+						<p>
+							A balanced binary-tree traversal has depth
+							<code>O(log n)</code>, while a severely skewed tree
+							can have depth <code>O(n)</code>. Always analyse the
+							maximum depth permitted by the input.
+						</p>
+					</article>
+				</div>
+				<div class="callout">
+					<strong>In-place does not mean zero space:</strong> an
+					in-place algorithm usually means <code>O(1)</code> or small
+					extra storage beyond the input, but recursive call frames,
+					library allocations, and output storage may still need to be
+					counted.
+				</div>
+			</section>
+
+			<section id="structures">
+				<h2 class="section-title">Useful complexity reference</h2>
+				<div class="card">
+					<div class="example">
+						Structure or operation Typical complexity Array index
+						access O(1) Array scan O(n) HashMap get/put O(1)
+						average, O(n) worst case HashSet contains O(1) average,
+						O(n) worst case ArrayDeque add/remove at an end O(1)
+						PriorityQueue offer/poll O(log n) PriorityQueue peek
+						O(1) Balanced TreeMap get/put O(log n) Binary search in
+						sorted array O(log n) BFS or DFS adjacency list O(V + E)
+					</div>
+					<p>
+						These are typical costs, not promises for every
+						implementation. For example, hash tables rely on good
+						hashing and resizing rules, and a binary search tree is
+						only <code>O(log n)</code> when it is balanced or
+						otherwise constrained.
+					</p>
+				</div>
+			</section>
+
+			<section id="interview">
+				<h2 class="section-title">Big O in an interview</h2>
+				<div class="card">
+					<h3>A reliable explanation sequence</h3>
+					<ol class="practice">
+						<li>
+							<strong>Define the inputs:</strong> say what
+							<code>n</code>, <code>m</code>, <code>V</code>, and
+							<code>E</code> represent.
+						</li>
+						<li>
+							<strong>Describe the work:</strong> count scans,
+							lookups, sorting, recursion levels, and repeated
+							operations.
+						</li>
+						<li>
+							<strong>Simplify:</strong> drop constants and
+							non-dominant terms only after writing the
+							unsimplified expression.
+						</li>
+						<li>
+							<strong>State time and space:</strong> distinguish
+							auxiliary memory from the input and output when
+							relevant.
+						</li>
+						<li>
+							<strong>Discuss assumptions:</strong> mention
+							average versus worst-case hashing, balanced versus
+							skewed trees, or early exits.
+						</li>
+					</ol>
+					<div class="example">
+						Example answer: "I scan the array once, so the time
+						complexity is O(n). The set can store every value, so
+						auxiliary space is O(n). Hash-set operations are O(1) on
+						average; in the worst case, they can degrade."
+					</div>
+				</div>
+				<div class="content-grid">
+					<article class="card">
+						<h3>Common mistakes</h3>
+						<ul class="practice">
+							<li>
+								Calling two sequential <code>O(n)</code> loops
+								<code>O(n^2)</code>.
+							</li>
+							<li>
+								Ignoring sorting performed before the main
+								algorithm.
+							</li>
+							<li>Forgetting recursion stack space.</li>
+							<li>
+								Using one symbol <code>n</code> for two
+								independent input sizes.
+							</li>
+							<li>
+								Claiming average-case hash-map performance is a
+								guaranteed worst case.
+							</li>
+						</ul>
+					</article>
+					<article class="card">
+						<h3>Practice prompts</h3>
+						<ul class="practice">
+							<li>
+								What are the time and space costs of Two Sum
+								with a hash map?
+							</li>
+							<li>Why is binary search <code>O(log n)</code>?</li>
+							<li>What is the complexity of merge sort?</li>
+							<li>
+								Compare recursive DFS and iterative BFS on a
+								graph.
+							</li>
+							<li>
+								Explain why a sliding-window solution can be
+								<code>O(n)</code> even with two while loops.
+							</li>
+						</ul>
+					</article>
+				</div>
+			</section>
+		</main>
+
+		<footer>
+			Interview Preparation Notes · Complexity is a model for making
+			growth visible.
+		</footer>
+	</body>
+</html>
