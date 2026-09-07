@@ -133,6 +133,132 @@ int first = queue.poll();</pre
 				</div>
 			</section>
 			<section>
+				<h2 class="section-title">Monotonic stacks</h2>
+				<div class="card">
+					<h3>When to use them</h3>
+					<p>
+						A monotonic stack keeps values in a sorted order while
+						they are still on the stack. The most common use cases
+						are “next greater element”, “previous greater element”,
+						“next smaller element”, “daily temperatures”, and other
+						range queries where an element needs to know the closest
+						item to its left or right that meets a certain
+						condition.
+					</p>
+					<p>
+						The pattern is simple: iterate left to right, push
+						indices or values onto the stack, and when a new value
+						invalidates the top, pop it until the stack property is
+						restored. The stack stores the important candidates; the
+						popped values are the ones that have already been
+						resolved or no longer matter.
+					</p>
+				</div>
+				<div class="content-grid">
+					<article class="card">
+						<span class="tag">Increasing</span>
+						<h3>Monotonic increasing stack</h3>
+						<p>
+							Keep the stack in increasing order from bottom to
+							top. Pop while the current value is smaller than the
+							top, because the current value can become the next
+							smaller element for the popped item.
+						</p>
+						<pre class="example">
+Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;();
+for (int i = 0; i &lt; nums.length; i++) {
+    while (!stack.isEmpty() &amp;&amp; nums[stack.peek()] &gt; nums[i]) {
+        int index = stack.pop();
+        // nums[index] has a next smaller element: nums[i]
+    }
+    stack.push(i);
+}</pre
+						>
+						<p>
+							This pattern is useful for nearest-smaller,
+							stock-span, and prefix-style queries when the stack
+							is ordered by value rather than by insertion time.
+						</p>
+					</article>
+					<article class="card">
+						<span class="tag">Decreasing</span>
+						<h3>Monotonic decreasing stack</h3>
+						<p>
+							Keep the stack in decreasing order from bottom to
+							top. We pop while the current temperature is greater
+							than or equal to the top, because the current value
+							is the warmer day that resolves the earlier one.
+						</p>
+						<pre class="example">
+int[] result = new int[temperatures.length];
+Deque&lt;Integer&gt; stack = new ArrayDeque&lt;&gt;();
+
+for (int i = 0; i &lt; temperatures.length; i++) {
+    while (!stack.isEmpty() &amp;&amp; temperatures[stack.peek()] &lt; temperatures[i]) {
+        int previous = stack.pop();
+        result[previous] = i - previous;
+    }
+    stack.push(i);
+}
+return result;</pre
+						>
+						<p>
+							This is the classic Daily Temperatures pattern: the
+							stack holds indices of temperatures that still need
+							a warmer day to their right. Each pop gives a
+							resolved answer in one pass.
+						</p>
+					</article>
+				</div>
+				<div class="callout">
+					<strong>Key invariant:</strong> the stack always contains a
+					valid candidate set for unresolved elements. When a new
+					value arrives, you either push it because it is relevant, or
+					pop earlier items that can no longer be the answer. This is
+					why the total work stays <code>O(n)</code>.
+				</div>
+				<div class="card">
+					<h3>Why it is efficient</h3>
+					<p>
+						Each index enters the stack once and leaves at most
+						once. That means the total number of push/pop operations
+						is linear. The algorithm does not revisit old values
+						unnecessarily, so it avoids the
+						<code>O(n²)</code> brute-force approach.
+					</p>
+					<p>
+						A monotonic stack is almost always a signal that the
+						problem is about “nearest greater/smaller” or “span to
+						the right/left”. If you see those words, think stack
+						before brute force.
+					</p>
+				</div>
+			</section>
+			<section>
+				<h2 class="section-title">Practice</h2>
+				<div class="card">
+					<ol class="practice">
+						<li>
+							<strong>Daily Temperatures:</strong> use a monotonic
+							decreasing stack of indices.
+						</li>
+						<li>
+							<strong>Next Greater Element I:</strong> keep a
+							decreasing stack and resolve values as you scan.
+						</li>
+						<li>
+							<strong>Next Greater Element II:</strong> extend the
+							idea to a circular array with a doubled pass.
+						</li>
+						<li>
+							<strong>Largest Rectangle in Histogram:</strong>
+							maintain a monotonic increasing stack of bar
+							indices.
+						</li>
+					</ol>
+				</div>
+			</section>
+			<section>
 				<h2 class="section-title">Practice</h2>
 				<div class="card">
 					<ol class="practice">
