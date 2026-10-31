@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>CBJ v2 | Strategy Lab</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<main class="app-shell">
+			<header class="app-header">
+				<div>
+					<p class="eyebrow">CBJ V2 / STRATEGY LAB</p>
+					<h1>Pause rule tester</h1>
+					<p class="lede">
+						Test whether stepping away after a winning streak
+						changes your exposure and bankroll path.
+					</p>
+				</div>
+				<div class="header-actions">
+					<button
+						class="theme-toggle"
+						type="button"
+						id="themeToggle"
+						aria-pressed="false">
+						<span aria-hidden="true">◐</span> DARK
+					</button>
+					<div class="status-pill" id="statusPill">READY</div>
+				</div>
+			</header>
+
+			<section class="experiment-grid">
+				<form
+					class="panel controls-panel"
+					id="experimentForm"
+					novalidate>
+					<div class="panel-heading">
+						<p class="eyebrow">EXPERIMENT SETTINGS</p>
+						<h2>Define the rule</h2>
+					</div>
+
+					<div class="field-grid">
+						<label>
+							<span>Starting bankroll</span>
+							<input
+								id="startingBankroll"
+								type="text"
+								inputmode="decimal"
+								min="1"
+								aria-describedby="bankrollHelp"
+								value="1000" />
+							<small id="bankrollHelp" class="field-help"
+								>Numbers may include commas.</small
+							>
+						</label>
+						<label>
+							<span>Flat bet per game</span>
+							<input
+								id="betAmount"
+								type="number"
+								min="1"
+								step="1"
+								value="10" />
+						</label>
+						<label>
+							<span>Games to test</span>
+							<input
+								id="rounds"
+								type="number"
+								min="1"
+								max="1000000"
+								step="100"
+								value="10000" />
+						</label>
+						<label>
+							<span>Pause after wins</span>
+							<input
+								id="winsBeforePause"
+								type="number"
+								min="1"
+								max="20"
+								step="1"
+								value="3" />
+						</label>
+						<label>
+							<span>Pause length</span>
+							<input
+								id="pauseLength"
+								type="number"
+								min="1"
+								max="1000"
+								step="1"
+								value="1" />
+						</label>
+						<p class="crypto-note">
+							<span aria-hidden="true">✦</span> Each run uses
+							browser cryptographic randomness.
+						</p>
+					</div>
+
+					<div class="model-note">
+						<strong>Observed played-game rates</strong>
+						<span id="outcomeRates"
+							>Run an experiment to calculate rates.</span
+						>
+						<small>Pushes do not change the win streak.</small>
+					</div>
+
+					<div class="button-row">
+						<button class="button primary" type="submit">
+							Run experiment
+						</button>
+						<button
+							class="button secondary"
+							type="button"
+							id="clearButton">
+							Clear
+						</button>
+					</div>
+				</form>
+
+				<section class="panel rule-panel" aria-labelledby="ruleTitle">
+					<div class="panel-heading">
+						<p class="eyebrow">CURRENT RULE</p>
+						<h2 id="ruleTitle">Waiting for a test</h2>
+					</div>
+					<div class="rule-display">
+						<div class="rule-number" id="ruleTrigger">3</div>
+						<div>
+							<strong>consecutive wins</strong>
+							<p>
+								then pause for
+								<strong id="rulePause">1 game</strong>
+							</p>
+						</div>
+					</div>
+					<p class="muted" id="ruleSummary">
+						Run an experiment to see how often the rule activates.
+					</p>
+				</section>
+			</section>
+
+			<section class="panel live-panel" aria-labelledby="liveTitle">
+				<div class="section-heading">
+					<div>
+						<p class="eyebrow">LIVE TABLE</p>
+						<h2 id="liveTitle">Play one hand</h2>
+					</div>
+					<div class="live-bankroll">
+						BANKROLL <strong id="liveBankroll">$1,000</strong>
+					</div>
+				</div>
+				<div class="table-felt">
+					<div class="hand-zone">
+						<span class="hand-label">DEALER</span>
+						<div class="cards" id="dealerCards">
+							<span class="empty-hand">--</span>
+						</div>
+						<strong id="dealerTotal">--</strong>
+					</div>
+					<div class="table-divider"></div>
+					<div class="hand-zone">
+						<span class="hand-label">PLAYER</span>
+						<div class="cards" id="playerCards">
+							<span class="empty-hand">--</span>
+						</div>
+						<strong id="playerTotal">--</strong>
+					</div>
+				</div>
+				<div class="live-controls">
+					<label
+						>BET
+						<input
+							id="liveBet"
+							type="number"
+							min="1"
+							step="1"
+							value="10"
+					/></label>
+					<button
+						class="button primary"
+						type="button"
+						id="dealGameButton">
+						DEAL
+					</button>
+					<button
+						class="button secondary"
+						type="button"
+						id="hitGameButton"
+						disabled>
+						HIT
+					</button>
+					<button
+						class="button secondary"
+						type="button"
+						id="standGameButton"
+						disabled>
+						STAND
+					</button>
+					<button
+						class="button secondary"
+						type="button"
+						id="newGameButton">
+						NEW GAME
+					</button>
+					<button
+						class="button pause-button"
+						type="button"
+						id="skipGameButton"
+						hidden>
+						SKIP PAUSED ROUND
+					</button>
+				</div>
+				<p class="live-message" id="liveMessage">
+					Start a new game or deal a hand.
+				</p>
+				<div class="live-stats">
+					<span id="liveRecord">0 wins · 0 losses · 0 pushes</span
+					><span id="liveStreak">Win streak: 0</span>
+				</div>
+				<p class="live-rules">
+					Simple rules: dealer stands on 17, blackjack pays 3:2, no
+					split or double.
+				</p>
+			</section>
+
+			<section class="metrics-grid" aria-live="polite">
+				<article class="metric-card accent">
+					<span>Final bankroll</span
+					><strong id="finalBankroll">$0</strong
+					><small id="bankrollDelta">No test yet</small>
+				</article>
+				<article class="metric-card">
+					<span>Games played</span><strong id="gamesPlayed">0</strong
+					><small id="gamesSkipped">0 paused</small>
+				</article>
+				<article class="metric-card saved-card">
+					<span>Losses avoided by pausing</span
+					><strong id="lossesAvoided">$0</strong
+					><small id="lossesAvoidedCount">0 paused losses</small>
+				</article>
+				<article class="metric-card missed-card">
+					<span>Wins missed while paused</span
+					><strong id="winsMissed">$0</strong
+					><small id="winsMissedCount">0 paused wins</small>
+				</article>
+				<article class="metric-card">
+					<span>Wins / losses</span><strong id="winLoss">0 / 0</strong
+					><small id="pushes">0 pushes</small>
+				</article>
+				<article class="metric-card">
+					<span>Longest win streak</span
+					><strong id="longestStreak">0</strong
+					><small id="pauseCount">0 pauses</small>
+				</article>
+			</section>
+
+			<section class="panel chart-panel">
+				<div class="section-heading">
+					<div>
+						<p class="eyebrow">BANKROLL PATH</p>
+						<h2>Exposure over time</h2>
+					</div>
+					<span class="chart-key"
+						><i class="key-dot"></i> simulated bankroll</span
+					>
+				</div>
+				<div class="chart-wrap">
+					<canvas
+						id="bankrollChart"
+						aria-label="Bankroll chart"></canvas>
+				</div>
+			</section>
+
+			<section class="panel history-panel">
+				<div class="section-heading">
+					<div>
+						<p class="eyebrow">RECENT ROUNDS</p>
+						<h2>What happened</h2>
+					</div>
+					<span class="muted" id="historyLabel"
+						>No rounds recorded</span
+					>
+				</div>
+				<div class="history-list" id="historyList">
+					<p class="empty-state">
+						Your latest 80 rounds will appear here.
+					</p>
+				</div>
+			</section>
+
+			<p class="disclaimer">
+				This is a simulation tool. A recent win streak does not make a
+				loss more likely; the pause rule only controls how many rounds
+				you choose to expose your bankroll to.
+			</p>
+		</main>
+		<script src="app.js"></script>
+	</body>
+</html>

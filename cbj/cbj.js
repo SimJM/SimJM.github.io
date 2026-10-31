@@ -21,6 +21,7 @@ let canSplit = false;
 let dealerHoleCard = null;
 let cutCardReached = false; // Track if cut card has been reached
 let cutCardPosition = 0; // Shuffle when cut card is reached (randomized 52-78 cards, ~1-1.5 decks)
+let bettingPausedForWinStreak = false;
 
 // Auto-play state
 let autoPlaying = false;
@@ -91,6 +92,8 @@ const betInput = document.getElementById("betInput");
 const autoRoundsInput = document.getElementById("autoRoundsInput");
 const bettingArea = document.getElementById("bettingArea");
 const dealBtn = document.getElementById("dealBtn");
+const streakGuardInput = document.getElementById("streakGuardInput");
+const resumeBettingBtn = document.getElementById("resumeBettingBtn");
 const hitBtn = document.getElementById("hitBtn");
 const standBtn = document.getElementById("standBtn");
 const doubleBtn = document.getElementById("doubleBtn");
@@ -657,8 +660,8 @@ function updateDisplay() {
 	const ddSuccessRate =
 		stats.doubleDownAttempts > 0
 			? ((stats.doubleDownWins / stats.doubleDownAttempts) * 100).toFixed(
-					1
-			  )
+					1,
+				)
 			: 0;
 	ddSuccessRateEl.textContent = `${ddSuccessRate}%`;
 	ddSuccessRateEl.className = `stat-value ${
@@ -772,7 +775,7 @@ function updateDisplay() {
 			dealerTotalEl.textContent = `Total: ${visibleValue}`;
 		} else {
 			dealerTotalEl.textContent = `Total: ${calculateHandValue(
-				dealerHand
+				dealerHand,
 			)}`;
 		}
 	} else {
@@ -952,7 +955,7 @@ function showHint() {
 	const standProb = calculateWinProbability(
 		currentHand,
 		dealerUpcard,
-		"stand"
+		"stand",
 	);
 	const hitProb = calculateWinProbability(currentHand, dealerUpcard, "hit");
 
@@ -985,7 +988,7 @@ function showHint() {
 		const doubleProb = calculateWinProbability(
 			currentHand,
 			dealerUpcard,
-			"double"
+			"double",
 		);
 		probabilities += `
 			<div class="prob-item ${move === "double" ? "recommended" : ""}">
@@ -1004,7 +1007,7 @@ function showHint() {
 		const splitProb = calculateWinProbability(
 			[currentHand[0]],
 			dealerUpcard,
-			"hit"
+			"hit",
 		);
 		probabilities += `
 			<div class="prob-item ${move === "split" ? "recommended" : ""}">
@@ -1028,7 +1031,7 @@ function showHint() {
 	const explanation = getBasicStrategyExplanation(
 		currentHand,
 		dealerUpcard,
-		move
+		move,
 	);
 
 	// Update dialog content
@@ -1104,6 +1107,7 @@ function toggleCustomDealPanel() {
 
 // Deal custom hand with specified cards
 function dealCustomHand() {
+	if (!canStartNewRound()) return;
 	const betAmount = parseInt(betInput.value);
 	if (isNaN(betAmount) || betAmount <= 0) {
 		showMessage("Please enter a valid bet amount", "lose");
@@ -1212,7 +1216,7 @@ function animateCustomDeal(playerCard1, playerCard2, dealerCard1) {
 			cardEl.textContent = `${playerCard2.value}${playerCard2.suit}`;
 			cardsEl.appendChild(cardEl);
 			totalEl.textContent = `Total: ${calculateHandValue(
-				playerHands[0]
+				playerHands[0],
 			)} | Bet: $${playerBets[0]}`;
 		}, delay);
 		delay += 400;
@@ -1233,6 +1237,7 @@ function animateCustomDeal(playerCard1, playerCard2, dealerCard1) {
 }
 
 function deal() {
+	if (!canStartNewRound()) return;
 	const betAmount = parseInt(betInput.value);
 	if (isNaN(betAmount) || betAmount <= 0) {
 		showMessage("Please enter a valid bet amount", "lose");
@@ -1319,7 +1324,7 @@ function animateInitialDeal() {
 			cardEl.textContent = `${card.value}${card.suit}`;
 			cardsEl.appendChild(cardEl);
 			totalEl.textContent = `Total: ${calculateHandValue(
-				playerHands[0]
+				playerHands[0],
 			)} | Bet: $${playerBets[0]}`;
 		}, delay);
 		delay += 400;
@@ -1408,6 +1413,47 @@ function checkBlackjacks() {
 	}
 }
 
+function getWinStreakPauseThreshold() {
+	const threshold = parseInt(streakGuardInput.value);
+	return Number.isInteger(threshold) && threshold >= 2 ? threshold : 3;
+}
+
+function pauseBettingAfterWinStreak() {
+	if (
+		stats.streakType === "win" &&
+		stats.streak >= getWinStreakPauseThreshold()
+	) {
+		bettingPausedForWinStreak = true;
+		dealBtn.disabled = true;
+		resumeBettingBtn.hidden = false;
+		showMessage(
+			`Pause after ${stats.streak} wins. Resume only if you still want to play.`,
+			"info",
+		);
+	}
+}
+
+function canStartNewRound() {
+	if (bettingPausedForWinStreak) {
+		showMessage(
+			"Betting is paused after your win streak. Resume betting first.",
+			"info",
+		);
+		return false;
+	}
+	return true;
+}
+
+function resumeBetting() {
+	bettingPausedForWinStreak = false;
+	resumeBettingBtn.hidden = true;
+	dealBtn.disabled = false;
+	showMessage(
+		"Betting resumed. Keep the next wager within your plan.",
+		"info",
+	);
+}
+
 // Reveal dealer hole card with flip animation
 function revealDealerHoleCard() {
 	const holeCardEl = dealerCardsEl.children[1];
@@ -1420,7 +1466,7 @@ function revealDealerHoleCard() {
 			holeCardEl.classList.add(getCardColor(dealerHand[1].suit));
 			holeCardEl.textContent = `${dealerHand[1].value}${dealerHand[1].suit}`;
 			dealerTotalEl.textContent = `Total: ${calculateHandValue(
-				dealerHand
+				dealerHand,
 			)}`;
 		}, 295); // Just before the 49-51% pause in animation
 
@@ -1534,7 +1580,7 @@ function dealerPlay() {
 
 	// Check if all player hands busted
 	const allBusted = playerHands.every(
-		(hand) => calculateHandValue(hand) > 21
+		(hand) => calculateHandValue(hand) > 21,
 	);
 
 	if (allBusted) {
@@ -1728,6 +1774,7 @@ function resolveRound() {
 // End round
 function endRound() {
 	gameInProgress = false;
+	pauseBettingAfterWinStreak();
 
 	// Update only stats and bankroll, not the cards
 	bankrollEl.textContent = `$${bankroll}`;
@@ -1773,7 +1820,7 @@ function endRound() {
 				if (!autoPlaying) {
 					showMessage(
 						"Shoe shuffled. Place your bet to continue",
-						"info"
+						"info",
 					);
 				}
 			}, 1500);
@@ -1781,7 +1828,7 @@ function endRound() {
 	}
 
 	// Auto-play continues immediately without showing NEW ROUND button
-	if (autoPlaying && bankroll > 0) {
+	if (autoPlaying && bankroll > 0 && !bettingPausedForWinStreak) {
 		newRoundBtn.style.display = "none";
 		const delay = cutCardReached ? 1000 : 600;
 		setTimeout(() => {
@@ -1798,7 +1845,7 @@ function newRound() {
 
 	newRoundBtn.textContent = "NEW ROUND";
 	newRoundBtn.style.display = "none";
-	dealBtn.disabled = false;
+	dealBtn.disabled = bettingPausedForWinStreak;
 	bettingArea.style.display = "block";
 	playerHands = [[]];
 	playerBets = [];
@@ -1812,7 +1859,12 @@ function newRound() {
 	playerHandsEl.innerHTML = "";
 
 	updateDisplay();
-	showMessage("Place your bet and click Deal to start", "info");
+	showMessage(
+		bettingPausedForWinStreak
+			? "Betting paused after your win streak. Resume betting to continue."
+			: "Place your bet and click Deal to start",
+		"info",
+	);
 	updateButtons();
 
 	// Only continue auto-play if manually triggered
@@ -1840,7 +1892,7 @@ function startAutoPlay() {
 	updateButtons(); // Disable all game action buttons
 	showMessage(
 		`Auto-playing with Basic Strategy (${autoPlayMaxRounds} rounds)`,
-		"info"
+		"info",
 	);
 
 	if (!gameInProgress) {
@@ -1854,7 +1906,7 @@ function stopAutoPlay() {
 	autoPlaying = false;
 	autoPlayBtn.textContent = "AUTO PLAY";
 	autoPlayBtn.classList.remove("active");
-	dealBtn.disabled = false;
+	dealBtn.disabled = bettingPausedForWinStreak;
 	betInput.disabled = false;
 	autoRoundsInput.disabled = false;
 	newRoundBtn.disabled = false;
@@ -1863,15 +1915,27 @@ function stopAutoPlay() {
 }
 
 function autoPlayStartNewRound() {
-	if (!autoPlaying || autoPlayRounds >= autoPlayMaxRounds || bankroll <= 0) {
+	if (
+		!autoPlaying ||
+		bettingPausedForWinStreak ||
+		autoPlayRounds >= autoPlayMaxRounds ||
+		bankroll <= 0
+	) {
 		stopAutoPlay();
+		if (bettingPausedForWinStreak) {
+			showMessage(
+				"Auto-play paused after your win streak. Resume betting to continue.",
+				"info",
+			);
+			return;
+		}
 		if (bankroll <= 0) {
 			showMessage("Auto-play stopped: Out of money", "lose");
 			newRoundBtn.style.display = "inline-block";
 		} else if (autoPlayRounds >= autoPlayMaxRounds) {
 			showMessage(
 				`Auto-play completed ${autoPlayMaxRounds} rounds`,
-				"info"
+				"info",
 			);
 			newRoundBtn.style.display = "inline-block";
 		}
@@ -1895,15 +1959,27 @@ function autoPlayStartNewRound() {
 }
 
 function autoPlayNextRound() {
-	if (!autoPlaying || autoPlayRounds >= autoPlayMaxRounds || bankroll <= 0) {
+	if (
+		!autoPlaying ||
+		bettingPausedForWinStreak ||
+		autoPlayRounds >= autoPlayMaxRounds ||
+		bankroll <= 0
+	) {
 		stopAutoPlay();
+		if (bettingPausedForWinStreak) {
+			showMessage(
+				"Auto-play paused after your win streak. Resume betting to continue.",
+				"info",
+			);
+			return;
+		}
 		if (bankroll <= 0) {
 			showMessage("Auto-play stopped: Out of money", "lose");
 			newRoundBtn.style.display = "inline-block";
 		} else if (autoPlayRounds >= autoPlayMaxRounds) {
 			showMessage(
 				`Auto-play completed ${autoPlayMaxRounds} rounds`,
-				"info"
+				"info",
 			);
 			newRoundBtn.style.display = "inline-block";
 		}
@@ -2017,6 +2093,30 @@ function toggleSuperAuto() {
 }
 
 function startSuperAuto() {
+	if (bettingPausedForWinStreak) {
+		showMessage(
+			"Super Auto is paused after your win streak. Resume betting first.",
+			"info",
+		);
+		return;
+	}
+
+	const betAmount = parseInt(betInput.value);
+	if (!Number.isInteger(betAmount) || betAmount <= 0) {
+		showMessage(
+			"Enter a valid bet amount before starting Super Auto.",
+			"lose",
+		);
+		return;
+	}
+	if (betAmount > bankroll) {
+		showMessage(
+			"Super Auto stopped: Insufficient funds for this bet.",
+			"lose",
+		);
+		return;
+	}
+
 	superAutoPlaying = true;
 	superAutoRounds = 0;
 	superAutoMaxRounds = parseInt(autoRoundsInput.value) || 10;
@@ -2045,16 +2145,21 @@ function stopSuperAuto() {
 	newRoundBtn.disabled = false;
 	updateDisplay();
 	updateButtons();
-	showMessage("Super Auto stopped", "info");
 }
 
 function runSuperAutoRounds() {
 	let roundsCompleted = 0;
+	let stopReason = "completed";
 
-	while (roundsCompleted < superAutoMaxRounds && bankroll > 0) {
+	while (
+		roundsCompleted < superAutoMaxRounds &&
+		bankroll > 0 &&
+		!bettingPausedForWinStreak
+	) {
 		const betAmount = parseInt(betInput.value);
 
 		if (betAmount > bankroll) {
+			stopReason = "insufficient-funds";
 			break;
 		}
 
@@ -2071,6 +2176,10 @@ function runSuperAutoRounds() {
 
 		// Resolve hands
 		instantResolveHands();
+		pauseBettingAfterWinStreak();
+		if (bettingPausedForWinStreak) {
+			break;
+		}
 
 		// Check for shuffle
 		if (cutCardReached) {
@@ -2103,9 +2212,21 @@ function runSuperAutoRounds() {
 	if (bankroll <= 0) {
 		showMessage(
 			`Super Auto completed ${roundsCompleted} rounds - Out of money!`,
-			"lose"
+			"lose",
 		);
 		newRoundBtn.textContent = "RESET GAME";
+		newRoundBtn.style.display = "inline-block";
+	} else if (bettingPausedForWinStreak) {
+		showMessage(
+			"Super Auto paused after your win streak. Resume betting to continue.",
+			"info",
+		);
+		newRoundBtn.style.display = "inline-block";
+	} else if (stopReason === "insufficient-funds") {
+		showMessage(
+			`Super Auto stopped after ${roundsCompleted} rounds: insufficient funds for the next bet.`,
+			"lose",
+		);
 		newRoundBtn.style.display = "inline-block";
 	} else {
 		showMessage(`Super Auto completed ${roundsCompleted} rounds`, "info");
@@ -2315,7 +2436,7 @@ function instantDealerPlay() {
 
 	// Check if all player hands busted
 	const allBusted = playerHands.every(
-		(hand) => calculateHandValue(hand) > 21
+		(hand) => calculateHandValue(hand) > 21,
 	);
 
 	if (allBusted) {
@@ -2566,11 +2687,11 @@ function updateChartInfo() {
 	const count = bankrollHistory.length;
 	if (count > 1000000) {
 		chartDataPoints.textContent = `${(count / 1000000).toFixed(
-			2
+			2,
 		)}M data points`;
 	} else if (count > 1000) {
 		chartDataPoints.textContent = `${(count / 1000).toFixed(
-			1
+			1,
 		)}K data points`;
 	} else {
 		chartDataPoints.textContent = `${count} data points`;
@@ -2622,7 +2743,7 @@ function downsampleData(data, threshold) {
 		for (let j = rangeStart; j < rangeEnd; j++) {
 			const area = Math.abs(
 				(pointA.hands - avgX) * (data[j].bankroll - pointA.bankroll) -
-					(pointA.hands - data[j].hands) * (avgY - pointA.bankroll)
+					(pointA.hands - data[j].hands) * (avgY - pointA.bankroll),
 			);
 			if (area > maxArea) {
 				maxArea = area;
@@ -2751,7 +2872,7 @@ function drawChart() {
 		0,
 		padding.top,
 		0,
-		height - padding.bottom
+		height - padding.bottom,
 	);
 	gradient.addColorStop(0, "rgba(0, 255, 0, 0.3)");
 	gradient.addColorStop(1, "rgba(0, 255, 0, 0.05)");
@@ -2817,6 +2938,7 @@ clearChartBtn.addEventListener("click", clearChartData);
 customDealToggle.addEventListener("click", toggleCustomDealPanel);
 customDealClose.addEventListener("click", toggleCustomDealPanel);
 customDealBtn.addEventListener("click", dealCustomHand);
+resumeBettingBtn.addEventListener("click", resumeBetting);
 
 // Hint dialog listeners
 hintClose.addEventListener("click", closeHint);

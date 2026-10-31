@@ -21,8 +21,11 @@ body {
 	padding: 40px;
 	max-width: 900px;
 	width: 100%;
-	box-shadow: 0 0 0 15px #8b4513, 0 0 0 20px #654321,
-		0 20px 60px rgba(0, 0, 0, 0.5), inset 0 0 100px rgba(0, 0, 0, 0.3);
+	box-shadow:
+		0 0 0 15px #8b4513,
+		0 0 0 20px #654321,
+		0 20px 60px rgba(0, 0, 0, 0.5),
+		inset 0 0 100px rgba(0, 0, 0, 0.3);
 	position: relative;
 	margin: 20px 0;
 }
@@ -34,7 +37,8 @@ body {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background: radial-gradient(
+	background:
+		radial-gradient(
 			ellipse at center,
 			transparent 0%,
 			rgba(0, 0, 0, 0.2) 100%
@@ -602,6 +606,18 @@ h1 {
 	font-size: 1.1em;
 }
 
+.streak-guard-control {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.streak-guard-control input {
+	width: 64px;
+	padding: 8px;
+	font-size: 1em;
+}
+
 .betting-area input {
 	padding: 10px 15px;
 	font-size: 1.1em;
@@ -968,8 +984,11 @@ h1 {
 	.game-container {
 		padding: 20px;
 		border-radius: 40% / 25%;
-		box-shadow: 0 0 0 10px #8b4513, 0 0 0 15px #654321,
-			0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 80px rgba(0, 0, 0, 0.3);
+		box-shadow:
+			0 0 0 10px #8b4513,
+			0 0 0 15px #654321,
+			0 10px 40px rgba(0, 0, 0, 0.5),
+			inset 0 0 80px rgba(0, 0, 0, 0.3);
 	}
 
 	h1 {

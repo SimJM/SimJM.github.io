@@ -32,8 +32,12 @@ window.headerManager = {
 			logo: "&#x1F52E; Number Analysis",
 			hideNavItems: [],
 		},
-		"loan.html": {
+		"loan/index.html": {
 			logo: "&#x1F4B0; Loan Calculator",
+			hideNavItems: [],
+		},
+		"allianz/index.html": {
+			logo: "&#x1F4B0; Allianz Dividend Calendar",
 			hideNavItems: [],
 		},
 		"wordle.html": {
@@ -71,12 +75,17 @@ window.headerManager = {
 	// Get current page filename
 	getCurrentPage() {
 		const path = window.location.pathname;
-		return path.substring(path.lastIndexOf("/") + 1) || "index.html";
+		const page = path.substring(path.lastIndexOf("/") + 1) || "index.html";
+		const folder = ["allianz", "loan"].find((name) =>
+			path.includes(`/${name}/`),
+		);
+		return folder && page === "index.html" ? `${folder}/${page}` : page;
 	},
 
 	// Load and configure header
 	loadHeader() {
-		return fetch("header.html")
+		const isNestedPage = this.getCurrentPage().includes("/");
+		return fetch(isNestedPage ? "../header.html" : "header.html")
 			.then((response) => response.text())
 			.then((data) => {
 				document.getElementById("header-placeholder").innerHTML = data;
@@ -102,6 +111,21 @@ window.headerManager = {
 		const logo = document.getElementById("dynamic-logo");
 		if (logo && config.logo) {
 			logo.innerHTML = config.logo;
+		}
+
+		if (currentPage.includes("/")) {
+			document
+				.querySelectorAll("#header-placeholder a[href]")
+				.forEach((link) => {
+					const href = link.getAttribute("href");
+					if (
+						href &&
+						!href.startsWith("../") &&
+						!href.startsWith("http")
+					) {
+						link.setAttribute("href", `../${href}`);
+					}
+				});
 		}
 
 		// Hide specified navigation items

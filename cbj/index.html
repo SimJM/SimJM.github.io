@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
@@ -227,7 +227,21 @@
 					max="1000"
 					value="10"
 					step="5" />
+				<label class="streak-guard-control" for="streakGuardInput">
+					PAUSE AFTER
+					<input
+						type="number"
+						id="streakGuardInput"
+						min="2"
+						max="10"
+						value="3"
+						step="1" />
+					WINS
+				</label>
 				<button id="dealBtn" class="btn btn-deal">DEAL</button>
+				<button id="resumeBettingBtn" class="btn btn-custom" hidden>
+					RESUME BETTING
+				</button>
 				<button id="customDealToggle" class="btn btn-custom">
 					⚙️ CUSTOM
 				</button>

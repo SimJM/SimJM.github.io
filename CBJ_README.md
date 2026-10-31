@@ -8,13 +8,13 @@ A fully-featured, casino-realistic Blackjack game built with vanilla JavaScript,
 
 ## Table of Contents
 
--   [Game Rules](#game-rules)
--   [Core Algorithms](#core-algorithms)
--   [Features & Implementation](#features--implementation)
--   [Statistics Tracking](#statistics-tracking)
--   [Auto-Play System](#auto-play-system)
--   [Bankroll Chart](#bankroll-chart)
--   [UI/UX Design](#uiux-design)
+- [Game Rules](#game-rules)
+- [Core Algorithms](#core-algorithms)
+- [Features & Implementation](#features--implementation)
+- [Statistics Tracking](#statistics-tracking)
+- [Auto-Play System](#auto-play-system)
+- [Bankroll Chart](#bankroll-chart)
+- [UI/UX Design](#uiux-design)
 
 ---
 
@@ -22,27 +22,27 @@ A fully-featured, casino-realistic Blackjack game built with vanilla JavaScript,
 
 ### Standard Blackjack Rules
 
--   **Objective**: Beat the dealer by getting closer to 21 without going over
--   **Card Values**:
-    -   Number cards (2-10): Face value
-    -   Face cards (J, Q, K): 10
-    -   Aces: 1 or 11 (whichever is more favorable)
--   **Blackjack**: Ace + 10-value card on first two cards
--   **Blackjack Payout**: 3:2 (bet $10, win $15)
--   **Regular Win**: 1:1 (bet $10, win $10)
--   **Push**: Tie with dealer, bet returned
--   **Bust**: Hand exceeds 21, automatic loss
+- **Objective**: Beat the dealer by getting closer to 21 without going over
+- **Card Values**:
+    - Number cards (2-10): Face value
+    - Face cards (J, Q, K): 10
+    - Aces: 1 or 11 (whichever is more favorable)
+- **Blackjack**: Ace + 10-value card on first two cards
+- **Blackjack Payout**: 3:2 (bet $10, win $15)
+- **Regular Win**: 1:1 (bet $10, win $10)
+- **Push**: Tie with dealer, bet returned
+- **Bust**: Hand exceeds 21, automatic loss
 
 ### House Rules
 
--   **Dealer Rules**: Dealer stands on all 17s (including soft 17)
--   **Number of Decks**: 6-deck shoe (312 cards)
--   **Cut Card System**: Placed randomly at 52-78 cards remaining (1-1.5 decks from end)
--   **Shuffle Timing**: After current round completes when cut card is reached
--   **Splitting**: Split once per hand, split aces receive only one card each
--   **Doubling**: Allowed on any first two cards
--   **Insurance**: Not implemented
--   **Surrender**: Not implemented
+- **Dealer Rules**: Dealer stands on all 17s (including soft 17)
+- **Number of Decks**: 6-deck shoe (312 cards)
+- **Cut Card System**: Placed randomly at 52-78 cards remaining (1-1.5 decks from end)
+- **Shuffle Timing**: After current round completes when cut card is reached
+- **Splitting**: Split once per hand, split aces receive only one card each
+- **Doubling**: Allowed on any first two cards
+- **Insurance**: Not implemented
+- **Surrender**: Not implemented
 
 ---
 
@@ -54,20 +54,19 @@ A fully-featured, casino-realistic Blackjack game built with vanilla JavaScript,
 
 **Why crypto.getRandomValues() over Math.random()**:
 
--   **Math.random() Issues**:
+- **Math.random() Issues**:
+    - Not cryptographically secure
+    - Predictable with sufficient observations
+    - Pseudorandom with deterministic seed
+    - Unsuitable for gambling/casino applications
+    - Can be exploited if pattern is discovered
 
-    -   Not cryptographically secure
-    -   Predictable with sufficient observations
-    -   Pseudorandom with deterministic seed
-    -   Unsuitable for gambling/casino applications
-    -   Can be exploited if pattern is discovered
-
--   **crypto.getRandomValues() Benefits**:
-    -   Cryptographically secure random number generator (CSPRNG)
-    -   Uses OS-level entropy sources
-    -   Unpredictable and cannot be reverse-engineered
-    -   Industry standard for security-sensitive applications
-    -   Ensures genuine fairness in card shuffling
+- **crypto.getRandomValues() Benefits**:
+    - Cryptographically secure random number generator (CSPRNG)
+    - Uses OS-level entropy sources
+    - Unpredictable and cannot be reverse-engineered
+    - Industry standard for security-sensitive applications
+    - Ensures genuine fairness in card shuffling
 
 **Implementation**:
 
@@ -81,10 +80,10 @@ function secureRandom() {
 
 **How it works**:
 
--   Creates a Uint32Array with one element
--   Fills it with cryptographically secure random bits
--   Normalizes to [0, 1) range (compatible with Math.random())
--   Used for all randomness: shuffling and cut card placement
+- Creates a Uint32Array with one element
+- Fills it with cryptographically secure random bits
+- Normalizes to [0, 1) range (compatible with Math.random())
+- Used for all randomness: shuffling and cut card placement
 
 ### 2. Fisher-Yates Shuffle Algorithm
 
@@ -103,12 +102,12 @@ function shuffle(array) {
 
 **How it works**:
 
--   Iterate backwards through the array
--   For each position `i`, select a random position `j` from 0 to `i` using **secureRandom()**
--   Swap elements at positions `i` and `j`
--   Time Complexity: O(n)
--   Guarantees uniform distribution (each permutation equally likely)
--   Enhanced with cryptographic randomness for casino-grade fairness
+- Iterate backwards through the array
+- For each position `i`, select a random position `j` from 0 to `i` using **secureRandom()**
+- Swap elements at positions `i` and `j`
+- Time Complexity: O(n)
+- Guarantees uniform distribution (each permutation equally likely)
+- Enhanced with cryptographic randomness for casino-grade fairness
 
 ### 3. Hand Value Calculation Algorithm
 
@@ -177,9 +176,9 @@ function isSoftHand(hand) {
 
 **How it works**:
 
--   Calculate hand value with all Aces as 11
--   A hand is "soft" if it contains an Ace AND the total is ≤21
--   Soft hands can't bust on the next hit (Ace converts to 1 if needed)
+- Calculate hand value with all Aces as 11
+- A hand is "soft" if it contains an Ace AND the total is ≤21
+- Soft hands can't bust on the next hit (Ace converts to 1 if needed)
 
 ### 5. Basic Strategy Decision Algorithm
 
@@ -239,10 +238,10 @@ IF hard hand:
 
 **Algorithm Characteristics**:
 
--   Based on computer simulations and mathematical probability
--   Minimizes house edge to approximately 0.5%
--   Considers dealer upcard, player total, soft/hard distinction
--   Accounts for available actions (split, double) and bankroll
+- Based on computer simulations and mathematical probability
+- Minimizes house edge to approximately 0.5%
+- Considers dealer upcard, player total, soft/hard distinction
+- Accounts for available actions (split, double) and bankroll
 
 ### 6. Cut Card Placement Algorithm
 
@@ -259,19 +258,19 @@ function setRandomCutCardPosition() {
 
 **How it works**:
 
--   Generates random integer between 52-78 (inclusive)
--   Represents 1-1.5 decks remaining from bottom of shoe
--   Mimics dealer manually inserting cut card
--   New random position set after each shuffle
--   When shoe reaches ≤ cutCardPosition cards, shuffle flag is set
--   Shuffle occurs after current round completes
+- Generates random integer between 52-78 (inclusive)
+- Represents 1-1.5 decks remaining from bottom of shoe
+- Mimics dealer manually inserting cut card
+- New random position set after each shuffle
+- When shoe reaches ≤ cutCardPosition cards, shuffle flag is set
+- Shuffle occurs after current round completes
 
 **Casino Realism**:
 
--   Real casinos: ~75-80% penetration (60-80 cards remaining)
--   This implementation: Random 52-78 cards (~67-75% penetration)
--   Prevents card counting advantages
--   Adds variance like real casino play
+- Real casinos: ~75-80% penetration (60-80 cards remaining)
+- This implementation: Random 52-78 cards (~67-75% penetration)
+- Prevents card counting advantages
+- Adds variance like real casino play
 
 ---
 
@@ -303,10 +302,10 @@ function setRandomCutCardPosition() {
 
 **Algorithm**:
 
--   Card starts 200px above final position, rotated 180° (face down)
--   Animates to final position while rotating to face up
--   Duration: 500ms with ease-out timing
--   Delay applied incrementally for sequential dealing effect
+- Card starts 200px above final position, rotated 180° (face down)
+- Animates to final position while rotating to face up
+- Duration: 500ms with ease-out timing
+- Delay applied incrementally for sequential dealing effect
 
 #### Flip Animation
 
@@ -325,10 +324,10 @@ function setRandomCutCardPosition() {
 
 **Algorithm**:
 
--   Rotates from 180° (face down) to 0° (face up)
--   Pauses at 90° (49-51%) to change card content
--   Prevents visible flickering during content swap
--   Duration: 600ms with ease-in-out timing
+- Rotates from 180° (face down) to 0° (face up)
+- Pauses at 90° (49-51%) to change card content
+- Prevents visible flickering during content swap
+- Duration: 600ms with ease-in-out timing
 
 #### Chip Toss Animation
 
@@ -354,10 +353,10 @@ function setRandomCutCardPosition() {
 
 **Algorithm**:
 
--   Chip starts 100px above, scaled to 50%, no rotation
--   Falls to position while growing to full size and rotating 360°
--   Duration: 800ms with cubic-bezier easing
--   Applied on deal, double down, and split actions
+- Chip starts 100px above, scaled to 50%, no rotation
+- Falls to position while growing to full size and rotating 360°
+- Duration: 800ms with cubic-bezier easing
+- Applied on deal, double down, and split actions
 
 ### 2. Shoe Management System
 
@@ -439,10 +438,10 @@ function split() {
 
 **Rendering**:
 
--   Each hand displayed in separate container
--   Active hand highlighted with gold border
--   Inactive hands dimmed (opacity 0.6)
--   Hand totals calculated independently
+- Each hand displayed in separate container
+- Active hand highlighted with gold border
+- Inactive hands dimmed (opacity 0.6)
+- Hand totals calculated independently
 
 ### 4. Next Cards Preview
 
@@ -469,19 +468,19 @@ function updateNextCardsPreview() {
 
 **Implementation Details**:
 
--   `shoe.slice(-10)` gets last 10 cards (next to be dealt)
--   `.reverse()` shows in order they'll be dealt
--   Updates after every card dealt
--   Expandable/collapsible container
--   Mini card design (smaller than game cards)
+- `shoe.slice(-10)` gets last 10 cards (next to be dealt)
+- `.reverse()` shows in order they'll be dealt
+- Updates after every card dealt
+- Expandable/collapsible container
+- Mini card design (smaller than game cards)
 
 ### 5. Double Down System
 
 **Rules**:
 
--   Allowed only on first two cards
--   Doubles the bet and takes exactly one more card
--   Automatically stands after receiving the card
+- Allowed only on first two cards
+- Doubles the bet and takes exactly one more card
+- Automatically stands after receiving the card
 
 **Algorithm**:
 
@@ -518,22 +517,22 @@ function doubleDown() {
 
 **Features**:
 
--   💡 Hint button available during player's turn
--   **Monte Carlo Simulation**: 10,000 simulations per action to calculate win/loss/push probabilities
--   Modal dialog with probability grid for all available actions
--   Context-aware explanations based on game situation
--   Same logic as auto-play mode (optimal Basic Strategy)
--   No card counting - uses infinite deck probabilities
+- 💡 Hint button available during player's turn
+- **Monte Carlo Simulation**: 10,000 simulations per action to calculate win/loss/push probabilities
+- Modal dialog with probability grid for all available actions
+- Context-aware explanations based on game situation
+- Same logic as auto-play mode (optimal Basic Strategy)
+- No card counting - uses infinite deck probabilities
 
 **User Interface**:
 
--   **Your Situation**: Displays current hand type and dealer's upcard
--   **Recommended Action**: Bold display of HIT/STAND/DOUBLE/SPLIT
--   **Probability Grid**: Shows win/lose/push percentages for each available action
-    -   Recommended action highlighted with gold border and green background
-    -   Color-coded: Green (win), Red (lose), Yellow (push)
-    -   2-column layout on mobile for optimal space usage
--   **Why?**: Detailed explanation of the mathematical reasoning
+- **Your Situation**: Displays current hand type and dealer's upcard
+- **Recommended Action**: Bold display of HIT/STAND/DOUBLE/SPLIT
+- **Probability Grid**: Shows win/lose/push percentages for each available action
+    - Recommended action highlighted with gold border and green background
+    - Color-coded: Green (win), Red (lose), Yellow (push)
+    - 2-column layout on mobile for optimal space usage
+- **Why?**: Detailed explanation of the mathematical reasoning
 
 **Probability Calculation**:
 
@@ -596,29 +595,29 @@ function showHint() {
 
 **Simulation Details**:
 
--   **Dealer Simulation**: Follows standard rules (hit until 17+, proper soft ace handling)
--   **Card Distribution**: 10-value cards = 30.8% (4/13), Aces = 7.7% (1/13)
--   **Infinite Deck**: No card counting, pure mathematical probabilities
--   **Player Strategy**: Conservative simulation for hit scenarios
--   **Split Calculation**: Per-hand average probability
+- **Dealer Simulation**: Follows standard rules (hit until 17+, proper soft ace handling)
+- **Card Distribution**: 10-value cards = 30.8% (4/13), Aces = 7.7% (1/13)
+- **Infinite Deck**: No card counting, pure mathematical probabilities
+- **Player Strategy**: Conservative simulation for hit scenarios
+- **Split Calculation**: Per-hand average probability
 
 **Explanation Categories**:
 
--   **Pair Splitting**: Why to always split Aces/8s, conditional splits for 2s/3s/6s/7s/9s
--   **Double Down**: Optimal situations for 9/10/11 and soft hands against weak dealer cards
--   **Soft Hands**: Can't bust scenarios, when to hit vs stand with Aces
--   **Hard Hands**: Dealer weakness (2-6 = 40%+ bust rate) vs strength (7-Ace)
--   **Bust Avoidance**: Mathematical reasoning for standing on 12-16 vs weak dealer
+- **Pair Splitting**: Why to always split Aces/8s, conditional splits for 2s/3s/6s/7s/9s
+- **Double Down**: Optimal situations for 9/10/11 and soft hands against weak dealer cards
+- **Soft Hands**: Can't bust scenarios, when to hit vs stand with Aces
+- **Hard Hands**: Dealer weakness (2-6 = 40%+ bust rate) vs strength (7-Ace)
+- **Bust Avoidance**: Mathematical reasoning for standing on 12-16 vs weak dealer
 
 **Implementation Details**:
 
--   Enabled only during active gameplay
--   Disabled during auto-play mode
--   Uses same `getBasicStrategyMove()` function as automation
--   Provides educational value while maintaining optimal play
--   Modal overlay with animations (fade in, slide in)
--   Responsive design: Desktop grid layout, 2-column mobile view
--   Optimized spacing to minimize scrolling on all devices
+- Enabled only during active gameplay
+- Disabled during auto-play mode
+- Uses same `getBasicStrategyMove()` function as automation
+- Provides educational value while maintaining optimal play
+- Modal overlay with animations (fade in, slide in)
+- Responsive design: Desktop grid layout, 2-column mobile view
+- Optimized spacing to minimize scrolling on all devices
 
 ---
 
@@ -735,12 +734,12 @@ last30.forEach((result) => {
 
 **Visual Design**:
 
--   **W**: White text on green circle
--   **L**: White text on red circle
--   **P**: White text on transparent circle with border
--   Circular badges (30px diameter)
--   Flex layout with wrapping
--   Most recent on the right
+- **W**: White text on green circle
+- **L**: White text on red circle
+- **P**: White text on transparent circle with border
+- Circular badges (30px diameter)
+- Flex layout with wrapping
+- Most recent on the right
 
 ---
 
@@ -752,24 +751,24 @@ Automatically play multiple rounds using optimal Basic Strategy decisions, avail
 
 ### Configuration
 
--   **Rounds**: User selectable 1-100
--   **Bet**: Uses current bet input amount
--   **Strategy**: Full Basic Strategy implementation
+- **Rounds**: User selectable 1-100
+- **Bet**: Uses current bet input amount
+- **Strategy**: Full Basic Strategy implementation
 
 ### Two Modes
 
 #### 1. Auto Play (Animated)
 
--   **Speed**: 400ms delay between actions, 1000ms when shuffle occurs
--   **Display**: Full card animations and visual feedback
--   **Use Case**: Watching strategy execution in real-time
+- **Speed**: 400ms delay between actions, 1000ms when shuffle occurs
+- **Display**: Full card animations and visual feedback
+- **Use Case**: Watching strategy execution in real-time
 
 #### 2. Super Auto (Instant)
 
--   **Speed**: No delays - runs all rounds instantly
--   **Display**: Statistics update in real-time, no card animations
--   **Use Case**: Quick simulation of hundreds/thousands of rounds for statistical analysis
--   **Button Style**: Distinctive red gradient with faster pulse animation
+- **Speed**: No delays - runs all rounds instantly
+- **Display**: Statistics update in real-time, no card animations
+- **Use Case**: Quick simulation of hundreds/thousands of rounds for statistical analysis
+- **Button Style**: Distinctive red gradient with faster pulse animation
 
 ### Control Flow
 
@@ -910,24 +909,24 @@ function moveToNextHand() {
 
 **How It Works**:
 
--   When a split occurs during auto-play, the game creates two hands
--   After playing the first hand, `moveToNextHand()` is called
--   If auto-play is active, it automatically continues with the second hand
--   All split hands are played sequentially using Basic Strategy
--   No manual intervention needed
+- When a split occurs during auto-play, the game creates two hands
+- After playing the first hand, `moveToNextHand()` is called
+- If auto-play is active, it automatically continues with the second hand
+- All split hands are played sequentially using Basic Strategy
+- No manual intervention needed
 
 ### Safety Features
 
--   Validates bankroll before each round
--   Stops if insufficient funds (both modes)
--   Can be manually interrupted (Stop buttons remain active)
--   Disables all manual action buttons during auto-play (Hit, Stand, Double, Split, Hint, Deal, New Round)
--   Prevents user interference and ensures clean Basic Strategy execution
--   Shows completion message with round count
--   Re-enables manual controls on stop
--   Handles split hands automatically - continues playing all split hands sequentially
--   Seamlessly transitions between hands during auto-play
--   **Super Auto**: Prevents double-counting of hands played in blackjack scenarios
+- Validates bankroll before each round
+- Stops if insufficient funds (both modes)
+- Can be manually interrupted (Stop buttons remain active)
+- Disables all manual action buttons during auto-play (Hit, Stand, Double, Split, Hint, Deal, New Round)
+- Prevents user interference and ensures clean Basic Strategy execution
+- Shows completion message with round count
+- Re-enables manual controls on stop
+- Handles split hands automatically - continues playing all split hands sequentially
+- Seamlessly transitions between hands during auto-play
+- **Super Auto**: Prevents double-counting of hands played in blackjack scenarios
 
 ### Implementation Details
 
@@ -935,18 +934,18 @@ function moveToNextHand() {
 
 **Instant Gameplay Functions**:
 
--   `instantDeal()` - Deals cards without setTimeout delays
--   `instantPlayHand()` - Executes Basic Strategy decisions instantly
--   `instantDealerPlay()` - Dealer draws to 17 without animation
--   `instantResolveHands()` - Resolves all hands and updates statistics immediately
+- `instantDeal()` - Deals cards without setTimeout delays
+- `instantPlayHand()` - Executes Basic Strategy decisions instantly
+- `instantDealerPlay()` - Dealer draws to 17 without animation
+- `instantResolveHands()` - Resolves all hands and updates statistics immediately
 
 **Key Optimizations**:
 
--   Bypasses all animation delays (no setTimeout calls)
--   Direct function calls instead of async callbacks
--   Single while loop processes all rounds synchronously
--   Statistics updated only once at completion for maximum speed
--   Proper handling of blackjack scenarios to prevent duplicate stat increments
+- Bypasses all animation delays (no setTimeout calls)
+- Direct function calls instead of async callbacks
+- Single while loop processes all rounds synchronously
+- Statistics updated only once at completion for maximum speed
+- Proper handling of blackjack scenarios to prevent duplicate stat increments
 
 #### Split and Double Down Implementation in Auto-Play
 
@@ -966,13 +965,13 @@ function getBasicStrategyMove(hand, dealerUpcard) {
 
 **Key Design Principles**:
 
--   **Separation of Concerns**: Strategy function returns optimal move, execution code validates constraints
--   **Constraint Validation**: Split/double decisions validated at execution time with:
-    -   `canSplit` flag (prevents multiple splits per round)
-    -   `canDouble` flag (ensures only on first two cards)
-    -   Bankroll availability check
-    -   Hand length verification (2 cards required)
--   **Fallback Logic**: If optimal move can't be executed (insufficient funds, constraints), falls back to next best action
+- **Separation of Concerns**: Strategy function returns optimal move, execution code validates constraints
+- **Constraint Validation**: Split/double decisions validated at execution time with:
+    - `canSplit` flag (prevents multiple splits per round)
+    - `canDouble` flag (ensures only on first two cards)
+    - Bankroll availability check
+    - Hand length verification (2 cards required)
+- **Fallback Logic**: If optimal move can't be executed (insufficient funds, constraints), falls back to next best action
 
 **Auto Play Mode** (Animated):
 
@@ -1030,10 +1029,10 @@ function instantPlayHand() {
 
 **Correct Behavior Examples**:
 
--   **Pair of 8s vs Dealer 10**: Strategy returns "split", auto-play executes if bankroll allows
--   **11 vs Dealer 6**: Strategy returns "double", auto-play doubles down
--   **Soft 18 (A,7) vs Dealer 5**: Strategy returns "double", auto-play doubles down
--   **After Split**: `canSplit = false` prevents re-splitting, but `canDouble = true` allows doubling on split hands
+- **Pair of 8s vs Dealer 10**: Strategy returns "split", auto-play executes if bankroll allows
+- **11 vs Dealer 6**: Strategy returns "double", auto-play doubles down
+- **Soft 18 (A,7) vs Dealer 5**: Strategy returns "double", auto-play doubles down
+- **After Split**: `canSplit = false` prevents re-splitting, but `canDouble = true` allows doubling on split hands
 
 **Bug Fix (Dec 2024)**:
 
@@ -1046,9 +1045,9 @@ Prior versions had an issue where `getBasicStrategyMove()` included constraint c
 
 **Performance**:
 
--   Can simulate 100+ rounds in milliseconds
--   Useful for long-term strategy analysis and testing
--   Provides instant statistical feedback
+- Can simulate 100+ rounds in milliseconds
+- Useful for long-term strategy analysis and testing
+- Provides instant statistical feedback
 
 ---
 
@@ -1062,24 +1061,24 @@ Visualize bankroll progression over time to analyze performance trends, volatili
 
 #### Interactive Canvas-Based Chart
 
--   **High Performance**: HTML5 Canvas rendering for smooth 60fps visualization
--   **Scalability**: Handles 10 million+ data points efficiently
--   **Real-time Updates**: Chart updates as you play
+- **High Performance**: HTML5 Canvas rendering for smooth 60fps visualization
+- **Scalability**: Handles 10 million+ data points efficiently
+- **Real-time Updates**: Chart updates as you play
 
 #### Data Tracking
 
--   **Every Round Tracked**: Records bankroll after each hand played
--   **Persistent History**: All data points stored for the session
--   **Data Point Counter**: Shows total tracked points (formatted as K/M for large numbers)
+- **Every Round Tracked**: Records bankroll after each hand played
+- **Persistent History**: All data points stored for the session
+- **Data Point Counter**: Shows total tracked points (formatted as K/M for large numbers)
 
 #### Advanced Downsampling
 
 **Largest-Triangle-Three-Buckets (LTTB) Algorithm**:
 
--   Intelligently reduces millions of data points to ~2000 visual points
--   Preserves visual accuracy and trend characteristics
--   Maintains critical peaks, valleys, and inflection points
--   Prevents chart performance degradation with large datasets
+- Intelligently reduces millions of data points to ~2000 visual points
+- Preserves visual accuracy and trend characteristics
+- Maintains critical peaks, valleys, and inflection points
+- Prevents chart performance degradation with large datasets
 
 **How LTTB Works**:
 
@@ -1120,22 +1119,22 @@ function downsampleData(data, threshold) {
 
 **Axes**:
 
--   **X-Axis**: Hands Played (auto-formatted: 1K, 10K, 1M, etc.)
--   **Y-Axis**: Bankroll in dollars
--   **Grid Lines**: 5 horizontal and 5 vertical lines for easy reading
+- **X-Axis**: Hands Played (auto-formatted: 1K, 10K, 1M, etc.)
+- **Y-Axis**: Bankroll in dollars
+- **Grid Lines**: 5 horizontal and 5 vertical lines for easy reading
 
 **Visual Features**:
 
--   **Green Line Chart**: Bankroll progression over time
--   **Gradient Fill**: Semi-transparent green area under curve
--   **Zero Line**: Red horizontal line when bankroll goes negative
--   **Current Position**: Green dot with gold ring highlighting latest value
+- **Green Line Chart**: Bankroll progression over time
+- **Gradient Fill**: Semi-transparent green area under curve
+- **Zero Line**: Red horizontal line when bankroll goes negative
+- **Current Position**: Green dot with gold ring highlighting latest value
 
 **Controls**:
 
--   **Toggle Button**: Expand/collapse chart panel
--   **Clear Data Button**: Reset chart history (keeps current bankroll as starting point)
--   **Data Counter**: Shows number of tracked data points
+- **Toggle Button**: Expand/collapse chart panel
+- **Clear Data Button**: Reset chart history (keeps current bankroll as starting point)
+- **Data Counter**: Shows number of tracked data points
 
 ### Performance Optimizations
 
@@ -1159,17 +1158,17 @@ setTimeout(() => drawChart(), 50);
 
 #### Canvas Optimization
 
--   **High DPI Support**: Scales with device pixel ratio for crisp display
--   **Responsive Sizing**: Auto-adjusts to container dimensions
--   **Window Resize Handling**: Re-renders on viewport changes
--   **Efficient Memory**: Only stores essential data (hands, bankroll)
+- **High DPI Support**: Scales with device pixel ratio for crisp display
+- **Responsive Sizing**: Auto-adjusts to container dimensions
+- **Window Resize Handling**: Re-renders on viewport changes
+- **Efficient Memory**: Only stores essential data (hands, bankroll)
 
 #### Rendering Strategy
 
--   **Conditional Updates**: Only redraws when chart is visible
--   **Batch Processing**: Groups updates during Super Auto mode
--   **Lazy Initialization**: Chart only initializes when first opened
--   **Throttled Redraws**: Limits frequency during high-speed play
+- **Conditional Updates**: Only redraws when chart is visible
+- **Batch Processing**: Groups updates during Super Auto mode
+- **Lazy Initialization**: Chart only initializes when first opened
+- **Throttled Redraws**: Limits frequency during high-speed play
 
 ### Use Cases
 
@@ -1194,40 +1193,40 @@ bankrollHistory = [
 
 **Chart Dimensions**:
 
--   Desktop: 400px height
--   Mobile: 300px height
--   Full width responsive
+- Desktop: 400px height
+- Mobile: 300px height
+- Full width responsive
 
 **Color Scheme**:
 
--   Chart background: `rgba(0, 0, 0, 0.5)`
--   Line color: `#00ff00` (green)
--   Grid lines: `rgba(255, 215, 0, 0.1)` (translucent gold)
--   Axis labels: `#ffd700` (gold)
--   Gradient fill: `rgba(0, 255, 0, 0.3)` to `rgba(0, 255, 0, 0.05)`
+- Chart background: `rgba(0, 0, 0, 0.5)`
+- Line color: `#00ff00` (green)
+- Grid lines: `rgba(255, 215, 0, 0.1)` (translucent gold)
+- Axis labels: `#ffd700` (gold)
+- Gradient fill: `rgba(0, 255, 0, 0.3)` to `rgba(0, 255, 0, 0.05)`
 
 ### Example Scenarios
 
 **10,000 Hands Analysis**:
 
--   Data points: 10,001 (including initial)
--   Visual points rendered: 2,000
--   Downsampling ratio: 5:1
--   Rendering time: <50ms
+- Data points: 10,001 (including initial)
+- Visual points rendered: 2,000
+- Downsampling ratio: 5:1
+- Rendering time: <50ms
 
 **1,000,000 Hands Simulation**:
 
--   Data points: 1,000,001
--   Visual points rendered: 2,000
--   Downsampling ratio: 500:1
--   Rendering time: <100ms
--   Memory usage: ~8MB (efficient storage)
+- Data points: 1,000,001
+- Visual points rendered: 2,000
+- Downsampling ratio: 500:1
+- Rendering time: <100ms
+- Memory usage: ~8MB (efficient storage)
 
 **Real-time Tracking**:
 
--   Updates every hand in normal play
--   Visual feedback within 16ms (60fps)
--   Smooth chart animations
+- Updates every hand in normal play
+- Visual feedback within 16ms (60fps)
+- Smooth chart animations
 
 ---
 
@@ -1237,12 +1236,12 @@ bankrollHistory = [
 
 **Color Palette**:
 
--   **Felt Green**: `#0a5f0a` (table surface)
--   **Wood Trim**: `#8B4513`, `#654321` (table border)
--   **Gold Accents**: `#ffd700` (buttons, highlights)
--   **Purple Theme**: `#9b59b6` (auto-play button)
--   **Red Theme**: `#ff6b6b`, `#ee5a6f` (super auto button - distinctive gradient)
--   **Dark Background**: `linear-gradient(135deg, #1a1a2e, #16213e)`
+- **Felt Green**: `#0a5f0a` (table surface)
+- **Wood Trim**: `#8B4513`, `#654321` (table border)
+- **Gold Accents**: `#ffd700` (buttons, highlights)
+- **Purple Theme**: `#9b59b6` (auto-play button)
+- **Red Theme**: `#ff6b6b`, `#ee5a6f` (super auto button - distinctive gradient)
+- **Dark Background**: `linear-gradient(135deg, #1a1a2e, #16213e)`
 
 **Oval Table Design**:
 
@@ -1260,9 +1259,9 @@ bankrollHistory = [
 
 **Felt Texture**:
 
--   Radial gradient for lighting effect
--   Repeating linear gradient for fabric texture
--   Semi-transparent overlays for realism
+- Radial gradient for lighting effect
+- Repeating linear gradient for fabric texture
+- Semi-transparent overlays for realism
 
 ### Responsive Design
 
@@ -1270,28 +1269,28 @@ bankrollHistory = [
 
 **Desktop (>768px)**:
 
--   Stats panel: 5 columns
--   Full card size: 70px × 100px
--   All controls visible
+- Stats panel: 5 columns
+- Full card size: 70px × 100px
+- All controls visible
 
 **Tablet (≤768px)**:
 
--   Stats panel: 3 columns
--   Card size: 60px × 86px
--   Compact button layout
+- Stats panel: 3 columns
+- Card size: 60px × 86px
+- Compact button layout
 
 **Mobile (≤480px)**:
 
--   Stats panel: 2 columns
--   Card size: 50px × 72px
--   Stacked controls
--   Smaller betting chips
+- Stats panel: 2 columns
+- Card size: 50px × 72px
+- Stacked controls
+- Smaller betting chips
 
 **Tiny Mobile (≤360px)**:
 
--   Card size: 45px × 65px
--   Minimal padding
--   Condensed stats
+- Card size: 45px × 65px
+- Minimal padding
+- Condensed stats
 
 ### Expandable Panels
 
@@ -1332,14 +1331,14 @@ function toggleNextCards() {
 
 ### Accessibility Features
 
--   High contrast text and backgrounds
--   Clear visual feedback for all actions
--   Disabled states for unavailable actions
--   Message system for game events
--   Keyboard-accessible controls
--   Color-coded statistics (green=positive, red=negative)
--   Interactive hint system for learning Basic Strategy
--   Modal dialogs with escape/click-outside to close
+- High contrast text and backgrounds
+- Clear visual feedback for all actions
+- Disabled states for unavailable actions
+- Message system for game events
+- Keyboard-accessible controls
+- Color-coded statistics (green=positive, red=negative)
+- Interactive hint system for learning Basic Strategy
+- Modal dialogs with escape/click-outside to close
 
 ---
 
@@ -1347,35 +1346,35 @@ function toggleNextCards() {
 
 **Frontend**:
 
--   **HTML5**: Semantic structure, modal dialogs
--   **CSS3**: Animations, gradients, flexbox, grid, keyframe animations
--   **Vanilla JavaScript ES6+**: No external dependencies
--   **Web Crypto API**: Cryptographically secure random number generation
+- **HTML5**: Semantic structure, modal dialogs
+- **CSS3**: Animations, gradients, flexbox, grid, keyframe animations
+- **Vanilla JavaScript ES6+**: No external dependencies
+- **Web Crypto API**: Cryptographically secure random number generation
 
 **Browser Compatibility**:
 
--   Modern browsers (Chrome, Firefox, Safari, Edge)
--   Requires ES6 support
--   CSS Grid and Flexbox support
--   CSS animations and transforms
--   Web Crypto API support (crypto.getRandomValues)
+- Modern browsers (Chrome, Firefox, Safari, Edge)
+- Requires ES6 support
+- CSS Grid and Flexbox support
+- CSS animations and transforms
+- Web Crypto API support (crypto.getRandomValues)
 
 **Performance**:
 
--   Zero network requests after initial load
--   Lightweight (~55KB total)
--   Smooth 60fps animations
--   Efficient DOM updates
--   Cryptographically secure randomness
+- Zero network requests after initial load
+- Lightweight (~55KB total)
+- Smooth 60fps animations
+- Efficient DOM updates
+- Cryptographically secure randomness
 
 ---
 
 ## File Structure
 
 ```
-cbj.html               - Game structure, UI elements, and hint modal
-cbj.css                - Styling, animations, responsive design
-cbj.js                 - Game logic, algorithms, event handlers
+cbj/index.html         - Game structure, UI elements, and hint modal
+cbj/cbj.css            - Styling, animations, responsive design
+cbj/cbj.js             - Game logic, algorithms, event handlers
 CBJ_README.md          - This documentation file
 BLACKJACK_STRATEGY.md  - Basic Strategy reference guide
 ```
